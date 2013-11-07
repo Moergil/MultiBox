@@ -5,8 +5,8 @@ import java.util.List;
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.HuhPlayer;
 import sk.hackcraft.multibox.model.Playlist;
-import sk.hackcraft.multibox.server.MockServerInterface;
-import sk.hackcraft.multibox.server.ServerInterface;
+import sk.hackcraft.multibox.net.MockServerInterface;
+import sk.hackcraft.multibox.net.ServerInterface;
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -34,45 +34,6 @@ public class PlayerActivity extends Activity
 		FragmentManager fragmentManager = getFragmentManager();
 		playerFragment = (PlayingInfobarFragment)fragmentManager.findFragmentById(R.id.fragment_player);
 		playlistFragment = (PlaylistFragment)fragmentManager.findFragmentById(R.id.fragment_playlist);
-		
-		serverInterface = new MockServerInterface();
-		
-		player = new HuhPlayer(serverInterface);
-		player.setEventListener(new HuhPlayer.EventListener()
-		{
-			@Override
-			public void onStateChange(boolean playing)
-			{
-				playerFragment.requestPlayingStateChange(playing);
-			}
-			
-			@Override
-			public void onNothingToPlay()
-			{
-				playerFragment.showNothing();
-			}
-			
-			@Override
-			public void onMultimediaUpdate(int playPosition)
-			{
-				//playerFragment.synchronizePlayingPosition(multimedia);
-			}
-			
-			@Override
-			public void onMultimediaChange(Multimedia newMultimedia, int playPosition)
-			{
-				playerFragment.showMultimedia(newMultimedia, playPosition);
-			}
-		});
-		
-		playlist = new Playlist(serverInterface, new Playlist.PlaylistListener()
-		{
-			@Override
-			public void onPlaylistReceived(List<Multimedia> playlist)
-			{
-				playlistFragment.setPlaylist(playlist);
-			}
-		});
 	}
 
 	@Override
@@ -86,18 +47,12 @@ public class PlayerActivity extends Activity
 	protected void onResume()
 	{
 		super.onResume();
-		
-		player.activate();
-		playlist.activate();
 	}
 	
 	@Override
 	protected void onPause()
 	{
 		super.onPause();
-		
-		player.deactivate();
-		playlist.deactivate();
 	}
 	
 	@Override

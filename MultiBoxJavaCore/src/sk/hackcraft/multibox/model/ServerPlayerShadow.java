@@ -3,11 +3,13 @@ package sk.hackcraft.multibox.model;
 import java.util.LinkedList;
 import java.util.List;
 
-import sk.hackcraft.multibox.server.ServerInterface;
+import sk.hackcraft.multibox.net.ServerInterface;
+import sk.hackcraft.util.MessageQueue;
 
 public class ServerPlayerShadow implements Player
 {
-	private ServerInterface serverInterface;
+	private final ServerInterface serverInterface;
+	private final MessageQueue messageQueue;
 	
 	private ServerListener serverListener;
 	
@@ -17,9 +19,10 @@ public class ServerPlayerShadow implements Player
 	
 	private List<PlayerEventListener> playerListeners;
 	
-	public ServerPlayerShadow(ServerInterface serverInterface)
+	public ServerPlayerShadow(ServerInterface serverInterface, MessageQueue messageQueue)
 	{
 		this.serverInterface = serverInterface;
+		this.messageQueue = messageQueue;
 		
 		this.playing = false;
 		this.activeMultimedia = null;
@@ -34,12 +37,7 @@ public class ServerPlayerShadow implements Player
 	public void init()
 	{
 		serverInterface.registerEventListener(serverListener);
-		
-		if (!serverInterface.isConnected())
-		{
-			serverInterface.connect();
-		}
-		
+
 		serverInterface.requestPlayerUpdate();
 	}
 
@@ -47,8 +45,6 @@ public class ServerPlayerShadow implements Player
 	public void close()
 	{
 		serverInterface.unregisterEventListener(serverListener);
-		
-		serverInterface.close();
 	}
 
 	@Override
@@ -118,40 +114,57 @@ public class ServerPlayerShadow implements Player
 		}
 
 		@Override
-		public void onPlayerUpdateReceived(Multimedia multimedia, int playbackPosition, boolean playing)
+		public void onPlayerUpdateReceived(final Multimedia multimedia, final int playbackPosition, final boolean playing)
 		{
 			if (multimedia == null)
 			{
 				if (activeMultimedia != null)
 				{
 					activeMultimedia = null;
-					playing = false;
 					
-					for (Player.PlayerEventListener listener : playerListeners)
+					for (final Player.PlayerEventListener listener : playerListeners)
 					{
-						listener.onMultimediaChanged(null);
+						messageQueue.post(new Runnable()
+						{
+							@Override
+							public void run()
+							{
+								listener.onMultimediaChanged(null);
+							}
+						});
 					}
 				}
 			}
 			else
 			{
-				boolean newMultimedia = false;
+				final boolean newMultimedia;
 				if (activeMultimedia == null || !activeMultimedia.equals(multimedia))
 				{
 					newMultimedia = true;
 					ServerPlayerShadow.this.activeMultimedia = multimedia;
 				}
+				else
+				{
+					newMultimedia = false;
+				}
 	
 				ServerPlayerShadow.this.playbackPosition = playbackPosition;
 				
-				for (Player.PlayerEventListener listener : playerListeners)
+				for (final Player.PlayerEventListener listener : playerListeners)
 				{
-					if (newMultimedia)
+					messageQueue.post(new Runnable()
 					{
-						listener.onMultimediaChanged(multimedia);
-					}
-					
-					listener.onPlaybackPositionChanged(playbackPosition);
+						@Override
+						public void run()
+						{
+							if (newMultimedia)
+							{
+								listener.onMultimediaChanged(multimedia);
+							}
+							
+							listener.onPlaybackPositionChanged(playbackPosition);
+						}
+					});
 				}
 			}
 			
@@ -161,11 +174,24 @@ public class ServerPlayerShadow implements Player
 			
 			if (stateChanged)
 			{
-				for (Player.PlayerEventListener listener : playerListeners)
+				for (final Player.PlayerEventListener listener : playerListeners)
 				{
-					listener.onPlayingStateChanged(playing);
+					messageQueue.post(new Runnable()
+					{
+						
+						@Override
+						public void run()
+						{
+							listener.onPlayingStateChanged(playing);
+						}
+					});
 				}
 			}
+		}
+
+		@Override
+		public void onPlaylistReceived(List<Multimedia> playlist)
+		{
 		}
 	}
 }

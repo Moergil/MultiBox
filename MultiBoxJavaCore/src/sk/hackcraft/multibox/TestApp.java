@@ -5,7 +5,7 @@ import java.util.Scanner;
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.ServerPlayerShadow;
-import sk.hackcraft.multibox.server.MockServerInterface;
+import sk.hackcraft.multibox.net.MockServerInterface;
 import sk.hackcraft.util.ConsoleLog;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.ManualEventLoop;
@@ -28,7 +28,7 @@ public class TestApp
 			@Override
 			public void run()
 			{
-				Player player = new ServerPlayerShadow(server);
+				Player player = new ServerPlayerShadow(server, eventLoop);
 				player.registerPlayerEventListener(new Player.PlayerEventListener()
 				{
 					@Override

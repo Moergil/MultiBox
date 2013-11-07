@@ -2,6 +2,6 @@ package sk.hackcraft.netinterface;
 
 public interface Message
 {
-	public int getType();
+	public MessageType getType();
 	public byte[] getContent();
 }

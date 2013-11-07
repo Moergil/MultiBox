@@ -94,7 +94,8 @@ public abstract class SocketInterface
 				{
 					Message message = waitingMessages.take();
 					
-					output.writeInt(message.getType());
+					int typeId = message.getType().toTypeId();
+					output.writeInt(typeId);
 					
 					byte content[] = message.getContent();
 					

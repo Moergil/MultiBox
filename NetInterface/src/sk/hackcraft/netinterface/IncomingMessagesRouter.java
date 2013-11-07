@@ -12,7 +12,7 @@ public class IncomingMessagesRouter
 		receivers = new HashMap<MessageType, MessageReceiver>();
 	}
 	
-	public synchronized void addReceiver(MessageType type, MessageReceiver receiver)
+	public synchronized void setReceiver(MessageType type, MessageReceiver receiver)
 	{
 		receivers.put(type, receiver);
 	}

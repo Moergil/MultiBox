@@ -1,4 +1,4 @@
-package sk.hackcraft.multibox.server;
+package sk.hackcraft.multibox.net;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -28,22 +28,6 @@ public class MockServerInterface implements ServerInterface
 		
 		this.serverListeners = new LinkedList<ServerInterface.ServerInterfaceEventListener>();
 	}
-	
-	@Override
-	public void connect()
-	{
-	}
-
-	@Override
-	public void close()
-	{
-	}
-
-	@Override
-	public boolean isConnected()
-	{
-		return true;
-	}
 
 	@Override
 	public void registerEventListener(ServerInterfaceEventListener listener)
@@ -56,11 +40,6 @@ public class MockServerInterface implements ServerInterface
 	{
 		serverListeners.remove(listener);
 	}
-
-	@Override
-	public void authentificate(String id, String password)
-	{
-	}
 	
 	public Controller getController()
 	{
@@ -69,25 +48,25 @@ public class MockServerInterface implements ServerInterface
 	
 	private void broadcastPlayerUpdate()
 	{
+		final Multimedia multimedia;
+		final int playbackPosition;
+		final boolean playing;
+		
+		if (playlist.isEmpty())
+		{
+			multimedia = null;
+			playbackPosition = 0;
+			playing = false;
+		}
+		else
+		{
+			multimedia = playlist.get(0);
+			playbackPosition = MockServerInterface.this.playbackPosition;
+			playing = true;
+		}
+		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			final Multimedia multimedia;
-			final int playbackPosition;
-			final boolean playing;
-			
-			if (playlist.isEmpty())
-			{
-				multimedia = null;
-				playbackPosition = 0;
-				playing = false;
-			}
-			else
-			{
-				multimedia = playlist.get(0);
-				playbackPosition = MockServerInterface.this.playbackPosition;
-				playing = true;
-			}
-
 			messageQueue.post(new Runnable()
 			{
 				@Override
@@ -98,11 +77,34 @@ public class MockServerInterface implements ServerInterface
 			});
 		}
 	}
+	
+	private void broadcastPlaylistUpdate()
+	{
+		final List<Multimedia> playlist = new LinkedList<Multimedia>(this.playlist);
+		
+		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
+		{
+			messageQueue.post(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					listener.onPlaylistReceived(playlist);
+				}
+			});
+		}
+	}
 
 	@Override
 	public void requestPlayerUpdate()
 	{
 		broadcastPlayerUpdate();
+	}
+	
+	@Override
+	public void requestPlaylistUpdate()
+	{
+		broadcastPlaylistUpdate();
 	}
 	
 	public class Controller

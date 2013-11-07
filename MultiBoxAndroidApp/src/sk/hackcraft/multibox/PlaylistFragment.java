@@ -4,8 +4,9 @@ import java.util.List;
 
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.HuhPlayer;
-import sk.hackcraft.multibox.server.ServerInterface;
-import sk.hackcraft.multibox.server.ServerInterfaceService;
+import sk.hackcraft.multibox.model.Playlist;
+import sk.hackcraft.multibox.net.ServerInterface;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -24,6 +25,22 @@ public class PlaylistFragment extends Fragment
 	private PlaylistAdapter playlistAdapter;
 	
 	private ListView playlistListView;
+	
+	private Playlist playlist;
+	private PlaylistListener playlistListener;
+	
+	@Override
+	public void onAttach(Activity activity)
+	{
+		super.onAttach(activity);
+		
+		MultiBoxApplication application = (MultiBoxApplication)activity.getApplication();
+		
+		playlistListener = new PlaylistListener();
+		
+		playlist = application.createPlaylist();
+		playlist.registerListener(playlistListener);
+	}
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -62,18 +79,24 @@ public class PlaylistFragment extends Fragment
 	public void onResume()
 	{
 		super.onResume();
+		
+		playlist.init();
 	}
 	
 	@Override
 	public void onPause()
 	{
-		// TODO Auto-generated method stub
 		super.onPause();
+		
+		playlist.close();
 	}
 	
-	public void setPlaying(boolean playing)
+	@Override
+	public void onDetach()
 	{
-
+		super.onDetach();
+		
+		playlist.unregisterListener(playlistListener);
 	}
 	
 	public void setPlaylist(List<Multimedia> playlist)
@@ -112,6 +135,15 @@ public class PlaylistFragment extends Fragment
 			multimediaNameView.setText(name);
 			
 			return multimediaItemView;
+		}
+	}
+	
+	private class PlaylistListener implements Playlist.PlaylistEventListener
+	{
+		@Override
+		public void onPlaylistChanged(List<Multimedia> newPlaylist)
+		{
+			setPlaylist(newPlaylist);
 		}
 	}
 }

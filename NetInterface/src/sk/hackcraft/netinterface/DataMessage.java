@@ -7,12 +7,12 @@ import java.io.IOException;
 
 public abstract class DataMessage implements Message
 {
-	private final MessageType messageName;
+	private final MessageType messageType;
 	private final byte content[];
 	
-	public DataMessage(MessageType messageName)
+	public DataMessage(MessageType messageType)
 	{
-		this.messageName = messageName;
+		this.messageType = messageType;
 		
 		ByteArrayOutputStream byteOutputStream = new ByteArrayOutputStream();
 		DataOutput output = new DataOutputStream(byteOutputStream);
@@ -30,9 +30,9 @@ public abstract class DataMessage implements Message
 	}
 	
 	@Override
-	public int getType()
+	public MessageType getType()
 	{
-		return messageName.toInt();
+		return messageType;
 	}
 	
 	@Override
@@ -46,6 +46,6 @@ public abstract class DataMessage implements Message
 	@Override
 	public String toString()
 	{
-		return messageName + " message";
+		return messageType + " message";
 	}
 }

@@ -3,7 +3,7 @@ package sk.hackcraft.multibox.model;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import sk.hackcraft.multibox.server.ServerInterface;
+import sk.hackcraft.multibox.net.ServerInterface;
 
 public class HuhPlayer
 {

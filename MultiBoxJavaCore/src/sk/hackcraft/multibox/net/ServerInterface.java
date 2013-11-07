@@ -1,23 +1,19 @@
-package sk.hackcraft.multibox.server;
+package sk.hackcraft.multibox.net;
 
 import java.io.Closeable;
 import java.util.List;
 
 import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.netinterface.MessageReceiver;
+import sk.hackcraft.netinterface.MessageType;
 
 public interface ServerInterface
 {
-	public void connect();
-	public void close();
-	
-	public boolean isConnected();
-	
 	public void registerEventListener(ServerInterfaceEventListener listener);
 	public void unregisterEventListener(ServerInterfaceEventListener listener);
 	
-	public void authentificate(String id, String password);
-	
 	public void requestPlayerUpdate();
+	public void requestPlaylistUpdate();
 	
 	public interface ServerInterfaceEventListener
 	{
@@ -26,5 +22,6 @@ public interface ServerInterface
 		public void onAuthentificationResponse(boolean succesfull);
 		
 		public void onPlayerUpdateReceived(Multimedia multimedia, int playbackPosition, boolean playing);
+		public void onPlaylistReceived(List<Multimedia> playlist);
 	}
 }
