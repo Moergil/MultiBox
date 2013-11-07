@@ -5,6 +5,7 @@ import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.net.Socket;
+import java.util.BitSet;
 
 public class TestNetwork
 {
@@ -18,19 +19,27 @@ public class TestNetwork
 			try
 			{
 				Socket socket = new Socket("192.168.1.12", 13110);
+				//Socket socket = new Socket("localhost", 13110);
 				socket.setSoTimeout(10000);
+				socket.setTcpNoDelay(true);
 				
 				DataOutput output = new DataOutputStream(socket.getOutputStream());
 				
-				System.out.println("Sended 42");
-				output.writeInt(41);
+				byte[] bytes = new byte[4];
+				bytes[3] = 32;
+				
+				System.out.println("Sended " + bytes.length + " bytes");
+				//output.write(bytes);
+				output.writeInt(30);
+				
+				socket.getOutputStream().flush();
 				
 				/*DataInput input = new DataInputStream(socket.getInputStream());
 				
 				System.out.print("Received: ");
 				System.out.println(input.readInt());*/
 				
-				//socket.close();
+				socket.close();
 			}
 			catch (Exception e)
 			{
