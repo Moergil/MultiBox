@@ -13,11 +13,11 @@ import sk.hackcraft.netinterface.DataMessageReceiver;
 import sk.hackcraft.netinterface.IncomingMessagesRouter;
 import sk.hackcraft.netinterface.MessageReceiver;
 import sk.hackcraft.netinterface.MessageType;
-import sk.hackcraft.netinterface.SocketInterface;
+import sk.hackcraft.netinterface.OldAsynchronousSocketInterface;
 import sk.hackcraft.util.MessageQueue;
 import sk.hackcraft.multibox.model.Multimedia;
 
-public class SocketServerInterface implements ServerInterface
+public class SocketServerLazyInterface implements ServerInterface
 {
 	private final MessageQueue messageQueue;
 	private final String serverAddress;
@@ -28,9 +28,9 @@ public class SocketServerInterface implements ServerInterface
 	
 	private List<ServerInterfaceEventListener> serverListeners;
 	
-	private SocketInterface socketInterface;
+	private OldAsynchronousSocketInterface socketInterface;
 	
-	public SocketServerInterface(MessageQueue messageQueue, String serverAddress, String username, String password)
+	public SocketServerLazyInterface(MessageQueue messageQueue, String serverAddress, String username, String password)
 	{
 		this.messageQueue = messageQueue;
 		this.serverAddress = serverAddress;
