@@ -30,7 +30,7 @@ public class TestNetwork
 				DataOutput outputData = new DataOutputStream(socket.getOutputStream());
 				
 				String hello = "hello!";
-				
+
 				byte helloBytes[] = hello.getBytes("UTF-8");
 				
 				outputData.writeInt(1);
