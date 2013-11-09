@@ -32,17 +32,18 @@ public class TestNetwork
 				String hello = "hello!";
 
 				byte helloBytes[] = hello.getBytes("UTF-8");
-				
-				outputData.writeInt(1);
-				outputData.writeInt(helloBytes.length);
-				
-				ByteArrayOutputStream contentStream = new ByteArrayOutputStream();
-				DataOutput contentDataOutput = new DataOutputStream(contentStream);
+
+				ByteArrayOutputStream contentByteStream = new ByteArrayOutputStream();
+				DataOutput contentDataOutput = new DataOutputStream(contentByteStream);
 				
 				contentDataOutput.writeInt(helloBytes.length);
 				contentDataOutput.write(helloBytes);
 				
-				outputData.write(contentStream.toByteArray());
+				byte contentBytes[] = contentByteStream.toByteArray();
+				
+				outputData.writeInt(1);
+				outputData.writeInt(contentBytes.length);
+				outputData.write(contentBytes);
 				
 				socket.close();
 			}
