@@ -11,14 +11,14 @@ import java.util.Map;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public abstract class SocketInterface
+public abstract class OldAsynchronousSocketInterface
 {	
 	private final Socket socket;
 	
 	protected final SendWorker sendWorker;
 	protected final ReceiveWorker receiveWorker;
 	
-	public SocketInterface(Socket socket, IncomingMessagesRouter incomingMessagesRouter) throws IOException
+	public OldAsynchronousSocketInterface(Socket socket, IncomingMessagesRouter incomingMessagesRouter) throws IOException
 	{
 		this.socket = socket;
 		
