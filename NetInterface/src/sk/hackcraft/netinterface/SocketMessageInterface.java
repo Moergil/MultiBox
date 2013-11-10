@@ -67,4 +67,10 @@ public class SocketMessageInterface implements MessageInterface
 			}
 		};
 	}
+	
+	@Override
+	public void close() throws IOException
+	{
+		socket.close();
+	}
 }

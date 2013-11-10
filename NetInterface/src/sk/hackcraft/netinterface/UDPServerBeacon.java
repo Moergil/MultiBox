@@ -39,7 +39,7 @@ public class UDPServerBeacon implements ServerBeacon
 		started = true;
 		
 		broadcastWorker = new BroadcastWorker();
-		broadcastWorkerThread = new Thread(broadcastWorker);
+		//broadcastWorkerThread = new Thread(broadcastWorker);
 		broadcastWorkerThread.start();
 	}
 
@@ -51,17 +51,17 @@ public class UDPServerBeacon implements ServerBeacon
 			throw new RuntimeException("Server beacon is not running.");
 		}
 		
-		broadcastWorker.stop();
+		//broadcastWorker.stop();
 		
 		started = false;
 	}
 	
-	private class BroadcastWorker extends StoppableRunnable
+	private class BroadcastWorker implements Runnable
 	{
 		@Override
 		public void run()
 		{
-			while (!isStopped())
+			/*while (!isStopped())
 			{
 				DatagramSocket socket = null;
 				
@@ -93,7 +93,7 @@ public class UDPServerBeacon implements ServerBeacon
 						socket.close();
 					}
 				}
-			}
+			}*/
 		}
 		
 		private List<InetAddress> getBroadcastAddresses() throws IOException

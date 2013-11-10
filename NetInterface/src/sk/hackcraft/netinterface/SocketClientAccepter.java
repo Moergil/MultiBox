@@ -54,7 +54,7 @@ public class SocketClientAccepter<I> implements ClientAccepter<I>
 			throw new RuntimeException("Client accepter was not running.");
 		}
 		
-		acceptingWorker.stop();
+		//acceptingWorker.stop();
 		
 		acceptingWorker = null;
 		acceptingWorkerThread = null;
@@ -84,12 +84,12 @@ public class SocketClientAccepter<I> implements ClientAccepter<I>
 		public I create(Socket socket) throws IOException;
 	}
 	
-	private class AcceptingWorker extends StoppableRunnable
+	private class AcceptingWorker implements Runnable
 	{
 		@Override
 		public void run()
 		{
-			while (!isStopped())
+			/*while (!isStopped())
 			{
 				ServerSocket serverSocket = null;
 				
@@ -120,7 +120,7 @@ public class SocketClientAccepter<I> implements ClientAccepter<I>
 						}
 					}
 				}
-			}
+			}*/
 		}
 	}
 }

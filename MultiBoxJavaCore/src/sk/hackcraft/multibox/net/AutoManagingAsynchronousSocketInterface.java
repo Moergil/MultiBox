@@ -3,24 +3,30 @@ package sk.hackcraft.multibox.net;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
-import sk.hackcraft.netinterface.AsynchronousSocketInterface;
+import sk.hackcraft.netinterface.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.IncomingMessagesRouter;
 import sk.hackcraft.netinterface.Message;
 import sk.hackcraft.netinterface.MessageInterface;
+import sk.hackcraft.netinterface.MessageInterfaceFactory;
 import sk.hackcraft.netinterface.MessageReceiver;
 import sk.hackcraft.netinterface.MessageType;
 import sk.hackcraft.netinterface.SocketMessageInterface;
-import sk.hackcraft.netinterface.AsynchronousSocketInterface.MessageSendListener;
+import sk.hackcraft.netinterface.AsynchronousMessageInterface.MessageSendListener;
+import sk.hackcraft.util.Log;
 import sk.hackcraft.util.MessageQueue;
 
-public class AutoManagingAsynchronousSocketInterface implements AsynchronousSocketInterface
+public class AutoManagingAsynchronousSocketInterface implements AsynchronousMessageInterface
 {
-	private AsynchronousSocketInterface.SeriousErrorListener seriousErrorListener;
+	private AsynchronousMessageInterface.SeriousErrorListener seriousErrorListener;
+
+	private final MessageInterfaceFactory messageInterfaceFactory;
 	
-	private final String address;
 	private final MessageQueue messageQueue;
+	private final Log log;
 	
 	private BlockingQueue<MessageEntry> pendingMessages;
 	private IncomingMessagesRouter incomingMessagesRouter;
@@ -31,21 +37,26 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousSock
 	private Thread receiveWorkerThread;
 	private Thread usageGuarderThread;
 	
+	private final Object networkingStateChangeLock;
+	
 	private boolean active;
-	private boolean cleaning;
 	
 	private volatile long lastNetworkActivity;
-	private static final int NETWORK_INACTIVITY_TIMEOUT = 10000;
+	private static final long NETWORK_INACTIVITY_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
 	
-	public AutoManagingAsynchronousSocketInterface(String address, MessageQueue messageQueue)
+	public AutoManagingAsynchronousSocketInterface(MessageInterfaceFactory messageInterfaceFactory, MessageQueue messageQueue, Log log)
 	{
-		this.address = address;
-		this.messageQueue = messageQueue;
+		this.messageInterfaceFactory = messageInterfaceFactory;
 		
+		this.messageQueue = messageQueue;
+		this.log = log;
+		
+		this.pendingMessages = new LinkedBlockingQueue<MessageEntry>();
 		this.incomingMessagesRouter = new IncomingMessagesRouter();
 		
-		this.active = true;
-		this.cleaning = false;
+		this.active = false;
+		
+		networkingStateChangeLock = new Object();
 	}
 	
 	@Override
@@ -75,82 +86,125 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousSock
 		incomingMessagesRouter.setReceiver(messageType, receiver);
 	}
 	
-	private boolean isNetworkingActive()
+	private void updateLastNetworkActivityTimeStamp()
 	{
-		// TODO synchronize
-		return messageInterface != null;
-	}
-	
-	private boolean isNetworkingSpawning()
-	{
-		return true; // TODO added synchronized guard variables
-	}
-
-	private synchronized void onNewPendingMessage()
-	{
-		if (!active)
+		long actualTime = System.currentTimeMillis();
+		
+		if (actualTime > lastNetworkActivity)
 		{
-			spawnNetworking();
-			active = false;
+			lastNetworkActivity = actualTime;
 		}
 	}
-	
-	private void spawnNetworking()
+
+	private void onNewPendingMessage()
 	{
-		Runnable initCode = new Runnable()
+		log.print("New pending message.");
+		
+		updateLastNetworkActivityTimeStamp();
+		
+		checkAndSpawnNetworking();
+	}
+	
+	private synchronized void checkAndSpawnNetworking()
+	{
+		if (active)
+		{
+			return;
+		}
+		
+		log.print("Starting networking...");
+		
+		active = true;
+		
+		Runnable networkingInitCode = new Runnable()
 		{
 			@Override
 			public void run()
 			{
-				try
+				synchronized (networkingStateChangeLock)
 				{
-					lastNetworkActivity = System.currentTimeMillis();
-					
-					Socket socket = new Socket(address, 13110);
-					messageInterface = new SocketMessageInterface(socket);
-					
-					usageGuarderThread = new Thread(new UsageGuarder());
-					usageGuarderThread.start();
-					
-					senderWorkerThread = new Thread(new SenderWorker());
-					senderWorkerThread.start();
-					
-					receiveWorkerThread = new Thread(new ReceiveWorker());
-					receiveWorkerThread.start();
-				}
-				catch (Exception e)
-				{
-					if (seriousErrorListener != null)
+					try
 					{
-						seriousErrorListener.onSeriousError();
+						lastNetworkActivity = System.currentTimeMillis();
+
+						messageInterface = messageInterfaceFactory.create();
+						
+						usageGuarderThread = new Thread(new UsageGuarder());
+						usageGuarderThread.start();
+						
+						senderWorkerThread = new Thread(new SenderWorker());
+						senderWorkerThread.start();
+						
+						receiveWorkerThread = new Thread(new ReceiveWorker());
+						receiveWorkerThread.start();
+						
+						log.print("Networking was started.");
+					}
+					catch (Exception e)
+					{
+						if (seriousErrorListener != null)
+						{
+							seriousErrorListener.onSeriousError(e.getMessage());
+						}
 					}
 				}
 			}
 		};
 		
-		new Thread(initCode).start();
+		new Thread(networkingInitCode).start();
 	}
 	
-	private void cleanNetworking()
+	private synchronized void cleanNetworking()
 	{
-		synchronized (this)
+		if (!active)
 		{
-			cleaning = true;
+			return;
 		}
 		
-		senderWorkerThread.interrupt();
-		receiveWorkerThread.interrupt();
+		log.print("Stopping networking...");
 		
-		senderWorkerThread = null;
-		receiveWorkerThread = null;
-		usageGuarderThread = null;
+		active = false;
 		
-		synchronized (AutoManagingAsynchronousSocketInterface.this)
+		Runnable networkingCleanupCode = new Runnable()
 		{
-			notifyAll();
-			cleaning = false;
-			active = true;
-		}
+			@Override
+			public void run()
+			{
+				synchronized (networkingStateChangeLock)
+				{
+					senderWorkerThread.interrupt();
+					receiveWorkerThread.interrupt();
+					usageGuarderThread.interrupt();
+					
+					try
+					{
+						messageInterface.close();
+					}
+					catch (IOException e)
+					{
+						throw new RuntimeException(e);
+					}
+					
+					try
+					{
+						senderWorkerThread.join();
+						receiveWorkerThread.join();
+					}
+					catch (InterruptedException e)
+					{
+						throw new RuntimeException(e);
+					}
+					
+					senderWorkerThread = null;
+					receiveWorkerThread = null;
+					usageGuarderThread = null;
+					
+					log.print("Networking was stopped.");
+				}
+			}
+		};
+		
+		new Thread(networkingCleanupCode).start();
 	}
 	
 	private class MessageEntry
@@ -200,6 +254,8 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousSock
 				{
 					messageInterface.sendMessage(message);
 					sendingResult = true;
+					
+					log.print("Message sended.");
 				}
 				catch (IOException e)
 				{
@@ -220,6 +276,12 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousSock
 						}
 					});
 				}
+				
+				if (!sendingResult)
+				{
+					cleanNetworking();
+					return;
+				}
 			}
 		};
 	}
@@ -236,10 +298,24 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousSock
 				try
 				{
 					message = messageInterface.waitForMessage();
+					
+					updateLastNetworkActivityTimeStamp();
+					
+					MessageType type = message.getType();
+					byte content[] = message.getContent();
+					
+					log.print("Message received.");
+					
+					incomingMessagesRouter.receiveMessage(type, content);
 				}
 				catch (IOException e)
 				{
+					if (!Thread.currentThread().isInterrupted())
+					{
+						cleanNetworking();
+					}
 					
+					return;
 				}
 			}
 		}
@@ -254,15 +330,16 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousSock
 			{
 				if (lastNetworkActivity + NETWORK_INACTIVITY_TIMEOUT < System.currentTimeMillis())
 				{
-					cleanNetworking();
+					log.print("Network is inactive for long time.");
 					
+					cleanNetworking();
 					return;
 				}
 				else
 				{
 					try
 					{
-						wait(TimeUnit.SECONDS.toMillis(1));
+						Thread.sleep(TimeUnit.SECONDS.toMillis(1));
 					}
 					catch (InterruptedException e)
 					{

@@ -6,7 +6,7 @@ import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.ServerPlayerShadow;
 import sk.hackcraft.multibox.net.MockServerInterface;
-import sk.hackcraft.util.ConsoleLog;
+import sk.hackcraft.util.PrintStreamLog;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.ManualEventLoop;
 import sk.hackcraft.util.MessageQueue;
@@ -18,7 +18,7 @@ public class TestApp
 	{
 		System.out.println("Go!");
 		
-		final Log log = new ConsoleLog();
+		final Log log = new PrintStreamLog("APP", System.out);
 		final ManualEventLoop eventLoop = new ManualEventLoop();
 		final MockServerInterface server = new MockServerInterface(eventLoop);
 		MockServerInterface.Controller controller = server.getController();

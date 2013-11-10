@@ -56,7 +56,7 @@ public class UDPServerFinder implements ServerFinder
 		
 		started = false;
 		
-		listenWorker.stop();
+		//listenWorker.stop();
 	}
 	
 	private void onBeaconReceived(final InetAddress address, final String name)
@@ -71,12 +71,12 @@ public class UDPServerFinder implements ServerFinder
 		});
 	}
 	
-	private class ListenWorker extends StoppableRunnable
+	private class ListenWorker implements Runnable
 	{
 		@Override
 		public void run()
 		{			
-			while (!isStopped())
+			/*while (!isStopped())
 			{
 				DatagramSocket socket = null;
 				try
@@ -113,7 +113,7 @@ public class UDPServerFinder implements ServerFinder
 						socket.close();
 					}
 				}
-			}
+			}*/
 		}
 	};
 }

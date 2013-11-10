@@ -11,25 +11,25 @@ import java.util.Map;
  */
 public class IncomingMessagesRouter
 {
-	private final Map<MessageType, MessageReceiver> receivers;
+	private final Map<Integer, MessageReceiver> receivers;
 	
 	public IncomingMessagesRouter()
 	{
-		receivers = new HashMap<MessageType, MessageReceiver>();
+		receivers = new HashMap<Integer, MessageReceiver>();
 	}
 	
 	public synchronized void setReceiver(MessageType type, MessageReceiver receiver)
 	{
-		receivers.put(type, receiver);
+		receivers.put(type.toTypeId(), receiver);
 	}
 	
-	public void receiveMessage(int type, byte content[])
+	public void receiveMessage(MessageType type, byte content[])
 	{
 		MessageReceiver receiver;
 		
 		synchronized (this)
 		{
-			receiver = receivers.get(type);
+			receiver = receivers.get(type.toTypeId());
 		}
 		
 		receiver.receive(content);

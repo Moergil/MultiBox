@@ -1,7 +1,7 @@
 package sk.hackcraft.netinterface;
 
 
-public interface AsynchronousSocketInterface
+public interface AsynchronousMessageInterface
 {
 	public void setSeriousErrorListener(SeriousErrorListener listener);
 	
@@ -17,6 +17,6 @@ public interface AsynchronousSocketInterface
 	
 	public interface SeriousErrorListener
 	{
-		public void onSeriousError();
+		public void onSeriousError(String errorDescription);
 	}
 }
