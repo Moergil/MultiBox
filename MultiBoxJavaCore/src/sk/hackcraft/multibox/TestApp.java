@@ -1,16 +1,12 @@
 package sk.hackcraft.multibox;
 
-import java.util.Scanner;
-
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.ServerPlayerShadow;
 import sk.hackcraft.multibox.net.MockServerInterface;
-import sk.hackcraft.util.PrintStreamLog;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.ManualEventLoop;
-import sk.hackcraft.util.MessageQueue;
-import sk.hackcraft.util.SimpleEventLoop;
+import sk.hackcraft.util.PrintStreamLog;
 
 public class TestApp
 {
@@ -55,13 +51,13 @@ public class TestApp
 		});
 		eventLoop.processAllMessages();
 		
-		controller.addSong("Song 1", 10);
+		controller.addSongToPlaylist("Song 1", 10);
 		eventLoop.processAllMessages();
 
-		controller.addSong("Song 2", 8);
+		controller.addSongToPlaylist("Song 2", 8);
 		eventLoop.processAllMessages();
 
-		controller.addSong("Song 3", 11);
+		controller.addSongToPlaylist("Song 3", 11);
 		eventLoop.processAllMessages();
 
 		controller.setPlaybackPosition(4);
@@ -85,10 +81,10 @@ public class TestApp
 		controller.finishSong();
 		eventLoop.processAllMessages();
 
-		controller.addRandomSong();
+		controller.addRandomSongToPlaylist();
 		eventLoop.processAllMessages();
 
-		controller.addRandomSong();
+		controller.addRandomSongToPlaylist();
 		eventLoop.processAllMessages();
 
 		controller.setPlaying(true);

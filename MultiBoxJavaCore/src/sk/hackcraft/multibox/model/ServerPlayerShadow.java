@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sk.hackcraft.multibox.net.ServerInterface;
+import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.MessageQueue;
 
 public class ServerPlayerShadow implements Player
@@ -37,7 +38,6 @@ public class ServerPlayerShadow implements Player
 	public void init()
 	{
 		serverInterface.registerEventListener(serverListener);
-
 		serverInterface.requestPlayerUpdate();
 	}
 
@@ -101,18 +101,8 @@ public class ServerPlayerShadow implements Player
 		playerListeners.remove(listener);
 	}
 	
-	private class ServerListener implements ServerInterface.ServerInterfaceEventListener
+	private class ServerListener extends ServerInterfaceEventAdapter
 	{
-		@Override
-		public void onDisconnect()
-		{
-		}
-
-		@Override
-		public void onAuthentificationResponse(boolean succesfull)
-		{
-		}
-
 		@Override
 		public void onPlayerUpdateReceived(final Multimedia multimedia, final int playbackPosition, final boolean playing)
 		{
@@ -187,11 +177,6 @@ public class ServerPlayerShadow implements Player
 					});
 				}
 			}
-		}
-
-		@Override
-		public void onPlaylistReceived(List<Multimedia> playlist)
-		{
 		}
 	}
 }

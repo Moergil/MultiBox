@@ -1,12 +1,8 @@
 package sk.hackcraft.multibox;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
-import java.net.ServerSocket;
-import java.net.Socket;
 
 import sk.hackcraft.multibox.net.AutoManagingAsynchronousSocketInterface;
-import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.netinterface.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.LoopbackMessageInterface;
 import sk.hackcraft.netinterface.Message;
@@ -14,10 +10,9 @@ import sk.hackcraft.netinterface.MessageInterface;
 import sk.hackcraft.netinterface.MessageInterfaceFactory;
 import sk.hackcraft.netinterface.MessageReceiver;
 import sk.hackcraft.netinterface.MessageType;
-import sk.hackcraft.netinterface.SocketMessageInterface;
-import sk.hackcraft.util.PrintStreamLog;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.ManualEventLoop;
+import sk.hackcraft.util.PrintStreamLog;
 
 public class TestAMANI
 {

@@ -7,10 +7,10 @@
 
 	<fragment
     	android:id="@+id/fragment_player"
-    	android:name="sk.hackcraft.multibox.PlayingInfobarFragment"
+    	android:name="sk.hackcraft.multibox.PlayerInfoFragment"
     	android:layout_width="match_parent"
     	android:layout_height="wrap_content"
-    	tools:layout="@layout/fragment_playing_infobar" />
+    	tools:layout="@layout/fragment_player_info" />
 	
     <fragment
     	android:id="@+id/fragment_playlist"

@@ -1,9 +1,6 @@
 package sk.hackcraft.multibox.model;
 
-import java.util.LinkedList;
 import java.util.List;
-
-import sk.hackcraft.multibox.net.ServerInterface;
 
 public interface Playlist
 {

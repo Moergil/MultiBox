@@ -3,10 +3,7 @@ package sk.hackcraft.multibox;
 import java.util.List;
 
 import sk.hackcraft.multibox.model.Multimedia;
-import sk.hackcraft.multibox.model.HuhPlayer;
 import sk.hackcraft.multibox.model.Playlist;
-import sk.hackcraft.multibox.net.ServerInterface;
-import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -14,7 +11,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.AdapterViewFlipper;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,28 +20,23 @@ public class PlaylistFragment extends Fragment
 {	
 	private PlaylistAdapter playlistAdapter;
 	
-	private ListView playlistListView;
+	private ListView playlistView;
 	
 	private Playlist playlist;
 	private PlaylistListener playlistListener;
-	
-	@Override
-	public void onAttach(Activity activity)
-	{
-		super.onAttach(activity);
-		
-		MultiBoxApplication application = (MultiBoxApplication)activity.getApplication();
-		
-		playlistListener = new PlaylistListener();
-		
-		playlist = application.createPlaylist();
-		playlist.registerListener(playlistListener);
-	}
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		playlistAdapter = new PlaylistAdapter(getActivity());
+
+		PlaylistProvider playlistProvider = (PlaylistProvider)getActivity();
+		playlist = playlistProvider.providePlaylist();
+		
+		playlistListener = new PlaylistListener();
+		playlist.registerListener(playlistListener);
 	}
 	
 	@Override
@@ -53,7 +44,7 @@ public class PlaylistFragment extends Fragment
 	{
 		View layout = inflater.inflate(R.layout.fragment_playlist, container, false);
 		
-		playlistListView = (ListView)layout.findViewById(R.id.playlist);
+		playlistView = (ListView)layout.findViewById(R.id.playlist);
 		
 		return layout;
 	}
@@ -63,9 +54,8 @@ public class PlaylistFragment extends Fragment
 	{
 		super.onActivityCreated(savedInstanceState);
 
-		playlistAdapter = new PlaylistAdapter(getActivity());
-		playlistListView.setAdapter(playlistAdapter);
-		playlistListView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+		playlistView.setAdapter(playlistAdapter);
+		playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener()
 		{
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
@@ -145,5 +135,10 @@ public class PlaylistFragment extends Fragment
 		{
 			setPlaylist(newPlaylist);
 		}
+	}
+	
+	public interface PlaylistProvider
+	{
+		public Playlist providePlaylist();
 	}
 }

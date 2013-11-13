@@ -1,10 +1,17 @@
 package sk.hackcraft.multibox.net;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
+import sk.hackcraft.multibox.model.GenericLibraryItem;
+import sk.hackcraft.multibox.model.LibraryItem;
+import sk.hackcraft.multibox.model.LibraryItemType;
 import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.util.MessageQueue;
 
 public class MockServerInterface implements ServerInterface
@@ -16,6 +23,8 @@ public class MockServerInterface implements ServerInterface
 	private List<Multimedia> playlist;
 	private int playbackPosition;
 	
+	private Map<Long, LibraryItem> library;
+	
 	private List<ServerInterface.ServerInterfaceEventListener> serverListeners;
 	
 	public MockServerInterface(MessageQueue messageQueue)
@@ -26,7 +35,63 @@ public class MockServerInterface implements ServerInterface
 		this.playlist = new LinkedList<Multimedia>();
 		this.playbackPosition = 0;
 		
+		initLibrary();
+		
 		this.serverListeners = new LinkedList<ServerInterface.ServerInterfaceEventListener>();
+	}
+	
+	private void initLibrary()
+	{
+		library = new HashMap<Long, LibraryItem>();
+		
+		long id = 0;
+		
+		DirectoryItem rootDirectory = new DirectoryItem(id++, "Mock Server");
+		DirectoryItem linkinParkDirectory = new DirectoryItem(id++, "Linkin Park");
+		DirectoryItem yesDirectory = new DirectoryItem(id++, "Yes");
+		
+		addLibraryItem(rootDirectory);
+		addLibraryItem(linkinParkDirectory);
+		addLibraryItem(yesDirectory);
+		
+		LibraryItem item;
+		
+		item = new MultimediaItem(id++, "Bleed it out");
+		linkinParkDirectory.addItem(item.getId());
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "Faint");
+		linkinParkDirectory.addItem(item.getId());
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "Blackout");
+		linkinParkDirectory.addItem(item.getId());
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "Homeworld");
+		yesDirectory.addItem(item.getId());
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "New languages");
+		yesDirectory.addItem(item.getId());
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "Terra's theme");
+		rootDirectory.addItem(item.getId());
+		addLibraryItem(item);
+		
+		rootDirectory.addItem(linkinParkDirectory.getId());
+		rootDirectory.addItem(yesDirectory.getId());
+	}
+	
+	private void addLibraryItem(LibraryItem item)
+	{
+		library.put(item.getId(), item);
+	}
+	
+	private <I> I getLibraryItem(long id, Class<I> itemClass)
+	{
+		return itemClass.cast(library.get(id));
 	}
 
 	@Override
@@ -76,7 +141,7 @@ public class MockServerInterface implements ServerInterface
 				}
 			});
 		}
-	}
+	}	
 	
 	private void broadcastPlaylistUpdate()
 	{
@@ -90,6 +155,32 @@ public class MockServerInterface implements ServerInterface
 				public void run()
 				{
 					listener.onPlaylistReceived(playlist);
+				}
+			});
+		}
+	}
+	
+	private void broadcastLibraryDirectoryContent(long id)
+	{
+		DirectoryItem directory = getLibraryItem(id, DirectoryItem.class);
+		
+		final String directoryName = directory.getName();
+		
+		final List<LibraryItem> items = new LinkedList<LibraryItem>();
+		for (long itemId : directory.getContent())
+		{
+			LibraryItem item = getLibraryItem(itemId, LibraryItem.class);
+			items.add(item);
+		}
+		
+		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
+		{
+			messageQueue.post(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					listener.onLibraryDirectoryReceived(directoryName, items);
 				}
 			});
 		}
@@ -123,7 +214,7 @@ public class MockServerInterface implements ServerInterface
 			return nextId++;
 		}
 		
-		public void addRandomSong()
+		public void addRandomSongToPlaylist()
 		{
 			long id = generateId();
 			String name = "Random" + random.nextInt(100);
@@ -134,7 +225,7 @@ public class MockServerInterface implements ServerInterface
 			playlist.add(multimedia);
 		}
 		
-		public void addSong(final String name, final int length)
+		public void addSongToPlaylist(final String name, final int length)
 		{
 			long id = generateId();
 			Multimedia multimedia = new Multimedia(id, name, length);
@@ -173,5 +264,11 @@ public class MockServerInterface implements ServerInterface
 			
 			broadcastPlayerUpdate();
 		}
+	}
+
+	@Override
+	public void requestLibraryDirectory(long id)
+	{
+		broadcastLibraryDirectoryContent(id);
 	}
 }

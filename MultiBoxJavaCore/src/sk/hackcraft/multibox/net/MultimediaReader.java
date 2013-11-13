@@ -1,7 +1,6 @@
 package sk.hackcraft.multibox.net;
 
 import java.io.DataInput;
-import java.io.IOError;
 import java.io.IOException;
 
 import sk.hackcraft.multibox.model.Multimedia;

@@ -1,11 +1,9 @@
 package sk.hackcraft.multibox.net;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Lock;
 
 import sk.hackcraft.netinterface.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.IncomingMessagesRouter;
@@ -14,8 +12,6 @@ import sk.hackcraft.netinterface.MessageInterface;
 import sk.hackcraft.netinterface.MessageInterfaceFactory;
 import sk.hackcraft.netinterface.MessageReceiver;
 import sk.hackcraft.netinterface.MessageType;
-import sk.hackcraft.netinterface.SocketMessageInterface;
-import sk.hackcraft.netinterface.AsynchronousMessageInterface.MessageSendListener;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.MessageQueue;
 

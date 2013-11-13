@@ -1,28 +1,20 @@
 package sk.hackcraft.multibox;
 
-import java.util.List;
-
-import sk.hackcraft.multibox.model.Multimedia;
-import sk.hackcraft.multibox.model.HuhPlayer;
+import sk.hackcraft.multibox.PlayerInfoFragment.PlayerProvider;
+import sk.hackcraft.multibox.PlaylistFragment.PlaylistProvider;
+import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
-import sk.hackcraft.multibox.net.MockServerInterface;
-import sk.hackcraft.multibox.net.ServerInterface;
-import android.os.Bundle;
 import android.app.Activity;
 import android.app.FragmentManager;
+import android.content.Intent;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
-public class PlayerActivity extends Activity
+public class PlayerActivity extends Activity implements PlayerProvider, PlaylistProvider
 {
-	private PlayingInfobarFragment playerFragment;
+	private PlayerInfoFragment playerFragment;
 	private PlaylistFragment playlistFragment;
-
-	private ServerInterface serverInterface;
-	
-	private HuhPlayer player;
-	private Playlist playlist;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -32,7 +24,7 @@ public class PlayerActivity extends Activity
 		setContentView(R.layout.activity_player);
 		
 		FragmentManager fragmentManager = getFragmentManager();
-		playerFragment = (PlayingInfobarFragment)fragmentManager.findFragmentById(R.id.fragment_player);
+		playerFragment = (PlayerInfoFragment)fragmentManager.findFragmentById(R.id.fragment_player);
 		playlistFragment = (PlaylistFragment)fragmentManager.findFragmentById(R.id.fragment_playlist);
 	}
 
@@ -70,6 +62,23 @@ public class PlayerActivity extends Activity
 	
 	private void openLibrary()
 	{
-		Toast.makeText(this, "open library", Toast.LENGTH_LONG).show();
+		Intent openLibraryIntent = new Intent(this, LibraryActivity.class);
+		startActivity(openLibraryIntent);
+	}
+
+	@Override
+	public Player providePlayer()
+	{
+		MultiBoxApplication application = (MultiBoxApplication)getApplication();
+		
+		return application.createPlayer();
+	}
+	
+	@Override
+	public Playlist providePlaylist()
+	{
+		MultiBoxApplication application = (MultiBoxApplication)getApplication();
+		
+		return application.createPlaylist();
 	}
 }

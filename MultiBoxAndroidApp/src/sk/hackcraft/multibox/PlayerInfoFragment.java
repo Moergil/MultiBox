@@ -1,28 +1,16 @@
 package sk.hackcraft.multibox;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
 import sk.hackcraft.multibox.model.Multimedia;
-import sk.hackcraft.multibox.model.HuhPlayer;
 import sk.hackcraft.multibox.model.Player;
-import sk.hackcraft.multibox.net.ServerInterface;
-import android.app.Activity;
 import android.app.Fragment;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.os.CountDownTimer;
-import android.support.v4.content.LocalBroadcastManager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-public class PlayingInfobarFragment extends Fragment
+public class PlayerInfoFragment extends Fragment
 {
 	private Player player;
 	private PlayerListener playerListener;
@@ -34,22 +22,21 @@ public class PlayingInfobarFragment extends Fragment
 	private ProgressBar progressView;
 	
 	@Override
-	public void onAttach(Activity activity)
+	public void onCreate(Bundle savedInstanceState)
 	{
-		super.onAttach(activity);
-		
-		MultiBoxApplication application = (MultiBoxApplication)activity.getApplication();
+		super.onCreate(savedInstanceState);
+
+		PlayerProvider playerProvider = (PlayerProvider)getActivity();
+		player = playerProvider.providePlayer();
 		
 		playerListener = new PlayerListener();
-		
-		player = application.createPlayer();
 		player.registerPlayerEventListener(playerListener);
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View layout = inflater.inflate(R.layout.fragment_playing_infobar, container, false);
+		View layout = inflater.inflate(R.layout.fragment_player_info, container, false);
 		
 		nameView = (TextView)layout.findViewById(R.id.player_multimedia_name);
 		timeView = (TextView)layout.findViewById(R.id.player_multimedia_time);
@@ -138,5 +125,10 @@ public class PlayingInfobarFragment extends Fragment
 				showMultimedia(newMultimedia);
 			}
 		}
+	}
+	
+	public interface PlayerProvider
+	{
+		public Player providePlayer();
 	}
 }

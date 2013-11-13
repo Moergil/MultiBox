@@ -1,12 +1,9 @@
 package sk.hackcraft.multibox;
 
 import java.io.ByteArrayOutputStream;
-import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.net.Socket;
-import java.util.BitSet;
 
 public class TestNetwork
 {

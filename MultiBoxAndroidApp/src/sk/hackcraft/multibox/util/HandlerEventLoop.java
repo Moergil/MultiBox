@@ -1,7 +1,7 @@
 package sk.hackcraft.multibox.util;
 
-import android.os.Handler;
 import sk.hackcraft.util.MessageQueue;
+import android.os.Handler;
 
 public class HandlerEventLoop implements MessageQueue
 {
