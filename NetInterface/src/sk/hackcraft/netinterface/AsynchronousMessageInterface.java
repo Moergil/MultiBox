@@ -1,6 +1,5 @@
 package sk.hackcraft.netinterface;
 
-
 public interface AsynchronousMessageInterface
 {
 	public void setSeriousErrorListener(SeriousErrorListener listener);

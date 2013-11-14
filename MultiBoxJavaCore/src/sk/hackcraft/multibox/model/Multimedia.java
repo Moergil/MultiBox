@@ -13,6 +13,13 @@ public class Multimedia
 		this.length = length;
 	}
 	
+	public Multimedia(Builder builder)
+	{
+		this.id = builder.id;
+		this.name = builder.name;
+		this.length = builder.length;
+	}
+	
 	public Multimedia(Multimedia multimedia)
 	{
 		this.id = multimedia.id;
@@ -63,5 +70,35 @@ public class Multimedia
 	public String toString()
 	{
 		return "#" + getId() + " " + getName();
+	}
+	
+	public static class Builder
+	{
+		private long id;
+		private String name;
+		private int length;
+		
+		public Builder setId(long id)
+		{
+			this.id = id;
+			return this;
+		}
+		
+		public Builder setName(String name)
+		{
+			this.name = name;
+			return this;
+		}
+		
+		public Builder setLength(int length)
+		{
+			this.length = length;
+			return this;
+		}
+
+		public Multimedia create()
+		{
+			return new Multimedia(this);
+		}
 	}
 }

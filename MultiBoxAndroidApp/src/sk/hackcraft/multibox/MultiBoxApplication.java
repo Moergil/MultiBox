@@ -12,9 +12,7 @@ import android.app.Application;
 import android.support.v4.content.LocalBroadcastManager;
 
 public class MultiBoxApplication extends Application
-{	
-	private LocalBroadcastManager broadcastManager;
-	
+{
 	private HandlerEventLoop eventLoop;
 	private MockServerInterface serverInterface;
 	
@@ -22,8 +20,6 @@ public class MultiBoxApplication extends Application
 	public void onCreate()
 	{
 		super.onCreate();
-		
-		broadcastManager = LocalBroadcastManager.getInstance(this);
 		
 		eventLoop = new HandlerEventLoop();
 		serverInterface = new MockServerInterface(eventLoop);
