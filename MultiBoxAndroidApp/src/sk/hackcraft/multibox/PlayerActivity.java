@@ -71,7 +71,7 @@ public class PlayerActivity extends Activity implements PlayerProvider, Playlist
 	{
 		MultiBoxApplication application = (MultiBoxApplication)getApplication();
 		
-		return application.createPlayer();
+		return application.getPlayer();
 	}
 	
 	@Override
@@ -79,6 +79,6 @@ public class PlayerActivity extends Activity implements PlayerProvider, Playlist
 	{
 		MultiBoxApplication application = (MultiBoxApplication)getApplication();
 		
-		return application.createPlaylist();
+		return application.getPlaylist();
 	}
 }

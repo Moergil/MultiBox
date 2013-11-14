@@ -8,7 +8,9 @@ import sk.hackcraft.netinterface.MessageType;
 public enum MessageTypes implements MessageType
 {
 	GET_PLAYER_STATE(1),
-	GET_PLAYLIST(2);
+	GET_PLAYLIST(2),
+	GET_LIBRARY_ITEM(3),
+	ADD_LIBRARY_ITEM_TO_PLAYLIST(4);
 
 	private static Map<Integer, MessageTypes> convertMap;
 	

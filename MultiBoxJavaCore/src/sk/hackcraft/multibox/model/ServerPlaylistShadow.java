@@ -62,6 +62,12 @@ public class ServerPlaylistShadow implements Playlist
 		return Collections.unmodifiableList(actualPlaylist);
 	}
 	
+	@Override
+	public void addItem(long itemId)
+	{
+		serverInterface.addLibraryItemToPlaylist(itemId);
+	}
+	
 	private void updatePlaylist(List<Multimedia> playlist)
 	{
 		actualPlaylist.clear();
@@ -88,6 +94,22 @@ public class ServerPlaylistShadow implements Playlist
 		public void onPlaylistReceived(List<Multimedia> playlist)
 		{
 			updatePlaylist(playlist);
+		}
+		
+		@Override
+		public void onAddingLibraryItemToPlaylistResult(final boolean result, final Multimedia multimedia)
+		{
+			for (final Playlist.PlaylistEventListener listener : playlistListeners)
+			{
+				messageQueue.post(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						listener.onItemAdded(result, multimedia);
+					}
+				});
+			}
 		}
 	}
 }

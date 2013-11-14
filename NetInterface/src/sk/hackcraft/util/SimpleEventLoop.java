@@ -1,6 +1,5 @@
 package sk.hackcraft.util;
 
-import java.util.Comparator;
 import java.util.concurrent.PriorityBlockingQueue;
 
 public class SimpleEventLoop implements Runnable, MessageQueue

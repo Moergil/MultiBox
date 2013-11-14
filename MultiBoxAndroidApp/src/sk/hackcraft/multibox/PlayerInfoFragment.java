@@ -62,9 +62,9 @@ public class PlayerInfoFragment extends Fragment
 	}
 	
 	@Override
-	public void onDetach()
+	public void onDestroy()
 	{
-		super.onDetach();
+		super.onDestroy();
 		
 		player.unregisterPlayerEventListener(playerListener);
 	}

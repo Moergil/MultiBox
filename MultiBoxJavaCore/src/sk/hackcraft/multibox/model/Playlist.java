@@ -11,9 +11,11 @@ public interface Playlist
 	public void unregisterListener(PlaylistEventListener listener);
 	
 	public List<Multimedia> getItems();
+	public void addItem(long itemId);
 	
 	public interface PlaylistEventListener
 	{
 		public void onPlaylistChanged(List<Multimedia> newPlaylist);
+		public void onItemAdded(boolean success, Multimedia multimedia);
 	}
 }

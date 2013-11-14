@@ -1,6 +1,5 @@
 package sk.hackcraft.multibox.model;
 
-import java.util.List;
 
 
 public interface Library
@@ -17,7 +16,6 @@ public interface Library
 	
 	public interface LibraryEventListener
 	{
-		public void onDirectoryReceived(String directoryName, List<LibraryItem> items);
-		public void onItemDetailReceived(LibraryItem item);
+		public void onItemReceived(LibraryItem item);
 	}
 }

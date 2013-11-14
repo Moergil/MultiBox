@@ -1,6 +1,5 @@
 package sk.hackcraft.netinterface;
 
-import java.io.IOError;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
