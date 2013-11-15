@@ -4,7 +4,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 
-import sk.hackcraft.multibox.net.encoders.MessageEncoder;
+import sk.hackcraft.multibox.util.DataTransformer;
 import sk.hackcraft.netinterface.Message;
 import sk.hackcraft.netinterface.MessageType;
 
@@ -19,7 +19,7 @@ public abstract class DataStringMessage<D> implements Message
 		this.data = data;
 	}
 	
-	protected abstract MessageEncoder<D, String> createEncoder();
+	protected abstract DataTransformer<D, String> createEncoder();
 	
 	@Override
 	public MessageType getType()
@@ -30,9 +30,9 @@ public abstract class DataStringMessage<D> implements Message
 	@Override
 	public byte[] getContent() throws IOException
 	{
-		MessageEncoder<D, String> encoder = createEncoder();
+		DataTransformer<D, String> encoder = createEncoder();
 		
-		String dataString = encoder.encode(data);
+		String dataString = encoder.transform(data);
 		
 		byte dataStringBytes[] = dataString.getBytes();
 		

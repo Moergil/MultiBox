@@ -1,13 +1,13 @@
-package sk.hackcraft.multibox.net.results;
+package sk.hackcraft.multibox.net.data;
 
 import sk.hackcraft.multibox.model.Multimedia;
 
-public class AddMultimediaToPlaylistResult
+public class AddMultimediaToPlaylistResultData
 {
 	private final boolean success;
 	private final Multimedia multimedia;
 	
-	public AddMultimediaToPlaylistResult(boolean success, Multimedia multimedia)
+	public AddMultimediaToPlaylistResultData(boolean success, Multimedia multimedia)
 	{
 		this.success = success;
 		this.multimedia = multimedia;

@@ -6,7 +6,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import sk.hackcraft.multibox.net.parsers.MessageParser;
+import sk.hackcraft.multibox.util.DataTransformer;
 import sk.hackcraft.netinterface.MessageReceiver;
 import sk.hackcraft.util.MessageQueue;
 
@@ -24,7 +24,7 @@ public abstract class DataStringMessageReceiver<R> implements MessageReceiver
 	@Override
 	public void receive(byte[] content) throws IOException
 	{
-		final MessageParser<String, R> parser = createParser();
+		final DataTransformer<String, R> parser = createParser();
 		
 		DataInputStream input = new DataInputStream(new ByteArrayInputStream(content));
 		
@@ -35,7 +35,7 @@ public abstract class DataStringMessageReceiver<R> implements MessageReceiver
 		
 		String dataString = new String(dataStringBytes, ENCODING);
 
-		final R result = parser.parse(dataString);
+		final R result = parser.transform(dataString);
 		
 		messageQueue.post(new Runnable()
 		{
@@ -47,6 +47,6 @@ public abstract class DataStringMessageReceiver<R> implements MessageReceiver
 		});
 	}
 	
-	protected abstract MessageParser<String, R> createParser();
+	protected abstract DataTransformer<String, R> createParser();
 	protected abstract void onResult(R result);
 }

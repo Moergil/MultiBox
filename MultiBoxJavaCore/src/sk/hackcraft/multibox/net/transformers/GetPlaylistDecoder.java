@@ -1,19 +1,19 @@
-package sk.hackcraft.multibox.net.parsers;
+package sk.hackcraft.multibox.net.transformers;
 
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import sk.hackcraft.multibox.model.Multimedia;
-import sk.hackcraft.multibox.net.results.GetPlaylistResult;
+import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GetPlaylistParser extends JacksonMessageParser<GetPlaylistResult>
+public class GetPlaylistDecoder extends JacksonMessageDecoder<GetPlaylistResultData>
 {
 	@Override
-	public GetPlaylistResult jacksonParse(ObjectMapper objectMapper, String jsonString) throws Exception
+	public GetPlaylistResultData decodeJson(ObjectMapper objectMapper, String jsonString) throws Exception
 	{
 		JsonNode rootNode = objectMapper.readTree(jsonString);
 		Iterator<JsonNode> nodesIterator = rootNode.path("playlist").elements();
@@ -30,6 +30,6 @@ public class GetPlaylistParser extends JacksonMessageParser<GetPlaylistResult>
 			playlist.add(multimedia);
 		}
 
-		return new GetPlaylistResult(playlist);
+		return new GetPlaylistResultData(playlist);
 	}
 }

@@ -4,19 +4,18 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.net.data.AddMultimediaToPlaylistResultData;
+import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
+import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
 import sk.hackcraft.multibox.net.data.LibraryItemIdData;
-import sk.hackcraft.multibox.net.encoders.LibraryItemIdEncoder;
-import sk.hackcraft.multibox.net.encoders.MessageEncoder;
 import sk.hackcraft.multibox.net.messages.DataStringMessage;
 import sk.hackcraft.multibox.net.messages.PlainRequestMessage;
-import sk.hackcraft.multibox.net.parsers.AddMultimediaToPlaylistParser;
-import sk.hackcraft.multibox.net.parsers.GetPlayerStateParser;
-import sk.hackcraft.multibox.net.parsers.GetPlaylistParser;
-import sk.hackcraft.multibox.net.parsers.MessageParser;
 import sk.hackcraft.multibox.net.receivers.DataStringMessageReceiver;
-import sk.hackcraft.multibox.net.results.AddMultimediaToPlaylistResult;
-import sk.hackcraft.multibox.net.results.GetPlayerStateResult;
-import sk.hackcraft.multibox.net.results.GetPlaylistResult;
+import sk.hackcraft.multibox.net.transformers.AddMultimediaToPlaylistDecoder;
+import sk.hackcraft.multibox.net.transformers.GetPlayerStateDecoder;
+import sk.hackcraft.multibox.net.transformers.GetPlaylistDecoder;
+import sk.hackcraft.multibox.net.transformers.LibraryItemIdEncoder;
+import sk.hackcraft.multibox.util.DataTransformer;
 import sk.hackcraft.netinterface.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.AsynchronousMessageInterface.SeriousErrorListener;
 import sk.hackcraft.netinterface.Message;
@@ -76,7 +75,7 @@ public class NetworkServerInterface implements ServerInterface
 		Message message = new DataStringMessage<LibraryItemIdData>(MessageTypes.GET_LIBRARY_ITEM, data)
 		{
 			@Override
-			protected MessageEncoder<LibraryItemIdData, String> createEncoder()
+			protected DataTransformer<LibraryItemIdData, String> createEncoder()
 			{
 				return new LibraryItemIdEncoder();
 			}
@@ -92,7 +91,7 @@ public class NetworkServerInterface implements ServerInterface
 		Message message = new DataStringMessage<LibraryItemIdData>(MessageTypes.ADD_LIBRARY_ITEM_TO_PLAYLIST, data)
 		{
 			@Override
-			protected MessageEncoder<LibraryItemIdData, String> createEncoder()
+			protected DataTransformer<LibraryItemIdData, String> createEncoder()
 			{
 				return new LibraryItemIdEncoder();
 			}
@@ -120,7 +119,7 @@ public class NetworkServerInterface implements ServerInterface
 		}
 	}
 	
-	private class GetPlayerStateReceiver extends DataStringMessageReceiver<GetPlayerStateResult>
+	private class GetPlayerStateReceiver extends DataStringMessageReceiver<GetPlayerStateResultData>
 	{
 		public GetPlayerStateReceiver(MessageQueue messageQueue)
 		{
@@ -128,13 +127,13 @@ public class NetworkServerInterface implements ServerInterface
 		}
 		
 		@Override
-		protected MessageParser<String, GetPlayerStateResult> createParser()
+		protected DataTransformer<String, GetPlayerStateResultData> createParser()
 		{
-			return new GetPlayerStateParser();
+			return new GetPlayerStateDecoder();
 		}
 
 		@Override
-		public void onResult(GetPlayerStateResult result)
+		public void onResult(GetPlayerStateResultData result)
 		{
 			Multimedia multimedia = result.getMultimedia();
 			int playbackPosition = result.getPlaybackPosition();
@@ -147,7 +146,7 @@ public class NetworkServerInterface implements ServerInterface
 		}
 	}
 	
-	private class GetPlaylistReceiver extends DataStringMessageReceiver<GetPlaylistResult>
+	private class GetPlaylistReceiver extends DataStringMessageReceiver<GetPlaylistResultData>
 	{
 		public GetPlaylistReceiver(MessageQueue messageQueue)
 		{
@@ -155,13 +154,13 @@ public class NetworkServerInterface implements ServerInterface
 		}
 
 		@Override
-		protected MessageParser<String, GetPlaylistResult> createParser()
+		protected DataTransformer<String, GetPlaylistResultData> createParser()
 		{
-			return new GetPlaylistParser();
+			return new GetPlaylistDecoder();
 		}
 
 		@Override
-		protected void onResult(GetPlaylistResult result)
+		protected void onResult(GetPlaylistResultData result)
 		{
 			List<Multimedia> playlist = result.getPlaylist();
 			
@@ -172,7 +171,7 @@ public class NetworkServerInterface implements ServerInterface
 		}
 	}
 	
-	private class AddMultimediaToPlaylistReceiver extends DataStringMessageReceiver<AddMultimediaToPlaylistResult>
+	private class AddMultimediaToPlaylistReceiver extends DataStringMessageReceiver<AddMultimediaToPlaylistResultData>
 	{
 		public AddMultimediaToPlaylistReceiver(MessageQueue messageQueue)
 		{
@@ -180,13 +179,13 @@ public class NetworkServerInterface implements ServerInterface
 		}
 
 		@Override
-		protected MessageParser<String, AddMultimediaToPlaylistResult> createParser()
+		protected DataTransformer<String, AddMultimediaToPlaylistResultData> createParser()
 		{
-			return new AddMultimediaToPlaylistParser();
+			return new AddMultimediaToPlaylistDecoder();
 		}
 
 		@Override
-		protected void onResult(AddMultimediaToPlaylistResult result)
+		protected void onResult(AddMultimediaToPlaylistResultData result)
 		{
 			final boolean success = result.isSuccess();
 			final Multimedia multimedia = result.getMultimedia();

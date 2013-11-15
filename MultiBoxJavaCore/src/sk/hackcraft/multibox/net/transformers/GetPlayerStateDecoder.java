@@ -1,15 +1,15 @@
-package sk.hackcraft.multibox.net.parsers;
+package sk.hackcraft.multibox.net.transformers;
 
 import sk.hackcraft.multibox.model.Multimedia;
-import sk.hackcraft.multibox.net.results.GetPlayerStateResult;
+import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class GetPlayerStateParser extends JacksonMessageParser<GetPlayerStateResult>
+public class GetPlayerStateDecoder extends JacksonMessageDecoder<GetPlayerStateResultData>
 {
 	@Override
-	public GetPlayerStateResult jacksonParse(ObjectMapper objectMapper, String dataString) throws Exception
+	public GetPlayerStateResultData decodeJson(ObjectMapper objectMapper, String dataString) throws Exception
 	{
 		JsonNode rootNode = objectMapper.readTree(dataString);
 		
@@ -21,6 +21,6 @@ public class GetPlayerStateParser extends JacksonMessageParser<GetPlayerStateRes
 		int playbackPosition = rootNode.path("playbackPosition").asInt();
 		boolean playing = rootNode.path("playing").asBoolean();
 		
-		return new GetPlayerStateResult(multimedia, playbackPosition, playing);
+		return new GetPlayerStateResultData(multimedia, playbackPosition, playing);
 	}
 }

@@ -1,4 +1,4 @@
-package sk.hackcraft.multibox.net.encoders;
+package sk.hackcraft.multibox.net.transformers;
 
 import sk.hackcraft.multibox.net.data.LibraryItemIdData;
 
