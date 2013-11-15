@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 
 public class PlayerActivity extends Activity implements PlayerProvider, PlaylistProvider
 {
@@ -20,7 +21,7 @@ public class PlayerActivity extends Activity implements PlayerProvider, Playlist
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-		
+
 		setContentView(R.layout.activity_player);
 		
 		FragmentManager fragmentManager = getFragmentManager();

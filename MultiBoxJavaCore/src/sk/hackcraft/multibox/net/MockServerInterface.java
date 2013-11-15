@@ -130,14 +130,14 @@ public class MockServerInterface implements ServerInterface
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			messageQueue.post(new Runnable()
+			messageQueue.postDelayed(new Runnable()
 			{
 				@Override
 				public void run()
 				{
 					listener.onPlayerUpdateReceived(multimedia, playbackPosition, playing);
 				}
-			});
+			}, 1000);
 		}
 	}	
 	
@@ -147,14 +147,14 @@ public class MockServerInterface implements ServerInterface
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			messageQueue.post(new Runnable()
+			messageQueue.postDelayed(new Runnable()
 			{
 				@Override
 				public void run()
 				{
 					listener.onPlaylistReceived(playlist);
 				}
-			});
+			}, 1000);
 		}
 	}
 	
@@ -164,14 +164,14 @@ public class MockServerInterface implements ServerInterface
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			messageQueue.post(new Runnable()
+			messageQueue.postDelayed(new Runnable()
 			{
 				@Override
 				public void run()
 				{
 					listener.onLibraryItemReceived(directory);
 				}
-			});
+			}, 1000);
 		}
 	}
 
