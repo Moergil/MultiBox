@@ -10,6 +10,7 @@ class QtMultimediaPlayer : public Player
 
 private:
     QMediaPlayer *qMediaPlayer;
+    bool playing;
 
 public slots:
     void onChangeMediaStatus(QMediaPlayer::MediaStatus status);
@@ -21,8 +22,9 @@ public:
 public slots:
     // Player interface
     void start();
-    void pause();
-    void resume();
+    void setPlaying(bool playing);
     void setVolume(int volume);
     void playNext();
+    bool isPlaying() const;
+    int getVolume() const;
 };

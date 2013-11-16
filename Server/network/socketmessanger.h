@@ -5,13 +5,14 @@
 
 #pragma once
 
-class SocketMessanger : public QObject, MessangerInterface
+class SocketMessanger : public QObject, public MessangerInterface
 {
     Q_OBJECT
 
 private:
+    static const qint32 QINT32_LENGTH = 4;
+
     QTcpSocket *tcpSocket;
-    int socketDescriptor;
 
 signals:
     void notEnoughDataError();
@@ -25,12 +26,16 @@ private:
     void writeNumber(qint32 number);
     bool nonReadDataExists();
     bool nonWrittenDataExists();
+    void setConnections();
+
+private slots:
+    void quitReading();
 
 public:
-    SocketMessanger(int socketDescriptor);
-    ~SocketMessanger();
+    SocketMessanger(int socketDescriptor, QObject *parent = 0);
+    SocketMessanger(const QString &hostName, quint16 port, QObject *parent = 0);
 
-    void open();
+    bool canWaitForMessage();
     DataMessage waitForMessage();
     void writeMessage(DataMessage message);
     void close();

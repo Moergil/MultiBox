@@ -2,7 +2,7 @@
 
 void QtMultimediaPlayer::onChangeMediaStatus(QMediaPlayer::MediaStatus status)
 {
-    if(status == QMediaPlayer::EndOfMedia)
+    if(status == QMediaPlayer::EndOfMedia || status == QMediaPlayer::UnknownMediaStatus)
     {
         emitSongRequestedSignal();
     }
@@ -11,6 +11,7 @@ void QtMultimediaPlayer::onChangeMediaStatus(QMediaPlayer::MediaStatus status)
 QtMultimediaPlayer::QtMultimediaPlayer() : Player()
 {
     this->qMediaPlayer = new QMediaPlayer;
+    this->playing = false;
 
     connect(this->qMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(onChangeMediaStatus(QMediaPlayer::MediaStatus)));
 }
@@ -25,14 +26,18 @@ void QtMultimediaPlayer::start()
     emitSongRequestedSignal();
 }
 
-void QtMultimediaPlayer::resume()
+void QtMultimediaPlayer::setPlaying(bool playing)
 {
-    this->qMediaPlayer->play();
-}
+    if(playing)
+    {
+        this->qMediaPlayer->play();
+    }
+    else
+    {
+        this->qMediaPlayer->pause();
+    }
 
-void QtMultimediaPlayer::pause()
-{
-    this->qMediaPlayer->pause();
+    this->playing = playing;
 }
 
 void QtMultimediaPlayer::setVolume(int volume)
@@ -46,4 +51,14 @@ void QtMultimediaPlayer::playNext()
     this->qMediaPlayer->setMedia(item.getItemUrl());
 
     this->qMediaPlayer->play();
+}
+
+bool QtMultimediaPlayer::isPlaying() const
+{
+    return playing;
+}
+
+int QtMultimediaPlayer::getVolume() const
+{
+    return this->qMediaPlayer->volume();
 }

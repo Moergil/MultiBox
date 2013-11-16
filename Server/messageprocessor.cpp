@@ -1,48 +1,65 @@
 #include "messageprocessor.h"
+#include "network/socketmessanger.h"
 
 #include <QThread>
 
-MessageProcessor::MessageProcessor(int socketDescriptor, QObject *parent) :
-    QObject(parent)
+#include <message/getplayerstaterequest.h>
+#include <message/pauserequest.h>
+#include <message/undefinedrequest.h>
+
+#include <util/bytearrayconverter.h>
+
+MessageProcessor::MessageProcessor(PlayerHandler *handler, int socketDescriptor, QObject *parent)
+    : QObject(parent), handler(handler)
 {
-    messanger = new SocketMessanger(socketDescriptor);
-
-    connect(messanger, SIGNAL(incommingMessage()), this, SLOT(onMessageAvailable()));
-
-    messanger->open();
+    messanger = new SocketMessanger(socketDescriptor, this);
 }
 
-MessageProcessor::~MessageProcessor()
+AbstractRequest *MessageProcessor::recognizeRequest(DataMessage &dataMessage)
 {
-    delete messanger;
-}
-
-void MessageProcessor::test()
-{
-    QByteArray data;
-    data.append('a').append('s').append('d').append('f').append((char)0);
-
-    DataMessage outmessage(45, data);
-    messanger->writeMessage(outmessage);
-    DataMessage outmessage1(46, data);
-    messanger->writeMessage(outmessage1);
-
-    QThread::sleep(1);
-
-    DataMessage outmessage2(48, data);
-    messanger->writeMessage(outmessage2);
-
-    while(true)
+    switch(dataMessage.getMessageType())
     {
-        DataMessage inmessage = messanger->waitForMessage();
+    case GetPlayerState:
+        return new GetPlayerStateRequest(dataMessage, getPlayerHandler());
 
-        qDebug() << "reading";
-        qDebug() << inmessage.getMessageType();
-        qDebug() << inmessage.getByteArray().constData();
+    /* case GetPlaylist :
+        break;
+
+    case GetLibraryDirectoryContent:
+        break;
+
+    case GetLibraryItemInfo:
+        break;
+
+    case AddItemToLibrary:
+        break;
+
+    case AddItemToPlaylist:
+        break; */
+
+    case Pause:
+        return new PauseRequest(dataMessage, getPlayerHandler());
+
+    default:
+        return new UndefinedRequest(dataMessage, getPlayerHandler());
     }
 }
 
-void MessageProcessor::close()
+PlayerHandler *MessageProcessor::getPlayerHandler()
 {
+    return handler;
+}
+
+void MessageProcessor::proccess()
+{
+    while(messanger->canWaitForMessage())
+    {
+        DataMessage dataMessage = messanger->waitForMessage();
+
+        AbstractRequest *request = recognizeRequest(dataMessage);
+        request->getRunnable()->run();
+    }
+
     messanger->close();
 }
+

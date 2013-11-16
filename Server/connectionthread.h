@@ -1,25 +1,24 @@
 #pragma once
 
-#include "socketmessanger.h"
-
 #include <QTcpSocket>
 #include <QThread>
 #include <QObject>
+
+#include <network/socketmessanger.h>
+#include <player/player.h>
 
 class ConnectionThread : public QThread
 {
     Q_OBJECT
 
-public:
-    ConnectionThread(int socketDescriptor, QObject *parent);
-
-    void run();
-
 private:
     int socketDescriptor;
     QTcpSocket *tcpSocket;
+    Player *player;
     SocketMessanger *messanger;
 
-    qint32 readNumber();
-    QByteArray readByteArray(qint32 byteLength);
+public:
+    ConnectionThread(Player *player, int socketDescriptor, QObject *parent);
+
+    void run();
 };

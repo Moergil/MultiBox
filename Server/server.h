@@ -3,11 +3,17 @@
 #include <QTcpServer>
 #include <QStringList>
 
+#include <player/player.h>
+
 class Server : public QTcpServer
 {
     Q_OBJECT
+
+private:
+    Player *player;
+
 public:
-    explicit Server(QObject *parent = 0);
+    Server(Player *player, QObject *parent = 0);
 
 protected:
     void incomingConnection(qintptr socketDescriptor);

@@ -1,21 +1,21 @@
-#include "datamessage.h"
-#include "bytearrayparser.h"
 #include "connectionthread.h"
-#include "socketmessanger.h"
 #include "messageprocessor.h"
 
 #include <QDataStream>
 #include <QByteArray>
 
-ConnectionThread::ConnectionThread(int socketDescriptor, QObject *parent)
-   : QThread(parent), socketDescriptor(socketDescriptor)
+ConnectionThread::ConnectionThread(Player *player, int socketDescriptor, QObject *parent)
+    : QThread(parent), socketDescriptor(socketDescriptor), player(player)
 {
 }
 
 void ConnectionThread::run()
 {
-    MessageProcessor processor(socketDescriptor);
-    processor.test();
-    //processor.close();
+    QObject object;
+
+    PlayerHandler *handler = new PlayerHandler(player, &object);
+    MessageProcessor processor(handler, socketDescriptor);
+
+    processor.proccess();
 }
 

@@ -22,11 +22,11 @@ protected:
 
 public slots:
     virtual void start() = 0;
-    virtual void pause() = 0;
-    virtual void resume() = 0;
+    virtual void setPlaying(bool playing) = 0;
     virtual void setVolume(int volume) = 0;
-
     virtual void playNext() = 0;
+    virtual bool isPlaying() const = 0;
+    virtual int getVolume() const = 0;
 
     void skipSong();
 
