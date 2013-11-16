@@ -16,5 +16,7 @@
     <string name="placeholder_multimedia_name">Multimedia Name</string>
     <string name="placeholder_multimedia_play_info">2:31</string>
     <string name="placeholder_library_item_name">Multimedia Name</string>
+    
+    <string name="message_connection_problem">Can\'t communicate with MultiBox server, check your network.</string>
 
 </resources>

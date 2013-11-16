@@ -72,12 +72,6 @@ public class ServerPlayerShadow implements Player
 	}
 
 	@Override
-	public void requestActiveMultimediaChange(Multimedia multimedia)
-	{
-		throw new UnsupportedOperationException("Not yet implemented.");
-	}
-
-	@Override
 	public void requestPlayingStateChange(boolean playing)
 	{
 		throw new UnsupportedOperationException("Not yet implemented.");

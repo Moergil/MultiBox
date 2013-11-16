@@ -1,9 +1,12 @@
 package sk.hackcraft.multibox;
 
+import java.util.concurrent.TimeUnit;
+
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
 import android.app.Fragment;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +23,8 @@ public class PlayerInfoFragment extends Fragment
 	private TextView nameView;
 	private TextView timeView;
 	private ProgressBar progressView;
+	
+	private CountDownTimer playbackPositionUpdater;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -62,11 +67,44 @@ public class PlayerInfoFragment extends Fragment
 	}
 	
 	@Override
-	public void onDetach()
+	public void onDestroy()
 	{
-		super.onDetach();
+		super.onDestroy();
 		
 		player.unregisterPlayerEventListener(playerListener);
+	}
+	
+	private void startPlaybackPositionUpdater(int secondsToEnd)
+	{
+		long millisToEnd = secondsToEnd * 1000;
+		
+		playbackPositionUpdater = new CountDownTimer(millisToEnd, 100)
+		{
+			
+			@Override
+			public void onTick(long millisUntilFinished)
+			{
+				int secondsUntilFinished = (int)TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
+				
+				int actualSeconds = activeMultimedia.getLength() - secondsUntilFinished;
+				
+				updatePlaybackPosition(actualSeconds);
+			}
+			
+			@Override
+			public void onFinish()
+			{
+				updatePlaybackPosition(activeMultimedia.getLength());
+			}
+		};
+		
+		playbackPositionUpdater.start();
+	}
+	
+	private void stopPlaybackPositionUpdater()
+	{
+		playbackPositionUpdater.cancel();
+		playbackPositionUpdater = null;
 	}
 	
 	public void showMultimedia(Multimedia multimedia)
@@ -105,17 +143,37 @@ public class PlayerInfoFragment extends Fragment
 		@Override
 		public void onPlayingStateChanged(boolean playing)
 		{
+			if (!playing && playbackPositionUpdater != null)
+			{
+				stopPlaybackPositionUpdater();
+			}
 		}
 
 		@Override
 		public void onPlaybackPositionChanged(int newPosition)
 		{
 			updatePlaybackPosition(newPosition);
+			
+			if (player.isPlaying())
+			{
+				if (playbackPositionUpdater != null)
+				{
+					stopPlaybackPositionUpdater();
+				}
+				
+				int secondsToEnd = activeMultimedia.getLength() - newPosition;
+				startPlaybackPositionUpdater(secondsToEnd);
+			}
 		}
 
 		@Override
 		public void onMultimediaChanged(Multimedia newMultimedia)
 		{
+			if (playbackPositionUpdater != null)
+			{
+				stopPlaybackPositionUpdater();
+			}
+			
 			if (newMultimedia == null)
 			{
 				showNothing();

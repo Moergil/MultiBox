@@ -1,11 +1,9 @@
 package sk.hackcraft.netinterface;
 
 import java.net.InetAddress;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 
 class ServersList
 {

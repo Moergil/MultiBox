@@ -6,9 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import sk.hackcraft.multibox.model.GenericLibraryItem;
 import sk.hackcraft.multibox.model.LibraryItem;
-import sk.hackcraft.multibox.model.LibraryItemType;
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
@@ -57,31 +55,31 @@ public class MockServerInterface implements ServerInterface
 		LibraryItem item;
 		
 		item = new MultimediaItem(id++, "Bleed it out");
-		linkinParkDirectory.addItem(item.getId());
+		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
 		item = new MultimediaItem(id++, "Faint");
-		linkinParkDirectory.addItem(item.getId());
+		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
 		item = new MultimediaItem(id++, "Blackout");
-		linkinParkDirectory.addItem(item.getId());
+		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
 		item = new MultimediaItem(id++, "Homeworld");
-		yesDirectory.addItem(item.getId());
+		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
 		item = new MultimediaItem(id++, "New languages");
-		yesDirectory.addItem(item.getId());
+		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
 		item = new MultimediaItem(id++, "Terra's theme");
-		rootDirectory.addItem(item.getId());
+		rootDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		rootDirectory.addItem(linkinParkDirectory.getId());
-		rootDirectory.addItem(yesDirectory.getId());
+		rootDirectory.addItem(linkinParkDirectory);
+		rootDirectory.addItem(yesDirectory);
 	}
 	
 	private void addLibraryItem(LibraryItem item)
@@ -132,14 +130,14 @@ public class MockServerInterface implements ServerInterface
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			messageQueue.post(new Runnable()
+			messageQueue.postDelayed(new Runnable()
 			{
 				@Override
 				public void run()
 				{
 					listener.onPlayerUpdateReceived(multimedia, playbackPosition, playing);
 				}
-			});
+			}, 1000);
 		}
 	}	
 	
@@ -149,40 +147,31 @@ public class MockServerInterface implements ServerInterface
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			messageQueue.post(new Runnable()
+			messageQueue.postDelayed(new Runnable()
 			{
 				@Override
 				public void run()
 				{
 					listener.onPlaylistReceived(playlist);
 				}
-			});
+			}, 1000);
 		}
 	}
 	
-	private void broadcastLibraryDirectoryContent(long id)
+	private void broadcastLibraryItemReceived(long id)
 	{
-		DirectoryItem directory = getLibraryItem(id, DirectoryItem.class);
-		
-		final String directoryName = directory.getName();
-		
-		final List<LibraryItem> items = new LinkedList<LibraryItem>();
-		for (long itemId : directory.getContent())
-		{
-			LibraryItem item = getLibraryItem(itemId, LibraryItem.class);
-			items.add(item);
-		}
+		final DirectoryItem directory = getLibraryItem(id, DirectoryItem.class);
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
-			messageQueue.post(new Runnable()
+			messageQueue.postDelayed(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					listener.onLibraryDirectoryReceived(directoryName, items);
+					listener.onLibraryItemReceived(directory);
 				}
-			});
+			}, 1000);
 		}
 	}
 
@@ -267,8 +256,14 @@ public class MockServerInterface implements ServerInterface
 	}
 
 	@Override
-	public void requestLibraryDirectory(long id)
+	public void requestLibraryItem(long id)
 	{
-		broadcastLibraryDirectoryContent(id);
+		broadcastLibraryItemReceived(id);
+	}
+	
+	@Override
+	public void addLibraryItemToPlaylist(long itemId)
+	{
+		// TODO Auto-generated method stub
 	}
 }

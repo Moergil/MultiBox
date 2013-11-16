@@ -82,9 +82,9 @@ public class PlaylistFragment extends Fragment
 	}
 	
 	@Override
-	public void onDetach()
+	public void onDestroy()
 	{
-		super.onDetach();
+		super.onDestroy();
 		
 		playlist.unregisterListener(playlistListener);
 	}
@@ -134,6 +134,11 @@ public class PlaylistFragment extends Fragment
 		public void onPlaylistChanged(List<Multimedia> newPlaylist)
 		{
 			setPlaylist(newPlaylist);
+		}
+
+		@Override
+		public void onItemAdded(boolean success, Multimedia multimedia)
+		{
 		}
 	}
 	

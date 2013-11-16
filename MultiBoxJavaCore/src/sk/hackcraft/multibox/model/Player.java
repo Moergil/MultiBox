@@ -10,8 +10,7 @@ public interface Player
 	
 	public int getPlaybackPosition();
 	public Multimedia getActiveMultimedia();
-	
-	public void requestActiveMultimediaChange(Multimedia multimedia);
+
 	public void requestPlayingStateChange(boolean playing);
 	public void requestActiveMultimediaSkip();
 	

@@ -1,5 +1,6 @@
 package sk.hackcraft.netinterface;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -7,7 +8,7 @@ import java.util.Map;
  * @author moergil
  * This class works as simple abstract map, which associates message type
  * with concrete message receiver. Main purpose is to synchronize access
- * to receivers, because they will be mostly used in multithread envirnoment.
+ * to receivers, because they will be mostly used in multithread environment.
  */
 public class IncomingMessagesRouter
 {
@@ -23,7 +24,7 @@ public class IncomingMessagesRouter
 		receivers.put(type.toTypeId(), receiver);
 	}
 	
-	public void receiveMessage(MessageType type, byte content[])
+	public void receiveMessage(MessageType type, byte content[]) throws IOException
 	{
 		MessageReceiver receiver;
 		
