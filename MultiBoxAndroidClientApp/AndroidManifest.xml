@@ -16,7 +16,7 @@
 		android:label="@string/app_name"
 		android:theme="@style/AppTheme">
 		<activity
-			android:name="sk.hackcraft.multibox.android.client.PlayerActivity"
+			android:name="sk.hackcraft.multibox.android.client.MainActivity"
 			android:label="@string/app_name">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN"/>
@@ -28,7 +28,7 @@
 		<activity
 			android:name="sk.hackcraft.multibox.android.client.LibraryActivity"
 			android:label="@string/app_name"
-			android:parentActivityName="sk.hackcraft.multibox.android.client.PlayerActivity">
+			android:parentActivityName="sk.hackcraft.multibox.android.client.MainActivity">
 		</activity>
 	</application>
 

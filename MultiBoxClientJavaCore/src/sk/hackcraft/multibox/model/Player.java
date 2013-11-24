@@ -15,7 +15,7 @@ public interface Player
 	public void requestActiveMultimediaSkip();
 	
 	public void registerPlayerEventListener(PlayerEventListener listener);
-	public void unregisterPlayerEventListener(PlayerEventListener listener);
+	public void unregisterListener(PlayerEventListener listener);
 	
 	public interface PlayerEventListener
 	{

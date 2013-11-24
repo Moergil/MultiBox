@@ -90,7 +90,7 @@ public class ServerPlayerShadow implements Player
 	}
 
 	@Override
-	public void unregisterPlayerEventListener(PlayerEventListener listener)
+	public void unregisterListener(PlayerEventListener listener)
 	{
 		playerListeners.remove(listener);
 	}

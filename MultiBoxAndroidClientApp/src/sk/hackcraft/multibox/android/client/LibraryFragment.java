@@ -8,6 +8,7 @@ import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.LibraryItem;
 import sk.hackcraft.multibox.model.LibraryItemType;
 import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
+import sk.hackcraft.multibox.model.libraryitems.BackNavigationLibraryItem;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -21,7 +22,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LibraryDirectoryFragment extends Fragment
+public class LibraryFragment extends Fragment
 {
 	private static final String SAVED_STATE_KEY_HISTORY = "history";
 	
@@ -72,7 +73,7 @@ public class LibraryDirectoryFragment extends Fragment
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View layout = inflater.inflate(R.layout.fragment_library_directory, container, false);
+		View layout = inflater.inflate(R.layout.fragment_library, container, false);
 		
 		contentView = (ListView)layout.findViewById(R.id.directory_content);
 		
@@ -100,9 +101,9 @@ public class LibraryDirectoryFragment extends Fragment
 					
 					history.push(itemId);
 				}
-				else
+				else if (item.getType() == LibraryItemType.BACK_NAVIGATION)
 				{
-					eventListener.onItemOpened(item);
+					navigateBack();
 				}
 			}
 		});
@@ -146,25 +147,20 @@ public class LibraryDirectoryFragment extends Fragment
 		long historyEntries[] = new long[history.size()];
 		for (int i = history.size() - 1; i >= 0; i--)
 		{
-			historyEntries[i] = history.pop();
+			historyEntries[i] = history.get(i);
 		}
 		
 		outState.putLongArray(SAVED_STATE_KEY_HISTORY, historyEntries);
 	}
 	
-	public boolean navigateBack()
+	public void navigateBack()
 	{
 		history.pop();
 		
-		if (history.isEmpty())
-		{
-			return false;
-		}
-		else
+		if (!history.isEmpty())
 		{
 			long id = history.peek();
 			requestDirectory(id);
-			return true;
 		}
 	}
 	
@@ -172,10 +168,15 @@ public class LibraryDirectoryFragment extends Fragment
 	{
 		library.requestItem(id);
 	}
-	
+
 	private void setDirectory(DirectoryItem directory)
 	{
 		contentAdapter.clear();
+		
+		if (history.size() > 1)
+		{
+			contentAdapter.add(new BackNavigationLibraryItem());
+		}
 		
 		List<LibraryItem> items = directory.getItems();
 		contentAdapter.addAll(items);
@@ -229,7 +230,7 @@ public class LibraryDirectoryFragment extends Fragment
 				DirectoryItem directory = (DirectoryItem)item;
 				setDirectory(directory);
 				
-				eventListener.onDirectoryChanged(directory.getId(), directory.getName());
+				eventListener.onItemChanged(directory.getId(), directory.getName());
 			}
 			else
 			{
@@ -240,8 +241,7 @@ public class LibraryDirectoryFragment extends Fragment
 	
 	public interface LibraryEventListener
 	{
-		public void onDirectoryChanged(long id, String name);
-		public void onItemOpened(LibraryItem item);
+		public void onItemChanged(long id, String name);
 	}
 	
 	public interface LibraryProvider

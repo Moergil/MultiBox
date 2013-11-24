@@ -1,32 +1,43 @@
 package sk.hackcraft.multibox.android.client;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
+import sk.hackcraft.multibox.model.Playlist;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class PlayerInfoFragment extends Fragment
+public class PlayerFragment extends Fragment
 {
 	private Player player;
 	private PlayerListener playerListener;
 	
-	private Multimedia activeMultimedia;
-	
+	private Playlist playlist;
+	private PlaylistListener playlistListener;
+
 	private TextView nameView;
 	private TextView timeView;
 	private ProgressBar progressView;
 	
-	private CountDownTimer playbackPositionUpdater;
+	private PlaylistAdapter playlistAdapter;	
+	private ListView playlistView;
 	
+	private CountDownTimer playbackPositionUpdater;
+
 	@Override
 	public void onCreate(Bundle savedInstanceState)
 	{
@@ -37,18 +48,44 @@ public class PlayerInfoFragment extends Fragment
 		
 		playerListener = new PlayerListener();
 		player.registerPlayerEventListener(playerListener);
+		
+		playlistAdapter = new PlaylistAdapter(getActivity());
+
+		PlaylistProvider playlistProvider = (PlaylistProvider)getActivity();
+		playlist = playlistProvider.providePlaylist();
+		
+		playlistListener = new PlaylistListener();
+		playlist.registerListener(playlistListener);
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
-		View layout = inflater.inflate(R.layout.fragment_player_info, container, false);
+		View layout = inflater.inflate(R.layout.fragment_player, container, false);
 		
 		nameView = (TextView)layout.findViewById(R.id.player_multimedia_name);
 		timeView = (TextView)layout.findViewById(R.id.player_multimedia_time);
 		progressView = (ProgressBar)layout.findViewById(R.id.player_multimedia_progress);
 		
+		playlistView = (ListView)layout.findViewById(R.id.playlist);
+		
 		return layout;
+	}
+	
+	@Override
+	public void onActivityCreated(Bundle savedInstanceState)
+	{
+		super.onActivityCreated(savedInstanceState);
+
+		playlistView.setAdapter(playlistAdapter);
+		playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				Toast.makeText(getActivity(), "clicked " + position, Toast.LENGTH_SHORT).show();
+			}
+		});
 	}
 	
 	@Override
@@ -57,6 +94,7 @@ public class PlayerInfoFragment extends Fragment
 		super.onResume();
 		
 		player.init();
+		playlist.init();
 	}
 	
 	@Override
@@ -65,6 +103,7 @@ public class PlayerInfoFragment extends Fragment
 		super.onPause();
 		
 		player.close();
+		playlist.close();
 	}
 	
 	@Override
@@ -72,7 +111,8 @@ public class PlayerInfoFragment extends Fragment
 	{
 		super.onDestroy();
 		
-		player.unregisterPlayerEventListener(playerListener);
+		player.unregisterListener(playerListener);
+		playlist.unregisterListener(playlistListener);
 	}
 	
 	private void startPlaybackPositionUpdater(int secondsToEnd)
@@ -87,7 +127,7 @@ public class PlayerInfoFragment extends Fragment
 			{
 				int secondsUntilFinished = (int)TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
 				
-				int actualSeconds = activeMultimedia.getLength() - secondsUntilFinished;
+				int actualSeconds = player.getActiveMultimedia().getLength() - secondsUntilFinished;
 				
 				updatePlaybackPosition(actualSeconds);
 			}
@@ -95,7 +135,7 @@ public class PlayerInfoFragment extends Fragment
 			@Override
 			public void onFinish()
 			{
-				updatePlaybackPosition(activeMultimedia.getLength());
+				updatePlaybackPosition(player.getActiveMultimedia().getLength());
 			}
 		};
 		
@@ -110,8 +150,6 @@ public class PlayerInfoFragment extends Fragment
 	
 	public void showMultimedia(Multimedia multimedia)
 	{
-		this.activeMultimedia = multimedia;
-		
 		String name = multimedia.getName();
 		nameView.setText(name);
 		
@@ -129,7 +167,7 @@ public class PlayerInfoFragment extends Fragment
 
 	public void updatePlaybackPosition(int newPlayPosition)
 	{
-		int length = activeMultimedia.getLength();
+		int length = player.getActiveMultimedia().getLength();
 		
 		int estimatedTime = length - newPlayPosition;
 		int seconds = (int)(estimatedTime % 60);
@@ -137,6 +175,19 @@ public class PlayerInfoFragment extends Fragment
 		timeView.setText(String.format("%d:%d", minutes, seconds));
 
 		progressView.setProgress(newPlayPosition);
+	}
+	
+	public void setPlaylist(List<Multimedia> playlist)
+	{
+		playlistAdapter.clear();
+		
+		if (!playlist.isEmpty())
+		{
+			playlist.remove(0);
+			playlistAdapter.addAll(playlist);
+		}
+		
+		playlistAdapter.notifyDataSetChanged();
 	}
 	
 	private class PlayerListener implements Player.PlayerEventListener
@@ -162,7 +213,7 @@ public class PlayerInfoFragment extends Fragment
 					stopPlaybackPositionUpdater();
 				}
 				
-				int secondsToEnd = activeMultimedia.getLength() - newPosition;
+				int secondsToEnd = player.getActiveMultimedia().getLength() - newPosition;
 				startPlaybackPositionUpdater(secondsToEnd);
 			}
 		}
@@ -175,7 +226,7 @@ public class PlayerInfoFragment extends Fragment
 				stopPlaybackPositionUpdater();
 			}
 			
-			if (newMultimedia == null)
+			if (!player.hasActiveMultimedia())
 			{
 				showNothing();
 			}
@@ -184,6 +235,51 @@ public class PlayerInfoFragment extends Fragment
 				showMultimedia(newMultimedia);
 			}
 		}
+	}
+	
+	private class PlaylistAdapter extends ArrayAdapter<Multimedia>
+	{
+		public PlaylistAdapter(Context context)
+		{
+			super(context, R.layout.item_playlist);
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			Multimedia multimedia = getItem(position);
+			
+			Context context = getContext();
+			LayoutInflater viewInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			
+			View multimediaItemView = viewInflater.inflate(R.layout.item_playlist, null);
+
+			TextView multimediaNameView = (TextView)multimediaItemView.findViewById(R.id.multimedia_item_name);
+			
+			String name = multimedia.getName();
+			multimediaNameView.setText(name);
+			
+			return multimediaItemView;
+		}
+	}
+	
+	private class PlaylistListener implements Playlist.PlaylistEventListener
+	{
+		@Override
+		public void onPlaylistChanged(List<Multimedia> newPlaylist)
+		{
+			setPlaylist(newPlaylist);
+		}
+
+		@Override
+		public void onItemAdded(boolean success, Multimedia multimedia)
+		{
+		}
+	}
+	
+	public interface PlaylistProvider
+	{
+		public Playlist providePlaylist();
 	}
 	
 	public interface PlayerProvider

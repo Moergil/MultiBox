@@ -3,7 +3,8 @@ package sk.hackcraft.multibox.model;
 public enum LibraryItemType
 {
 	DIRECTORY(1),
-	MULTIMEDIA(2);
+	MULTIMEDIA(2),
+	BACK_NAVIGATION(3);
 	
 	private final long id;
 	
