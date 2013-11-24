@@ -126,9 +126,25 @@ namespace MultiBoxWindowsPhoneApp
             }
         }
 
-        #region Phone application initialization
+		#region MultiBox global logic
 
-        // Avoid double-initialization
+		private IAsynchronousMessageInterface asynchronousMessageInterface;
+
+		/*public bool Connected
+		{
+			get;
+		}*/
+
+		public void CreateServerConnection(string serverAddress)
+		{
+			// create async interface
+		}
+
+		#endregion
+
+		#region Phone application initialization
+
+		// Avoid double-initialization
         private bool phoneApplicationInitialized = false;
 
         // Do not add any additional code to this method
