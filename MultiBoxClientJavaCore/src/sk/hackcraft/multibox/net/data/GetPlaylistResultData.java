@@ -4,18 +4,18 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 
 public class GetPlaylistResultData
 {
-	private final List<Multimedia> playlist;
+	private final List<MultimediaItem> playlist;
 	
-	public GetPlaylistResultData(List<Multimedia> playlist)
+	public GetPlaylistResultData(List<MultimediaItem> playlist)
 	{
-		this.playlist = Collections.unmodifiableList(new LinkedList<Multimedia>(playlist));
+		this.playlist = Collections.unmodifiableList(new LinkedList<MultimediaItem>(playlist));
 	}
 	
-	public List<Multimedia> getPlaylist()
+	public List<MultimediaItem> getPlaylist()
 	{
 		return playlist;
 	}

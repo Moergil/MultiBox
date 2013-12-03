@@ -1,4 +1,6 @@
 <resources>
 	<dimen name="standard_margin">16dp</dimen>
     <dimen name="activity_standard_margin">16dp</dimen>
+    
+    <dimen name="touch_button_height">9dp</dimen>
 </resources>

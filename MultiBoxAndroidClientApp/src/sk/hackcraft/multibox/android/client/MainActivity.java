@@ -1,9 +1,7 @@
 package sk.hackcraft.multibox.android.client;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.android.client.LibraryFragment.LibraryEventListener;
@@ -17,17 +15,12 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.Window;
-import android.widget.Toast;
 
 public class MainActivity extends Activity implements PlayerProvider, PlaylistProvider, LibraryProvider, LibraryEventListener
 {

@@ -3,12 +3,15 @@ package sk.hackcraft.multibox.net;
 import java.util.LinkedList;
 import java.util.List;
 
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.LibraryItem;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.data.AddMultimediaToPlaylistResultData;
+import sk.hackcraft.multibox.net.data.GetLibraryItemData;
 import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
 import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
 import sk.hackcraft.multibox.net.data.LibraryItemIdData;
 import sk.hackcraft.multibox.net.transformers.AddMultimediaToPlaylistDecoder;
+import sk.hackcraft.multibox.net.transformers.GetLibraryItemDecoder;
 import sk.hackcraft.multibox.net.transformers.GetPlayerStateDecoder;
 import sk.hackcraft.multibox.net.transformers.GetPlaylistDecoder;
 import sk.hackcraft.multibox.net.transformers.LibraryItemIdEncoder;
@@ -40,6 +43,12 @@ public class NetworkServerInterface implements ServerInterface
 		messageInterface.setMessageReceiver(MessageTypes.GET_PLAYER_STATE, new GetPlayerStateReceiver(messageQueue));
 		messageInterface.setMessageReceiver(MessageTypes.GET_PLAYLIST, new GetPlaylistReceiver(messageQueue));
 		messageInterface.setMessageReceiver(MessageTypes.ADD_LIBRARY_ITEM_TO_PLAYLIST, new AddMultimediaToPlaylistReceiver(messageQueue));
+	}
+	
+	@Override
+	public void close()
+	{
+		messageInterface.close();
 	}
 
 	@Override
@@ -135,7 +144,7 @@ public class NetworkServerInterface implements ServerInterface
 		@Override
 		public void onResult(GetPlayerStateResultData result)
 		{
-			Multimedia multimedia = result.getMultimedia();
+			MultimediaItem multimedia = result.getMultimedia();
 			int playbackPosition = result.getPlaybackPosition();
 			boolean playing = result.isPlaying();
 			
@@ -162,7 +171,7 @@ public class NetworkServerInterface implements ServerInterface
 		@Override
 		protected void onResult(GetPlaylistResultData result)
 		{
-			List<Multimedia> playlist = result.getPlaylist();
+			List<MultimediaItem> playlist = result.getPlaylist();
 			
 			for (ServerInterfaceEventListener listener : serverListeners)
 			{
@@ -188,11 +197,36 @@ public class NetworkServerInterface implements ServerInterface
 		protected void onResult(AddMultimediaToPlaylistResultData result)
 		{
 			final boolean success = result.isSuccess();
-			final Multimedia multimedia = result.getMultimedia();
+			final MultimediaItem multimedia = result.getMultimedia();
 			
 			for (ServerInterfaceEventListener listener : serverListeners)
 			{
 				listener.onAddingLibraryItemToPlaylistResult(success, multimedia);
+			}
+		}
+	}
+	
+	private class GetLibraryItemReceiver extends DataStringMessageReceiver<GetLibraryItemData>
+	{
+		public GetLibraryItemReceiver(MessageQueue messageQueue)
+		{
+			super(messageQueue);
+		}
+
+		@Override
+		protected DataTransformer<String, GetLibraryItemData> createParser()
+		{
+			return new GetLibraryItemDecoder();
+		}
+
+		@Override
+		protected void onResult(GetLibraryItemData result)
+		{
+			final LibraryItem libraryItem = result.getLibraryItem();
+			
+			for (ServerInterfaceEventListener listener : serverListeners)
+			{
+				listener.onLibraryItemReceived(libraryItem);
 			}
 		}
 	}

@@ -3,6 +3,7 @@ package sk.hackcraft.multibox.model;
 import java.util.LinkedList;
 import java.util.List;
 
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.MessageQueue;
@@ -15,7 +16,7 @@ public class ServerPlayerShadow implements Player
 	private ServerListener serverListener;
 	
 	private boolean playing;
-	private Multimedia activeMultimedia;
+	private MultimediaItem activeMultimedia;
 	private int playbackPosition;
 	
 	private List<PlayerEventListener> playerListeners;
@@ -66,7 +67,7 @@ public class ServerPlayerShadow implements Player
 	}
 
 	@Override
-	public Multimedia getActiveMultimedia()
+	public MultimediaItem getActiveMultimedia()
 	{
 		return activeMultimedia;
 	}
@@ -98,7 +99,7 @@ public class ServerPlayerShadow implements Player
 	private class ServerListener extends ServerInterfaceEventAdapter
 	{
 		@Override
-		public void onPlayerUpdateReceived(final Multimedia multimedia, final int playbackPosition, final boolean playing)
+		public void onPlayerUpdateReceived(final MultimediaItem multimedia, final int playbackPosition, final boolean playing)
 		{
 			if (multimedia == null)
 			{

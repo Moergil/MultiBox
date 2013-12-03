@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import sk.hackcraft.multibox.R;
-import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -148,7 +148,7 @@ public class PlayerFragment extends Fragment
 		playbackPositionUpdater = null;
 	}
 	
-	public void showMultimedia(Multimedia multimedia)
+	public void showMultimedia(MultimediaItem multimedia)
 	{
 		String name = multimedia.getName();
 		nameView.setText(name);
@@ -177,7 +177,7 @@ public class PlayerFragment extends Fragment
 		progressView.setProgress(newPlayPosition);
 	}
 	
-	public void setPlaylist(List<Multimedia> playlist)
+	public void setPlaylist(List<MultimediaItem> playlist)
 	{
 		playlistAdapter.clear();
 		
@@ -219,7 +219,7 @@ public class PlayerFragment extends Fragment
 		}
 
 		@Override
-		public void onMultimediaChanged(Multimedia newMultimedia)
+		public void onMultimediaChanged(MultimediaItem newMultimedia)
 		{
 			if (playbackPositionUpdater != null)
 			{
@@ -237,7 +237,7 @@ public class PlayerFragment extends Fragment
 		}
 	}
 	
-	private class PlaylistAdapter extends ArrayAdapter<Multimedia>
+	private class PlaylistAdapter extends ArrayAdapter<MultimediaItem>
 	{
 		public PlaylistAdapter(Context context)
 		{
@@ -247,7 +247,7 @@ public class PlayerFragment extends Fragment
 		@Override
 		public View getView(int position, View convertView, ViewGroup parent)
 		{
-			Multimedia multimedia = getItem(position);
+			MultimediaItem multimedia = getItem(position);
 			
 			Context context = getContext();
 			LayoutInflater viewInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -266,13 +266,13 @@ public class PlayerFragment extends Fragment
 	private class PlaylistListener implements Playlist.PlaylistEventListener
 	{
 		@Override
-		public void onPlaylistChanged(List<Multimedia> newPlaylist)
+		public void onPlaylistChanged(List<MultimediaItem> newPlaylist)
 		{
 			setPlaylist(newPlaylist);
 		}
 
 		@Override
-		public void onItemAdded(boolean success, Multimedia multimedia)
+		public void onItemAdded(boolean success, MultimediaItem multimedia)
 		{
 		}
 	}

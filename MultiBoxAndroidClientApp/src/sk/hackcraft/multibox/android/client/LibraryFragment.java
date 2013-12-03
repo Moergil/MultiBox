@@ -4,11 +4,13 @@ import java.util.List;
 import java.util.Stack;
 
 import sk.hackcraft.multibox.R;
+import sk.hackcraft.multibox.android.client.PlayerFragment.PlaylistProvider;
 import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.LibraryItem;
 import sk.hackcraft.multibox.model.LibraryItemType;
-import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
+import sk.hackcraft.multibox.model.Playlist;
 import sk.hackcraft.multibox.model.libraryitems.BackNavigationLibraryItem;
+import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
 import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
@@ -28,6 +30,8 @@ public class LibraryFragment extends Fragment
 	
 	private Library library;
 	private LibraryListener libraryListener;
+	
+	private Playlist playlist;
 	
 	private ListView contentView;
 	
@@ -53,6 +57,9 @@ public class LibraryFragment extends Fragment
 		
 		libraryListener = new LibraryListener();
 		library.registerLibraryEventListener(libraryListener);
+		
+		PlaylistProvider playlistProvider = (PlaylistProvider)activity;
+		playlist = playlistProvider.providePlaylist();
 		
 		history = new Stack<Long>();
 
@@ -93,17 +100,23 @@ public class LibraryFragment extends Fragment
 			{
 				LibraryItem item = contentAdapter.getItem(position);
 
-				if (item.getType() == LibraryItemType.DIRECTORY)
+				long itemId = item.getId();
+				
+				switch (item.getType())
 				{
-					long itemId = item.getId();
-
-					requestDirectory(itemId);
-					
-					history.push(itemId);
-				}
-				else if (item.getType() == LibraryItemType.BACK_NAVIGATION)
-				{
-					navigateBack();
+					case DIRECTORY:
+						requestDirectory(itemId);
+						history.push(itemId);
+						break;
+					case MULTIMEDIA:
+						String messageTemplate = getString(R.string.notice_queying_multimedia);
+						String message = String.format(messageTemplate, item.getName());
+						Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT).show();
+						playlist.addItem(itemId);
+						break;
+					case BACK_NAVIGATION:
+						navigateBack();
+						break;
 				}
 			}
 		});

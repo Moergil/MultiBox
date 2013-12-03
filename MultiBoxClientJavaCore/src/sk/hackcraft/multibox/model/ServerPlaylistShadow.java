@@ -4,6 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.MessageQueue;
@@ -13,7 +14,7 @@ public class ServerPlaylistShadow implements Playlist
 	private final ServerInterface serverInterface;
 	private final MessageQueue messageQueue;
 	
-	private List<Multimedia> actualPlaylist;
+	private List<MultimediaItem> actualPlaylist;
 	
 	private List<Playlist.PlaylistEventListener> playlistListeners;
 	
@@ -28,7 +29,7 @@ public class ServerPlaylistShadow implements Playlist
 		
 		serverListener = new ServerListener();
 		
-		actualPlaylist = new LinkedList<Multimedia>();
+		actualPlaylist = new LinkedList<MultimediaItem>();
 	}
 	
 	@Override
@@ -57,7 +58,7 @@ public class ServerPlaylistShadow implements Playlist
 	}
 
 	@Override
-	public List<Multimedia> getItems()
+	public List<MultimediaItem> getItems()
 	{
 		return Collections.unmodifiableList(actualPlaylist);
 	}
@@ -68,12 +69,12 @@ public class ServerPlaylistShadow implements Playlist
 		serverInterface.addLibraryItemToPlaylist(itemId);
 	}
 	
-	private void updatePlaylist(List<Multimedia> playlist)
+	private void updatePlaylist(List<MultimediaItem> playlist)
 	{
 		actualPlaylist.clear();
 		actualPlaylist.addAll(playlist);
 		
-		final List<Multimedia> playlistCopy = new LinkedList<Multimedia>(actualPlaylist);
+		final List<MultimediaItem> playlistCopy = new LinkedList<MultimediaItem>(actualPlaylist);
 		
 		for (final Playlist.PlaylistEventListener listener : playlistListeners)
 		{
@@ -91,13 +92,13 @@ public class ServerPlaylistShadow implements Playlist
 	private class ServerListener extends ServerInterfaceEventAdapter
 	{
 		@Override
-		public void onPlaylistReceived(List<Multimedia> playlist)
+		public void onPlaylistReceived(List<MultimediaItem> playlist)
 		{
 			updatePlaylist(playlist);
 		}
 		
 		@Override
-		public void onAddingLibraryItemToPlaylistResult(final boolean result, final Multimedia multimedia)
+		public void onAddingLibraryItemToPlaylistResult(final boolean result, final MultimediaItem multimedia)
 		{
 			for (final Playlist.PlaylistEventListener listener : playlistListeners)
 			{

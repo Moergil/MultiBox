@@ -6,6 +6,8 @@ import sk.hackcraft.netinterface.message.MessageType;
 
 public interface AsynchronousMessageInterface
 {
+	public void close();
+	
 	public void setSeriousErrorListener(SeriousErrorListener listener);
 	
 	public void sendMessage(Message message);

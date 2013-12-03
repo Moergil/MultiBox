@@ -10,7 +10,10 @@
     <string name="action_skip">Skip</string>
     <string name="action_clean_playlist">Clean playlist</string>
     
+    <string name="action_connect">Connect</string>
+    
     <string name="notice_nothing_to_play">Nothing to play</string>
+    <string name="notice_queying_multimedia">Queying %s&#8230;</string>
     
     <string name="placeholder_multimedia_name">Multimedia Name</string>
     <string name="placeholder_multimedia_play_info">2:31</string>
@@ -20,5 +23,9 @@
     
     <string name="playlist">Playlist</string>
     <string name="library">Library</string>
+    
+    <string name="manual_server_address">Set server manually</string>
+    
+    <string name="hint_server_address">Server address</string>
 
 </resources>

@@ -1,0 +1,37 @@
+<RelativeLayout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:padding="@dimen/activity_standard_margin">
+	
+    <TextView
+        android:id="@+id/label_server_connect"
+		android:text="@string/manual_server_address"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"/>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_below="@+id/label_server_connect">
+        
+        <EditText
+			android:id="@+id/server_address_input_field"
+			android:inputType="text"
+			android:hint="@string/hint_server_address"
+			android:layout_width="160dp"
+			android:layout_height="wrap_content"
+			android:height="@dimen/touch_button_height"/>
+		
+		<Button
+		    android:id="@+id/button_server_connect"
+		    android:text="@string/action_connect"
+		    android:layout_width="wrap_content"
+		    android:layout_height="wrap_content"
+		    android:height="@dimen/touch_button_height"/>
+	
+    </LinearLayout>
+	
+    
+</RelativeLayout>

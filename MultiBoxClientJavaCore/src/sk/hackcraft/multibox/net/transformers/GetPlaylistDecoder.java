@@ -4,7 +4,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,14 +18,14 @@ public class GetPlaylistDecoder extends JacksonMessageDecoder<GetPlaylistResultD
 		JsonNode rootNode = objectMapper.readTree(jsonString);
 		Iterator<JsonNode> nodesIterator = rootNode.path("playlist").elements();
 		
-		List<Multimedia> playlist = new LinkedList<Multimedia>();
+		List<MultimediaItem> playlist = new LinkedList<MultimediaItem>();
 		while (nodesIterator.hasNext())
 		{
 			JsonNode node = nodesIterator.next();
 			String multimediaJson = node.toString();
 			
-			Multimedia.Builder builder = objectMapper.readValue(multimediaJson, Multimedia.Builder.class);
-			Multimedia multimedia = builder.create();
+			MultimediaItem.Builder builder = objectMapper.readValue(multimediaJson, MultimediaItem.Builder.class);
+			MultimediaItem multimedia = builder.create();
 			
 			playlist.add(multimedia);
 		}
