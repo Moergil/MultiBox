@@ -3,11 +3,11 @@
 
 #include <util/messagecontentwriter.h>
 
-GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
+GetPlayerStateResponse::GetPlayerStateResponse(PlaylistState playlistState,
                                                 qint32 playbackPosition,
                                                 bool playing,
                                                 QObject *parent)
-    : AbstractResponse(parent), multimedia(multimedia),
+    : AbstractResponse(parent), playlistState(playlistState),
       playbackPosition(playbackPosition), playing(playing)
 {
 }
@@ -15,7 +15,7 @@ GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
 DataContent GetPlayerStateResponse::toDataContent()
 {
     MessageContentWriter writer;
-    writer.write(multimedia.toQJsonObject());
+    writer.write(playlistState.toQJsonObject());
     writer.write(playbackPosition);
     writer.write(playing);
 

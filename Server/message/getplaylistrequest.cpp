@@ -14,8 +14,9 @@ bool GetPlayerStateRequest::canResponse() const
 
 void GetPlayerStateRequest::execute()
 {
-    //Multimedia currentMultimedia = getPlayerHandler()->getCurrentMultimedia();
-    /*GetPlayerStateResponse * response = new GetPlayerStateResponse(currentMultimedia, 0, false);
+    PlaylistState playlistState = getPlayerHandler()->getPlaylistState();
 
-    setResponse(response);*/
+    GetPlayerStateResponse * response = new GetPlayerStateResponse(playlistState, 0, false);
+
+    setResponse(response);
 }
