@@ -2,7 +2,6 @@ package sk.hackcraft.multibox.android.client;
 
 import sk.hackcraft.multibox.R;
 import android.app.Activity;
-import android.content.Intent;
 
 public class ActivityTransitionAnimator
 {

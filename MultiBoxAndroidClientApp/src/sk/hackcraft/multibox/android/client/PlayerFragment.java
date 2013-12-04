@@ -1,11 +1,13 @@
 package sk.hackcraft.multibox.android.client;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
+import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import android.app.Activity;
 import android.app.Fragment;
@@ -23,7 +25,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class PlayerFragment extends Fragment
-{
+{	
 	private Player player;
 	private PlayerListener playerListener;
 	
@@ -43,6 +45,21 @@ public class PlayerFragment extends Fragment
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		setRetainInstance(true);
+		
+		Activity activity = getActivity();
+		MultiBoxApplication application = (MultiBoxApplication)activity.getApplication();
+		
+		Server server = application.getServer();
+		player = server.getPlayer();
+		playlist = server.getPlaylist();
+		
+		playerListener = new PlayerListener();
+		player.registerPlayerEventListener(playerListener);
+		
+		playlistListener = new PlaylistListener();
+		playlist.registerListener(playlistListener);
 	}
 	
 	@Override
@@ -65,21 +82,9 @@ public class PlayerFragment extends Fragment
 		super.onActivityCreated(savedInstanceState);
 		
 		Activity activity = getActivity();
-		
-		PlayerProvider playerProvider = (PlayerProvider)activity;
-		player = playerProvider.providePlayer();
-		
-		playerListener = new PlayerListener();
-		player.registerPlayerEventListener(playerListener);
-		
+
 		playlistAdapter = new PlaylistAdapter(activity);
-
-		PlaylistProvider playlistProvider = (PlaylistProvider)activity;
-		playlist = playlistProvider.providePlaylist();
 		
-		playlistListener = new PlaylistListener();
-		playlist.registerListener(playlistListener);
-
 		playlistView.setAdapter(playlistAdapter);
 		playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener()
 		{
@@ -89,6 +94,21 @@ public class PlayerFragment extends Fragment
 				Toast.makeText(getActivity(), "clicked " + position, Toast.LENGTH_SHORT).show();
 			}
 		});
+		
+		if (player.isPlaying())
+		{
+			MultimediaItem multimedia = player.getActiveMultimedia();
+			showMultimedia(multimedia);
+			
+			int playbackPosition = player.getPlaybackPosition();
+			updatePlaybackPosition(playbackPosition);
+		}
+		else
+		{
+			showNothing();
+		}
+		
+		setPlaylist(playlist.getItems());
 	}
 	
 	@Override
@@ -107,6 +127,11 @@ public class PlayerFragment extends Fragment
 		
 		player.close();
 		playlist.close();
+		
+		if (isPlaybackPositionUpdaterActive())
+		{
+			stopPlaybackPositionUpdater();
+		}
 	}
 	
 	@Override
@@ -116,6 +141,11 @@ public class PlayerFragment extends Fragment
 		
 		player.unregisterListener(playerListener);
 		playlist.unregisterListener(playlistListener);
+	}
+	
+	private boolean isPlaybackPositionUpdaterActive()
+	{
+		return playbackPositionUpdater != null;
 	}
 	
 	private void startPlaybackPositionUpdater(int secondsToEnd)
@@ -130,15 +160,21 @@ public class PlayerFragment extends Fragment
 			{
 				int secondsUntilFinished = (int)TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
 				
-				int actualSeconds = player.getActiveMultimedia().getLength() - secondsUntilFinished;
-				
-				updatePlaybackPosition(actualSeconds);
+				try
+				{
+					int actualSeconds = player.getActiveMultimedia().getLength() - secondsUntilFinished;
+					setPlaybackPosition(actualSeconds);
+				}
+				catch (Exception e)
+				{
+					e.printStackTrace();
+				}
 			}
-			
+	
 			@Override
 			public void onFinish()
 			{
-				updatePlaybackPosition(player.getActiveMultimedia().getLength());
+				setPlaybackPosition(player.getActiveMultimedia().getLength());
 			}
 		};
 		
@@ -167,27 +203,44 @@ public class PlayerFragment extends Fragment
 		timeView.setText("");
 		progressView.setProgress(0);
 	}
-
-	public void updatePlaybackPosition(int newPlayPosition)
+	
+	public void setPlaybackPosition(int playbackPosition)
 	{
 		int length = player.getActiveMultimedia().getLength();
 		
-		int estimatedTime = length - newPlayPosition;
+		int estimatedTime = length - playbackPosition;
 		int seconds = (int)(estimatedTime % 60);
 		int minutes = (int)(estimatedTime / 60);
 		timeView.setText(String.format("%d:%d", minutes, seconds));
 
-		progressView.setProgress(newPlayPosition);
+		progressView.setProgress(playbackPosition);
+	}
+
+	public void updatePlaybackPosition(int playbackPosition)
+	{
+		setPlaybackPosition(playbackPosition);
+		
+		if (player.isPlaying())
+		{
+			if (playbackPositionUpdater != null)
+			{
+				stopPlaybackPositionUpdater();
+			}
+			
+			int secondsToEnd = player.getActiveMultimedia().getLength() - playbackPosition;
+			startPlaybackPositionUpdater(secondsToEnd);
+		}
 	}
 	
 	public void setPlaylist(List<MultimediaItem> playlist)
 	{
 		playlistAdapter.clear();
 		
-		if (!playlist.isEmpty())
+		List<MultimediaItem> playlistCopy = new ArrayList<MultimediaItem>(playlist);
+		if (!playlistCopy.isEmpty())
 		{
-			playlist.remove(0);
-			playlistAdapter.addAll(playlist);
+			playlistCopy.remove(0);
+			playlistAdapter.addAll(playlistCopy);
 		}
 		
 		playlistAdapter.notifyDataSetChanged();
@@ -208,17 +261,6 @@ public class PlayerFragment extends Fragment
 		public void onPlaybackPositionChanged(int newPosition)
 		{
 			updatePlaybackPosition(newPosition);
-			
-			if (player.isPlaying())
-			{
-				if (playbackPositionUpdater != null)
-				{
-					stopPlaybackPositionUpdater();
-				}
-				
-				int secondsToEnd = player.getActiveMultimedia().getLength() - newPosition;
-				startPlaybackPositionUpdater(secondsToEnd);
-			}
 		}
 
 		@Override
@@ -278,15 +320,5 @@ public class PlayerFragment extends Fragment
 		public void onItemAdded(boolean success, MultimediaItem multimedia)
 		{
 		}
-	}
-	
-	public interface PlaylistProvider
-	{
-		public Playlist providePlaylist();
-	}
-	
-	public interface PlayerProvider
-	{
-		public Player providePlayer();
 	}
 }

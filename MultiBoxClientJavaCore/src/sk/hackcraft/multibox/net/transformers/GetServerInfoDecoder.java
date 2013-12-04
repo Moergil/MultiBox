@@ -1,9 +1,9 @@
 package sk.hackcraft.multibox.net.transformers;
 
+import sk.hackcraft.multibox.net.data.GetServerInfoResultData;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
-import sk.hackcraft.multibox.net.data.GetServerInfoResultData;
 
 public class GetServerInfoDecoder extends JacksonMessageDecoder<GetServerInfoResultData>
 {

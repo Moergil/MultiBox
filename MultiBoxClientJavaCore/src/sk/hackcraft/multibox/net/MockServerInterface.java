@@ -292,5 +292,6 @@ public class MockServerInterface implements ServerInterface
 		playlist.add(new MultimediaItem(itemId, "Item " + itemId, 10));
 		
 		broadcastPlaylistUpdate();
+		broadcastPlayerUpdate();
 	}
 }

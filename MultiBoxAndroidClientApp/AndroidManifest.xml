@@ -27,7 +27,8 @@
 	    </activity>
 	    
 		<activity
-			android:name="sk.hackcraft.multibox.android.client.MainActivity"/>
+			android:name="sk.hackcraft.multibox.android.client.MainActivity"
+			android:label=""/>
 	</application>
 
 </manifest>

@@ -172,6 +172,11 @@ public class ServerPlayerShadow implements Player
 					});
 				}
 			}
+			
+			if (activeMultimedia == null)
+			{
+				System.out.println();
+			}
 		}
 	}
 }

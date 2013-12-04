@@ -5,28 +5,25 @@ import java.util.LinkedList;
 import java.util.List;
 
 import sk.hackcraft.multibox.R;
-import sk.hackcraft.multibox.android.client.LibraryFragment.LibraryProvider;
-import sk.hackcraft.multibox.android.client.PlayerFragment.PlayerProvider;
-import sk.hackcraft.multibox.android.client.PlayerFragment.PlaylistProvider;
-import sk.hackcraft.multibox.model.Library;
-import sk.hackcraft.multibox.model.Player;
-import sk.hackcraft.multibox.model.Playlist;
 import sk.hackcraft.multibox.model.Server;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v13.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends Activity implements PlayerProvider, PlaylistProvider, LibraryProvider, BackPressedEvent
+public class MainActivity extends Activity implements BackPressedEvent
 {
 	private static final String SAVED_STATE_KEY_ACTIVE_TAB = "activeTab";
 	private static final String SAVED_STATE_KEY_SERVER_NAME = "serverName";
+	
+	public static final String EXTRA_KEY_SERVER_NAME = "serverName";
 	
 	private Server server;
 	
@@ -41,6 +38,9 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		Intent intent = getIntent();
+		String serverName = intent.getStringExtra(EXTRA_KEY_SERVER_NAME);
 
 		MultiBoxApplication application = (MultiBoxApplication)getApplication();
 		server = application.getServer();
@@ -49,6 +49,7 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 		
 		actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
+        actionBar.setTitle(serverName);
 		
 		setContentView(R.layout.activity_main);
 
@@ -89,12 +90,17 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 		
 		if (savedInstanceState != null)
 		{
-			int activeTab = savedInstanceState.getInt(SAVED_STATE_KEY_ACTIVE_TAB);
-			actionBar.setSelectedNavigationItem(activeTab);
-			
-			String serverName = savedInstanceState.getString(SAVED_STATE_KEY_SERVER_NAME);
-			actionBar.setTitle(serverName);
+			restoreState(savedInstanceState);
 		}
+	}
+	
+	private void restoreState(Bundle savedInstanceState)
+	{
+		int activeTab = savedInstanceState.getInt(SAVED_STATE_KEY_ACTIVE_TAB);
+		actionBar.setSelectedNavigationItem(activeTab);
+		
+		String serverName = savedInstanceState.getString(SAVED_STATE_KEY_SERVER_NAME);
+		actionBar.setTitle(serverName);
 	}
 
 	@Override
@@ -114,9 +120,9 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 	}
 	
 	@Override
-	protected void onResume()
+	protected void onRestart()
 	{
-		super.onResume();
+		super.onRestart();
 		
 		server.requestInfo(new Server.ServerInfoListener()
 		{
@@ -126,12 +132,6 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 				actionBar.setTitle(name);
 			}
 		});
-	}
-	
-	@Override
-	protected void onPause()
-	{
-		super.onPause();
 	}
 	
 	@Override
@@ -169,24 +169,6 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 	public void unregisterBackPressedListener(BackPressedListener listener)
 	{
 		backPressedListeners.remove(listener);
-	}
-
-	@Override
-	public Player providePlayer()
-	{
-		return server.getPlayer();
-	}
-	
-	@Override
-	public Playlist providePlaylist()
-	{
-		return server.getPlaylist();
-	}
-	
-	@Override
-	public Library provideLibrary()
-	{
-		return server.getLibrary();
 	}
 	
 	private class TabsAdapter extends FragmentPagerAdapter implements ActionBar.TabListener

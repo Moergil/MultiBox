@@ -1,6 +1,7 @@
 package sk.hackcraft.multibox.android.client;
 
 import sk.hackcraft.multibox.R;
+import sk.hackcraft.multibox.model.Server;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -80,12 +81,22 @@ public class ServerSelectActivity extends Activity
 		String address = serverAddressInputField.getText().toString();
 		application.createServerConnection(address);
 		
-		startMainActivity();
+		Server server = application.getServer();
+		server.requestInfo(new Server.ServerInfoListener()
+		{
+			@Override
+			public void onServerNameReceived(String name)
+			{
+				startMainActivity(name);
+			}
+		});
 	}
 	
-	private void startMainActivity()
+	private void startMainActivity(String serverName)
 	{
 		Intent intent = new Intent(this, MainActivity.class);
+		
+		intent.putExtra(MainActivity.EXTRA_KEY_SERVER_NAME, serverName);
 		
 		startActivity(intent);
 		ActivityTransitionAnimator.runStartActivityAnimation(this);

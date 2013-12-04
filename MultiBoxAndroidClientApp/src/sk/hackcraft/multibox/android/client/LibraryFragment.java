@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Stack;
 
 import sk.hackcraft.multibox.R;
-import sk.hackcraft.multibox.android.client.PlayerFragment.PlaylistProvider;
 import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.LibraryItem;
 import sk.hackcraft.multibox.model.LibraryItemType;
 import sk.hackcraft.multibox.model.Playlist;
+import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
 import android.app.Activity;
 import android.app.Fragment;
@@ -42,28 +42,9 @@ public class LibraryFragment extends Fragment
 	private BackPressedListener backPressedListener;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState)
+	public void onAttach(Activity activity)
 	{
-		super.onCreate(savedInstanceState);
-		
-		Activity activity = getActivity();
-		
-		contentAdapter = new DirectoryContentAdapter(activity);
-		
-		history = new Stack<Long>();
-
-		if (savedInstanceState != null)
-		{
-			long historyEntries[] = savedInstanceState.getLongArray(SAVED_STATE_KEY_HISTORY);
-			for (Long id : historyEntries)
-			{
-				history.push(id);
-			}			
-		}
-		else
-		{
-			history.push(Library.ROOT_DIRECTORY);
-		}
+		super.onAttach(activity);
 		
 		backPressedEvent = (BackPressedEvent)activity;
 		backPressedListener = new BackPressedListener()
@@ -85,6 +66,41 @@ public class LibraryFragment extends Fragment
 	}
 	
 	@Override
+	public void onCreate(Bundle savedInstanceState)
+	{
+		super.onCreate(savedInstanceState);
+		
+		setRetainInstance(true);
+		
+		Activity activity = getActivity();
+		MultiBoxApplication application = (MultiBoxApplication)activity.getApplication();
+		
+		Server server = application.getServer();
+		library = server.getLibrary();
+		playlist = server.getPlaylist();
+		
+		libraryListener = new LibraryListener();
+		library.registerLibraryEventListener(libraryListener);
+		
+		contentAdapter = new DirectoryContentAdapter(activity);
+		
+		history = new Stack<Long>();
+
+		if (savedInstanceState != null)
+		{
+			long historyEntries[] = savedInstanceState.getLongArray(SAVED_STATE_KEY_HISTORY);
+			for (Long id : historyEntries)
+			{
+				history.push(id);
+			}			
+		}
+		else
+		{
+			history.push(Library.ROOT_DIRECTORY);
+		}
+	}
+	
+	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState)
 	{
 		View layout = inflater.inflate(R.layout.fragment_library, container, false);
@@ -98,17 +114,6 @@ public class LibraryFragment extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
-		
-		Activity activity = getActivity();
-		
-		LibraryProvider libraryProvider = (LibraryProvider)activity;
-		library = libraryProvider.provideLibrary();
-		
-		libraryListener = new LibraryListener();
-		library.registerLibraryEventListener(libraryListener);
-		
-		PlaylistProvider playlistProvider = (PlaylistProvider)activity;
-		playlist = playlistProvider.providePlaylist();
 
 		contentView.setAdapter(contentAdapter);
 		contentView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -271,10 +276,5 @@ public class LibraryFragment extends Fragment
 				Toast.makeText(getActivity(), "TODO item detail", Toast.LENGTH_SHORT).show();
 			}
 		}
-	}
-	
-	public interface LibraryProvider
-	{
-		public Library provideLibrary();
 	}
 }
