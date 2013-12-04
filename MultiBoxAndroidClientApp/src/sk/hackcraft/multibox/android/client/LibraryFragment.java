@@ -9,7 +9,6 @@ import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.LibraryItem;
 import sk.hackcraft.multibox.model.LibraryItemType;
 import sk.hackcraft.multibox.model.Playlist;
-import sk.hackcraft.multibox.model.libraryitems.BackNavigationLibraryItem;
 import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
 import android.app.Activity;
 import android.app.Fragment;
@@ -36,10 +35,11 @@ public class LibraryFragment extends Fragment
 	private ListView contentView;
 	
 	private DirectoryContentAdapter contentAdapter;
-	
-	private LibraryEventListener eventListener;
 
 	private Stack<Long> history;
+	
+	BackPressedEvent backPressedEvent;
+	private BackPressedListener backPressedListener;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState)
@@ -49,17 +49,6 @@ public class LibraryFragment extends Fragment
 		Activity activity = getActivity();
 		
 		contentAdapter = new DirectoryContentAdapter(activity);
-		
-		eventListener = (LibraryEventListener)activity;
-		
-		LibraryProvider libraryProvider = (LibraryProvider)activity;
-		library = libraryProvider.provideLibrary();
-		
-		libraryListener = new LibraryListener();
-		library.registerLibraryEventListener(libraryListener);
-		
-		PlaylistProvider playlistProvider = (PlaylistProvider)activity;
-		playlist = playlistProvider.providePlaylist();
 		
 		history = new Stack<Long>();
 
@@ -75,6 +64,24 @@ public class LibraryFragment extends Fragment
 		{
 			history.push(Library.ROOT_DIRECTORY);
 		}
+		
+		backPressedEvent = (BackPressedEvent)activity;
+		backPressedListener = new BackPressedListener()
+		{
+			@Override
+			public boolean onBackPressed()
+			{
+				if (canNavigateBack())
+				{
+					navigateBack();
+					return true;
+				}
+				else
+				{
+					return false;
+				}
+			}
+		};
 	}
 	
 	@Override
@@ -91,6 +98,17 @@ public class LibraryFragment extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
+		
+		Activity activity = getActivity();
+		
+		LibraryProvider libraryProvider = (LibraryProvider)activity;
+		library = libraryProvider.provideLibrary();
+		
+		libraryListener = new LibraryListener();
+		library.registerLibraryEventListener(libraryListener);
+		
+		PlaylistProvider playlistProvider = (PlaylistProvider)activity;
+		playlist = playlistProvider.providePlaylist();
 
 		contentView.setAdapter(contentAdapter);
 		contentView.setOnItemClickListener(new AdapterView.OnItemClickListener()
@@ -134,12 +152,17 @@ public class LibraryFragment extends Fragment
 			long id = history.peek();
 			library.requestItem(id);
 		}
+		
+		
+		backPressedEvent.registerBackPressedListener(backPressedListener);
 	}
 	
 	@Override
 	public void onPause()
 	{
 		super.onPause();
+		
+		backPressedEvent.unregisterBackPressedListener(backPressedListener);
 		
 		library.close();
 	}
@@ -166,6 +189,11 @@ public class LibraryFragment extends Fragment
 		outState.putLongArray(SAVED_STATE_KEY_HISTORY, historyEntries);
 	}
 	
+	public boolean canNavigateBack()
+	{
+		return history.size() > 1;
+	}
+	
 	public void navigateBack()
 	{
 		history.pop();
@@ -185,11 +213,6 @@ public class LibraryFragment extends Fragment
 	private void setDirectory(DirectoryItem directory)
 	{
 		contentAdapter.clear();
-		
-		if (history.size() > 1)
-		{
-			contentAdapter.add(new BackNavigationLibraryItem());
-		}
 		
 		List<LibraryItem> items = directory.getItems();
 		contentAdapter.addAll(items);
@@ -242,19 +265,12 @@ public class LibraryFragment extends Fragment
 			{
 				DirectoryItem directory = (DirectoryItem)item;
 				setDirectory(directory);
-				
-				eventListener.onItemChanged(directory.getId(), directory.getName());
 			}
 			else
 			{
 				Toast.makeText(getActivity(), "TODO item detail", Toast.LENGTH_SHORT).show();
 			}
 		}
-	}
-	
-	public interface LibraryEventListener
-	{
-		public void onItemChanged(long id, String name);
 	}
 	
 	public interface LibraryProvider

@@ -7,6 +7,7 @@ import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
+import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -42,20 +43,6 @@ public class PlayerFragment extends Fragment
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
-
-		PlayerProvider playerProvider = (PlayerProvider)getActivity();
-		player = playerProvider.providePlayer();
-		
-		playerListener = new PlayerListener();
-		player.registerPlayerEventListener(playerListener);
-		
-		playlistAdapter = new PlaylistAdapter(getActivity());
-
-		PlaylistProvider playlistProvider = (PlaylistProvider)getActivity();
-		playlist = playlistProvider.providePlaylist();
-		
-		playlistListener = new PlaylistListener();
-		playlist.registerListener(playlistListener);
 	}
 	
 	@Override
@@ -76,6 +63,22 @@ public class PlayerFragment extends Fragment
 	public void onActivityCreated(Bundle savedInstanceState)
 	{
 		super.onActivityCreated(savedInstanceState);
+		
+		Activity activity = getActivity();
+		
+		PlayerProvider playerProvider = (PlayerProvider)activity;
+		player = playerProvider.providePlayer();
+		
+		playerListener = new PlayerListener();
+		player.registerPlayerEventListener(playerListener);
+		
+		playlistAdapter = new PlaylistAdapter(activity);
+
+		PlaylistProvider playlistProvider = (PlaylistProvider)activity;
+		playlist = playlistProvider.providePlaylist();
+		
+		playlistListener = new PlaylistListener();
+		playlist.registerListener(playlistListener);
 
 		playlistView.setAdapter(playlistAdapter);
 		playlistView.setOnItemClickListener(new AdapterView.OnItemClickListener()

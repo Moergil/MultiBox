@@ -8,10 +8,12 @@ import sk.hackcraft.multibox.android.client.util.HandlerEventLoop;
 import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
+import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.model.ServerLibraryShadow;
 import sk.hackcraft.multibox.model.ServerPlayerShadow;
 import sk.hackcraft.multibox.model.ServerPlaylistShadow;
 import sk.hackcraft.multibox.net.AutoManagingAsynchronousSocketInterface;
+import sk.hackcraft.multibox.net.MockServerInterface;
 import sk.hackcraft.multibox.net.NetworkServerInterface;
 import sk.hackcraft.multibox.net.NetworkStandards;
 import sk.hackcraft.multibox.net.ServerInterface;
@@ -28,6 +30,8 @@ public class MultiBoxApplication extends Application
 	private HandlerEventLoop eventLoop;
 	private ServerInterface serverInterface;
 	
+	private Server server;
+	
 	private Log log;
 
 	@Override
@@ -42,7 +46,7 @@ public class MultiBoxApplication extends Application
 	
 	public void createServerConnection(final String address)
 	{
-		MessageInterfaceFactory factory = new MessageInterfaceFactory()
+		/*MessageInterfaceFactory factory = new MessageInterfaceFactory()
 		{
 			@Override
 			public MessageInterface create() throws IOException
@@ -62,7 +66,11 @@ public class MultiBoxApplication extends Application
 				serverInterface = null;
 				startConnectActivityAfterDisconnect();
 			}
-		});
+		});*/
+		
+		serverInterface = new MockServerInterface(eventLoop);
+		
+		server = new Server(serverInterface, eventLoop);
 	}
 	
 	public void destroyServerConnection()
@@ -76,27 +84,17 @@ public class MultiBoxApplication extends Application
 		return serverInterface != null;
 	}
 	
-	public Player getPlayer()
+	public Server getServer()
 	{
-		return new ServerPlayerShadow(serverInterface, eventLoop);
-	}
-	
-	public Playlist getPlaylist()
-	{
-		return new ServerPlaylistShadow(serverInterface, eventLoop);
-	}
-	
-	public Library getLibrary()
-	{
-		return new ServerLibraryShadow(serverInterface, eventLoop);
+		return server;
 	}
 	
 	private void startConnectActivityAfterDisconnect()
 	{
-		Intent intent = new Intent(this, ConnectActivity.class);
+		Intent intent = new Intent(this, ServerSelectActivity.class);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
 		
-		intent.putExtra(ConnectActivity.EXTRA_KEY_DISCONNECT, true);
+		intent.putExtra(ServerSelectActivity.EXTRA_KEY_DISCONNECT, true);
 		
 		startActivity(intent);
 	}

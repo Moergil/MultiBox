@@ -1,16 +1,17 @@
 package sk.hackcraft.multibox.android.client;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import sk.hackcraft.multibox.R;
-import sk.hackcraft.multibox.android.client.LibraryFragment.LibraryEventListener;
 import sk.hackcraft.multibox.android.client.LibraryFragment.LibraryProvider;
 import sk.hackcraft.multibox.android.client.PlayerFragment.PlayerProvider;
 import sk.hackcraft.multibox.android.client.PlayerFragment.PlaylistProvider;
 import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
+import sk.hackcraft.multibox.model.Server;
 import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
@@ -22,26 +23,35 @@ import android.support.v4.view.ViewPager;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class MainActivity extends Activity implements PlayerProvider, PlaylistProvider, LibraryProvider, LibraryEventListener
+public class MainActivity extends Activity implements PlayerProvider, PlaylistProvider, LibraryProvider, BackPressedEvent
 {
 	private static final String SAVED_STATE_KEY_ACTIVE_TAB = "activeTab";
+	private static final String SAVED_STATE_KEY_SERVER_NAME = "serverName";
+	
+	private Server server;
 	
 	private ViewPager viewPager;
 	private TabsAdapter tabsAdapter;
 	
 	private ActionBar actionBar;
+	
+	private List<BackPressedListener> backPressedListeners;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_main);
-
+		MultiBoxApplication application = (MultiBoxApplication)getApplication();
+		server = application.getServer();
+		
+		backPressedListeners = new LinkedList<BackPressedListener>();
+		
 		actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
-        actionBar.setDisplayOptions(0, ActionBar.DISPLAY_SHOW_TITLE);
-        
+		
+		setContentView(R.layout.activity_main);
+
 		viewPager = (ViewPager)findViewById(R.id.pager);
 		
 		tabsAdapter = new TabsAdapter(this, viewPager);
@@ -81,6 +91,9 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 		{
 			int activeTab = savedInstanceState.getInt(SAVED_STATE_KEY_ACTIVE_TAB);
 			actionBar.setSelectedNavigationItem(activeTab);
+			
+			String serverName = savedInstanceState.getString(SAVED_STATE_KEY_SERVER_NAME);
+			actionBar.setTitle(serverName);
 		}
 	}
 
@@ -97,12 +110,22 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 		super.onSaveInstanceState(outState);
 		
 		outState.putInt(SAVED_STATE_KEY_ACTIVE_TAB, actionBar.getSelectedNavigationIndex());
+		outState.putString(SAVED_STATE_KEY_SERVER_NAME, (String)actionBar.getTitle());
 	}
 	
 	@Override
 	protected void onResume()
 	{
 		super.onResume();
+		
+		server.requestInfo(new Server.ServerInfoListener()
+		{
+			@Override
+			public void onServerNameReceived(String name)
+			{
+				actionBar.setTitle(name);
+			}
+		});
 	}
 	
 	@Override
@@ -120,35 +143,50 @@ public class MainActivity extends Activity implements PlayerProvider, PlaylistPr
 				return super.onOptionsItemSelected(item);
 		}
 	}
+	
+	@Override
+	public void onBackPressed()
+	{
+		for (BackPressedListener listener : backPressedListeners)
+		{
+			if (listener.onBackPressed())
+			{
+				return;
+			}
+		}
+
+		super.onBackPressed();
+		ActivityTransitionAnimator.runFinishActivityAnimation(this);
+	}
+	
+	@Override
+	public void registerBackPressedListener(BackPressedListener listener)
+	{
+		backPressedListeners.add(listener);
+	}
+	
+	@Override
+	public void unregisterBackPressedListener(BackPressedListener listener)
+	{
+		backPressedListeners.remove(listener);
+	}
 
 	@Override
 	public Player providePlayer()
 	{
-		MultiBoxApplication application = (MultiBoxApplication)getApplication();
-		
-		return application.getPlayer();
+		return server.getPlayer();
 	}
 	
 	@Override
 	public Playlist providePlaylist()
 	{
-		MultiBoxApplication application = (MultiBoxApplication)getApplication();
-		
-		return application.getPlaylist();
+		return server.getPlaylist();
 	}
 	
 	@Override
 	public Library provideLibrary()
 	{
-		MultiBoxApplication application = (MultiBoxApplication)getApplication();
-		
-		return application.getLibrary();
-	}
-	
-	@Override
-	public void onItemChanged(long id, String name)
-	{
-		//actionBar.setTitle(name);
+		return server.getLibrary();
 	}
 	
 	private class TabsAdapter extends FragmentPagerAdapter implements ActionBar.TabListener

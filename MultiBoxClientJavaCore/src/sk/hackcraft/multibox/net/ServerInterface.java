@@ -12,6 +12,8 @@ public interface ServerInterface
 	public void registerEventListener(ServerInterfaceEventListener listener);
 	public void unregisterEventListener(ServerInterfaceEventListener listener);
 	
+	public void requestServerInfo();
+	
 	public void requestPlayerUpdate();
 	public void requestPlaylistUpdate();
 	
@@ -22,7 +24,7 @@ public interface ServerInterface
 	{
 		public void onDisconnect();
 		
-		public void onAuthentificationResponse(boolean succesfull);
+		public void onServerInfoReceived(String serverName);
 		
 		public void onPlayerUpdateReceived(MultimediaItem multimedia, int playbackPosition, boolean playing);
 		public void onPlaylistReceived(List<MultimediaItem> playlist);
@@ -38,9 +40,9 @@ public interface ServerInterface
 		public void onDisconnect()
 		{
 		}
-
+		
 		@Override
-		public void onAuthentificationResponse(boolean succesfull)
+		public void onServerInfoReceived(String serverName)
 		{
 		}
 

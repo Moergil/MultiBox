@@ -9,11 +9,13 @@ import sk.hackcraft.multibox.net.data.AddMultimediaToPlaylistResultData;
 import sk.hackcraft.multibox.net.data.GetLibraryItemData;
 import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
 import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
+import sk.hackcraft.multibox.net.data.GetServerInfoResultData;
 import sk.hackcraft.multibox.net.data.LibraryItemIdData;
 import sk.hackcraft.multibox.net.transformers.AddMultimediaToPlaylistDecoder;
 import sk.hackcraft.multibox.net.transformers.GetLibraryItemDecoder;
 import sk.hackcraft.multibox.net.transformers.GetPlayerStateDecoder;
 import sk.hackcraft.multibox.net.transformers.GetPlaylistDecoder;
+import sk.hackcraft.multibox.net.transformers.GetServerInfoDecoder;
 import sk.hackcraft.multibox.net.transformers.LibraryItemIdEncoder;
 import sk.hackcraft.netinterface.connection.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.connection.AsynchronousMessageInterface.SeriousErrorListener;
@@ -43,6 +45,8 @@ public class NetworkServerInterface implements ServerInterface
 		messageInterface.setMessageReceiver(MessageTypes.GET_PLAYER_STATE, new GetPlayerStateReceiver(messageQueue));
 		messageInterface.setMessageReceiver(MessageTypes.GET_PLAYLIST, new GetPlaylistReceiver(messageQueue));
 		messageInterface.setMessageReceiver(MessageTypes.ADD_LIBRARY_ITEM_TO_PLAYLIST, new AddMultimediaToPlaylistReceiver(messageQueue));
+		messageInterface.setMessageReceiver(MessageTypes.GET_LIBRARY_ITEM, new GetLibraryItemReceiver(messageQueue));
+		messageInterface.setMessageReceiver(MessageTypes.GET_SERVER_INFO, new GetServerInfoReceiver(messageQueue));
 	}
 	
 	@Override
@@ -61,6 +65,13 @@ public class NetworkServerInterface implements ServerInterface
 	public void unregisterEventListener(ServerInterfaceEventListener listener)
 	{
 		serverListeners.remove(listener);
+	}
+	
+	@Override
+	public void requestServerInfo()
+	{
+		Message message = new EmptyMessage(MessageTypes.GET_SERVER_INFO);
+		messageInterface.sendMessage(message);
 	}
 
 	@Override
@@ -227,6 +238,31 @@ public class NetworkServerInterface implements ServerInterface
 			for (ServerInterfaceEventListener listener : serverListeners)
 			{
 				listener.onLibraryItemReceived(libraryItem);
+			}
+		}
+	}
+	
+	private class GetServerInfoReceiver extends DataStringMessageReceiver<GetServerInfoResultData>
+	{
+		public GetServerInfoReceiver(MessageQueue messageQueue)
+		{
+			super(messageQueue);
+		}
+
+		@Override
+		protected DataTransformer<String, GetServerInfoResultData> createParser()
+		{
+			return new GetServerInfoDecoder();
+		}
+
+		@Override
+		protected void onResult(GetServerInfoResultData result)
+		{
+			final String serverName = result.getServerName();
+			
+			for (ServerInterfaceEventListener listener : serverListeners)
+			{
+				listener.onServerInfoReceived(serverName);
 			}
 		}
 	}

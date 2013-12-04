@@ -113,6 +113,21 @@ public class MockServerInterface implements ServerInterface
 		return new Controller();
 	}
 	
+	private void broadcastServerInfo()
+	{
+		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
+		{
+			messageQueue.postDelayed(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					listener.onServerInfoReceived("M0ck3d");
+				}
+			}, 1000);
+		}
+	}	
+	
 	private void broadcastPlayerUpdate()
 	{
 		final MultimediaItem multimedia;
@@ -177,6 +192,12 @@ public class MockServerInterface implements ServerInterface
 				}
 			}, 1000);
 		}
+	}
+	
+	@Override
+	public void requestServerInfo()
+	{
+		broadcastServerInfo();
 	}
 
 	@Override
