@@ -40,7 +40,7 @@ public class MultiBoxApplication extends Application
 	
 	public void createServerConnection(final String address)
 	{
-		MessageInterfaceFactory factory = new MessageInterfaceFactory()
+		/*MessageInterfaceFactory factory = new MessageInterfaceFactory()
 		{
 			@Override
 			public MessageInterface create() throws IOException
@@ -60,9 +60,9 @@ public class MultiBoxApplication extends Application
 				serverInterface = null;
 				startConnectActivityAfterDisconnect();
 			}
-		});
+		});*/
 		
-		//serverInterface = new MockServerInterface(eventLoop);
+		serverInterface = new MockServerInterface(eventLoop);
 		
 		server = new Server(serverInterface, eventLoop);
 	}

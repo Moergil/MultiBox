@@ -63,7 +63,7 @@ public class MultimediaItem implements LibraryItem
 		return equals(multimedia);
 	}
 	
-	public boolean equals(MultimediaItem multimedia)
+	private boolean equals(MultimediaItem multimedia)
 	{
 		return multimedia.getId() == id;
 	}

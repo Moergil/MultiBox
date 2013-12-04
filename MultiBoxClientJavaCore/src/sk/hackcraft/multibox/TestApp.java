@@ -25,7 +25,7 @@ public class TestApp
 			public void run()
 			{
 				Player player = new ServerPlayerShadow(server, eventLoop);
-				player.registerPlayerEventListener(new Player.PlayerEventListener()
+				/*player.registerPlayerEventListener(new Player.PlayerEventListener()
 				{
 					@Override
 					public void onPlayingStateChanged(boolean playing)
@@ -44,7 +44,7 @@ public class TestApp
 					{
 						log.print("P: multimedia changed: " + newMultimedia);
 					}
-				});
+				});*/
 
 				player.init();
 			}

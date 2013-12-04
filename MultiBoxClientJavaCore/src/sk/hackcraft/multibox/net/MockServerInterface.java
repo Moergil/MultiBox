@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import sk.hackcraft.multibox.model.LibraryItem;
 import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
@@ -37,6 +38,11 @@ public class MockServerInterface implements ServerInterface
 		this.serverListeners = new LinkedList<ServerInterface.ServerInterfaceEventListener>();
 	}
 	
+	private long generateDelay()
+	{
+		return 50;
+	}
+	
 	@Override
 	public void close()
 	{		
@@ -62,23 +68,23 @@ public class MockServerInterface implements ServerInterface
 		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Faint", 5);
+		item = new MultimediaItem(id++, "Faint", 6);
 		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Blackout", 5);
+		item = new MultimediaItem(id++, "Blackout", 7);
 		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Homeworld", 5);
+		item = new MultimediaItem(id++, "Homeworld", 3);
 		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "New languages", 5);
+		item = new MultimediaItem(id++, "New languages", 8);
 		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Terra's theme", 5);
+		item = new MultimediaItem(id++, "Terra's theme", 9);
 		rootDirectory.addItem(item);
 		addLibraryItem(item);
 		
@@ -113,6 +119,46 @@ public class MockServerInterface implements ServerInterface
 		return new Controller();
 	}
 	
+	private boolean isPlaying()
+	{
+		return playing;
+	}
+	
+	private void startPlaying()
+	{
+		if (playlist.isEmpty())
+		{
+			return;
+		}
+		
+		playing = true;
+
+		int length = playlist.get(0).getLength();
+		
+		messageQueue.postDelayed(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				playlist.remove(0);
+				
+				broadcastPlayerUpdate();
+				broadcastPlaylistUpdate();
+				
+				if (!playlist.isEmpty())
+				{
+					MultimediaItem nextOne = playlist.get(0);
+					messageQueue.postDelayed(this, TimeUnit.SECONDS.toMillis(nextOne.getLength()));
+				}
+				else
+				{
+					playing = false;
+					broadcastPlayerUpdate();
+				}
+			}
+		}, TimeUnit.SECONDS.toMillis(length));
+	}
+	
 	private void broadcastServerInfo()
 	{
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
@@ -124,7 +170,7 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onServerInfoReceived("M0ck3d");
 				}
-			}, 1000);
+			}, generateDelay());
 		}
 	}	
 	
@@ -156,7 +202,7 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onPlayerUpdateReceived(multimedia, playbackPosition, playing);
 				}
-			}, 1000);
+			}, generateDelay());
 		}
 	}	
 	
@@ -173,7 +219,7 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onPlaylistReceived(playlist);
 				}
-			}, 1000);
+			}, generateDelay());
 		}
 	}
 	
@@ -190,7 +236,7 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onLibraryItemReceived(directory);
 				}
-			}, 1000);
+			}, generateDelay());
 		}
 	}
 	
@@ -289,9 +335,15 @@ public class MockServerInterface implements ServerInterface
 	@Override
 	public void addLibraryItemToPlaylist(long itemId)
 	{
-		playlist.add(new MultimediaItem(itemId, "Item " + itemId, 10));
+		MultimediaItem item = (MultimediaItem)library.get(itemId);
+		playlist.add(item);
 		
 		broadcastPlaylistUpdate();
 		broadcastPlayerUpdate();
+		
+		if (!isPlaying())
+		{
+			startPlaying();
+		}
 	}
 }

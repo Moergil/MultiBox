@@ -21,8 +21,10 @@ public interface Player
 	
 	public interface PlayerEventListener
 	{
-		public void onPlayingStateChanged(boolean playing);
-		public void onPlaybackPositionChanged(int newPosition);
-		public void onMultimediaChanged(MultimediaItem newMultimedia);
+		public void set(MultimediaItem multimedia);
+		public void play();
+		public void play(int playbackPosition);
+		public void pause();
+		public void synchronizePlaybackPosition(int playbackPosition);
 	}
 }

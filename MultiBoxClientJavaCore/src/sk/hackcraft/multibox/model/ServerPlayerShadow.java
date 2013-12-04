@@ -2,6 +2,7 @@ package sk.hackcraft.multibox.model;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.ServerInterface;
@@ -15,6 +16,8 @@ public class ServerPlayerShadow implements Player
 	
 	private ServerListener serverListener;
 	
+	private long lastUpdateTimestamp;
+	
 	private boolean playing;
 	private MultimediaItem activeMultimedia;
 	private int playbackPosition;
@@ -25,6 +28,8 @@ public class ServerPlayerShadow implements Player
 	{
 		this.serverInterface = serverInterface;
 		this.messageQueue = messageQueue;
+		
+		this.lastUpdateTimestamp = System.currentTimeMillis();
 		
 		this.playing = false;
 		this.activeMultimedia = null;
@@ -63,7 +68,8 @@ public class ServerPlayerShadow implements Player
 	@Override
 	public int getPlaybackPosition()
 	{
-		return playbackPosition;
+		int offset = (int)TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - lastUpdateTimestamp);
+		return playbackPosition + offset;
 	}
 
 	@Override
@@ -101,82 +107,74 @@ public class ServerPlayerShadow implements Player
 		@Override
 		public void onPlayerUpdateReceived(final MultimediaItem multimedia, final int playbackPosition, final boolean playing)
 		{
-			if (multimedia == null)
-			{
-				if (activeMultimedia != null)
-				{
-					activeMultimedia = null;
-					
-					for (final Player.PlayerEventListener listener : playerListeners)
-					{
-						messageQueue.post(new Runnable()
-						{
-							@Override
-							public void run()
-							{
-								listener.onMultimediaChanged(null);
-							}
-						});
-					}
-				}
-			}
-			else
-			{
-				final boolean newMultimedia;
-				if (activeMultimedia == null || !activeMultimedia.equals(multimedia))
-				{
-					newMultimedia = true;
-					ServerPlayerShadow.this.activeMultimedia = multimedia;
-				}
-				else
-				{
-					newMultimedia = false;
-				}
-	
-				ServerPlayerShadow.this.playbackPosition = playbackPosition;
-				
-				for (final Player.PlayerEventListener listener : playerListeners)
-				{
-					messageQueue.post(new Runnable()
-					{
-						@Override
-						public void run()
-						{
-							if (newMultimedia)
-							{
-								listener.onMultimediaChanged(multimedia);
-							}
-							
-							listener.onPlaybackPositionChanged(playbackPosition);
-						}
-					});
-				}
-			}
+			ServerPlayerShadow player = ServerPlayerShadow.this;
+
+			final boolean wasPlaying = player.playing;
 			
-			boolean stateChanged = ServerPlayerShadow.this.playing != playing;
-			
-			ServerPlayerShadow.this.playing = playing;
-			
-			if (stateChanged)
-			{
-				for (final Player.PlayerEventListener listener : playerListeners)
-				{
-					messageQueue.post(new Runnable()
-					{
-						
-						@Override
-						public void run()
-						{
-							listener.onPlayingStateChanged(playing);
-						}
-					});
-				}
-			}
+			final boolean playingStateChanged = player.playing != playing;
+			final boolean playbackPositionChanged = player.playbackPosition != playbackPosition;
+			final boolean multimediaChanged;
 			
 			if (activeMultimedia == null)
 			{
-				System.out.println();
+				multimediaChanged = multimedia != null;
 			}
+			else
+			{
+				multimediaChanged = !player.activeMultimedia.equals(multimedia);
+			}
+			
+			lastUpdateTimestamp = System.currentTimeMillis();
+			
+			player.activeMultimedia = multimedia;
+			player.playing = playing;
+			player.playbackPosition = playbackPosition;
+			
+			messageQueue.post(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					for (final Player.PlayerEventListener listener : playerListeners)
+					{
+						if (multimediaChanged)
+						{
+							if (wasPlaying)
+							{
+								listener.pause();
+							}
+							
+							listener.set(multimedia);
+							
+							if (playing)
+							{
+								listener.play();
+							}
+						}
+						else
+						{
+							if (playingStateChanged)
+							{
+								if (playing)
+								{
+									listener.play(playbackPosition);
+								}
+								else
+								{
+									listener.pause();
+								}
+							}
+							else
+							{
+								if (playbackPositionChanged)
+								{
+									listener.synchronizePlaybackPosition(playbackPosition);
+								}
+							}
+						}
+					}
+				}
+			});
 		}
 	}
 }

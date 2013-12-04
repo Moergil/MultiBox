@@ -14,9 +14,11 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -38,6 +40,8 @@ public class PlayerFragment extends Fragment
 	
 	private PlaylistAdapter playlistAdapter;	
 	private ListView playlistView;
+
+	private MultimediaItem multimedia;
 	
 	private CountDownTimer playbackPositionUpdater;
 
@@ -101,7 +105,7 @@ public class PlayerFragment extends Fragment
 			showMultimedia(multimedia);
 			
 			int playbackPosition = player.getPlaybackPosition();
-			updatePlaybackPosition(playbackPosition);
+			synchronizePlaybackPositionInfo(playbackPosition);
 		}
 		else
 		{
@@ -118,6 +122,15 @@ public class PlayerFragment extends Fragment
 		
 		player.init();
 		playlist.init();
+		
+		if (player.isPlaying())
+		{
+			MultimediaItem multimedia = player.getActiveMultimedia();
+			int length = multimedia.getLength();
+			int playbackPosition = player.getPlaybackPosition();
+			
+			startPlaybackPositionUpdater(length, playbackPosition);
+		}
 	}
 	
 	@Override
@@ -128,7 +141,7 @@ public class PlayerFragment extends Fragment
 		player.close();
 		playlist.close();
 		
-		if (isPlaybackPositionUpdaterActive())
+		if (player.isPlaying())
 		{
 			stopPlaybackPositionUpdater();
 		}
@@ -143,38 +156,27 @@ public class PlayerFragment extends Fragment
 		playlist.unregisterListener(playlistListener);
 	}
 	
-	private boolean isPlaybackPositionUpdaterActive()
+	private void startPlaybackPositionUpdater(final int length, int playbackPosition)
 	{
-		return playbackPositionUpdater != null;
-	}
-	
-	private void startPlaybackPositionUpdater(int secondsToEnd)
-	{
-		long millisToEnd = secondsToEnd * 1000;
+		long millisToEnd = TimeUnit.SECONDS.toMillis(length - playbackPosition);
 		
-		playbackPositionUpdater = new CountDownTimer(millisToEnd, 100)
+		Display display = ((WindowManager)getActivity().getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+		int refreshRate = (int)display.getRefreshRate();
+		
+		playbackPositionUpdater = new CountDownTimer(millisToEnd, TimeUnit.SECONDS.toMillis(1) / refreshRate)
 		{
-			
 			@Override
 			public void onTick(long millisUntilFinished)
 			{
-				int secondsUntilFinished = (int)TimeUnit.MILLISECONDS.toSeconds(millisUntilFinished);
-				
-				try
-				{
-					int actualSeconds = player.getActiveMultimedia().getLength() - secondsUntilFinished;
-					setPlaybackPosition(actualSeconds);
-				}
-				catch (Exception e)
-				{
-					e.printStackTrace();
-				}
+				long actualMilliseconds = TimeUnit.SECONDS.toMillis(length) - millisUntilFinished;
+				setPlaybackPositionInfo(length, actualMilliseconds);
 			}
 	
 			@Override
 			public void onFinish()
 			{
-				setPlaybackPosition(player.getActiveMultimedia().getLength());
+				int length = player.getActiveMultimedia().getLength();
+				setPlaybackPositionInfo(length, TimeUnit.SECONDS.toMillis(length));
 			}
 		};
 		
@@ -183,18 +185,25 @@ public class PlayerFragment extends Fragment
 	
 	private void stopPlaybackPositionUpdater()
 	{
+		if (playbackPositionUpdater == null)
+		{
+			return;
+		}
+		
 		playbackPositionUpdater.cancel();
 		playbackPositionUpdater = null;
 	}
 	
 	public void showMultimedia(MultimediaItem multimedia)
 	{
+		this.multimedia = multimedia;
+		
 		String name = multimedia.getName();
 		nameView.setText(name);
 		
 		int length = multimedia.getLength();
-		progressView.setMax(length);
-		updatePlaybackPosition(0);
+		progressView.setMax((int)TimeUnit.SECONDS.toMillis(length));
+		synchronizePlaybackPositionInfo(0);
 	}
 	
 	public void showNothing()
@@ -204,32 +213,22 @@ public class PlayerFragment extends Fragment
 		progressView.setProgress(0);
 	}
 	
-	public void setPlaybackPosition(int playbackPosition)
+	public void setPlaybackPositionInfo(int length, long playbackPositionMillis)
 	{
-		int length = player.getActiveMultimedia().getLength();
-		
-		int estimatedTime = length - playbackPosition;
+		int estimatedTime = length - (int)TimeUnit.MILLISECONDS.toSeconds(playbackPositionMillis);
 		int seconds = (int)(estimatedTime % 60);
 		int minutes = (int)(estimatedTime / 60);
 		timeView.setText(String.format("%d:%d", minutes, seconds));
 
-		progressView.setProgress(playbackPosition);
+		progressView.setProgress((int)playbackPositionMillis);
 	}
 
-	public void updatePlaybackPosition(int playbackPosition)
+	public void synchronizePlaybackPositionInfo(int playbackPosition)
 	{
-		setPlaybackPosition(playbackPosition);
+		MultimediaItem multimedia = player.getActiveMultimedia();
 		
-		if (player.isPlaying())
-		{
-			if (playbackPositionUpdater != null)
-			{
-				stopPlaybackPositionUpdater();
-			}
-			
-			int secondsToEnd = player.getActiveMultimedia().getLength() - playbackPosition;
-			startPlaybackPositionUpdater(secondsToEnd);
-		}
+		int length = multimedia.getLength();
+		setPlaybackPositionInfo(length, playbackPosition);
 	}
 	
 	public void setPlaylist(List<MultimediaItem> playlist)
@@ -248,10 +247,19 @@ public class PlayerFragment extends Fragment
 	
 	private class PlayerListener implements Player.PlayerEventListener
 	{
-		@Override
+		/*@Override
 		public void onPlayingStateChanged(boolean playing)
 		{
-			if (!playing && playbackPositionUpdater != null)
+			if (playing)
+			{
+				MultimediaItem multimedia = player.getActiveMultimedia();
+				int length = multimedia.getLength();
+				
+				int playbackPosition = player.getPlaybackPosition();
+				
+				startPlaybackPositionUpdater(length, length - playbackPosition);
+			}
+			else
 			{
 				stopPlaybackPositionUpdater();
 			}
@@ -260,18 +268,13 @@ public class PlayerFragment extends Fragment
 		@Override
 		public void onPlaybackPositionChanged(int newPosition)
 		{
-			updatePlaybackPosition(newPosition);
+			synchronizePlaybackPositionInfo(newPosition);
 		}
 
 		@Override
 		public void onMultimediaChanged(MultimediaItem newMultimedia)
 		{
-			if (playbackPositionUpdater != null)
-			{
-				stopPlaybackPositionUpdater();
-			}
-			
-			if (!player.hasActiveMultimedia())
+			if (newMultimedia == null)
 			{
 				showNothing();
 			}
@@ -279,6 +282,46 @@ public class PlayerFragment extends Fragment
 			{
 				showMultimedia(newMultimedia);
 			}
+		}*/
+
+		@Override
+		public void set(MultimediaItem multimedia)
+		{
+			if (multimedia != null)
+			{
+				showMultimedia(multimedia);
+			}
+			else
+			{
+				showNothing();
+			}
+		}
+		
+		@Override
+		public void play()
+		{
+			play(0);
+		}
+
+		@Override
+		public void play(int playbackPosition)
+		{
+			int length = multimedia.getLength();
+			
+			startPlaybackPositionUpdater(length, playbackPosition);
+		}
+
+		@Override
+		public void pause()
+		{
+			stopPlaybackPositionUpdater();
+		}
+		
+		@Override
+		public void synchronizePlaybackPosition(int playbackPosition)
+		{
+			pause();
+			play(playbackPosition);
 		}
 	}
 	
