@@ -1,17 +1,26 @@
 package sk.hackcraft.multibox.android.client;
 
+import java.util.List;
+
 import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.model.Server;
+import sk.hackcraft.multibox.util.SelectedServersStorage;
+import sk.hackcraft.multibox.util.SelectedServersStorage.ServerEntry;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class ServerSelectActivity extends Activity
 {
@@ -20,6 +29,12 @@ public class ServerSelectActivity extends Activity
 	private MultiBoxApplication application;
 	
 	private EditText serverAddressInputField;
+	private ListView lastServersList;
+	private View disconnectNotification;
+	
+	private ServersAdapter lastServersAdapter;
+	
+	private SelectedServersStorage lastServersStorage;
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
@@ -48,10 +63,30 @@ public class ServerSelectActivity extends Activity
 			}
 		});
 		
+		disconnectNotification = findViewById(R.id.disconnect_notification);
+		
+		lastServersList = (ListView)findViewById(R.id.last_servers_list);
+		
+		lastServersAdapter = new ServersAdapter(this);
+		lastServersList.setAdapter(lastServersAdapter);
+		lastServersList.setOnItemClickListener(new AdapterView.OnItemClickListener()
+		{
+			@Override
+			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
+			{
+				ServerEntry serverEntry = lastServersAdapter.getItem(position);
+				
+				String address = serverEntry.getAddress();
+				onServerSelected(address);
+			}
+		});
+		
+		lastServersStorage = application.getSelectedServersStorage();
+		
 		Intent startIntent = getIntent();
 		if (startIntent.getBooleanExtra(EXTRA_KEY_DISCONNECT, false))
 		{
-			Toast.makeText(this, "disconnect", Toast.LENGTH_LONG).show();
+			disconnectNotification.setVisibility(View.VISIBLE);
 		}
 		
 		Button connectButton = (Button)findViewById(R.id.button_server_connect);
@@ -74,11 +109,57 @@ public class ServerSelectActivity extends Activity
 		{
 			application.destroyServerConnection();
 		}
+		
+		lastServersStorage.requestServersList(new SelectedServersStorage.ServersListListener()
+		{
+			@Override
+			public void onServersReceived(List<ServerEntry> servers)
+			{
+				if (servers.isEmpty())
+				{
+					return;
+				}
+				
+				lastServersAdapter.clear();
+				lastServersAdapter.addAll(servers);
+				
+				View lastServersFieldset = findViewById(R.id.last_servers_fieldset);
+				lastServersFieldset.setVisibility(View.VISIBLE);
+			}
+			
+			@Override
+			public void onFailure()
+			{
+			}
+		});
+	}
+	
+	@Override
+	public void onUserInteraction()
+	{
+		super.onUserInteraction();
+		
+		if (disconnectNotification.getVisibility() == View.VISIBLE)
+		{
+			disconnectNotification.setVisibility(View.GONE);
+		}
 	}
 	
 	private void onManualConnectRequested()
 	{
 		String address = serverAddressInputField.getText().toString();
+		connectToServer(address);
+		
+		serverAddressInputField.setText("");
+	}
+	
+	private void onServerSelected(String address)
+	{
+		connectToServer(address);
+	}
+	
+	private void connectToServer(final String address)
+	{
 		application.createServerConnection(address);
 		
 		Server server = application.getServer();
@@ -87,6 +168,14 @@ public class ServerSelectActivity extends Activity
 			@Override
 			public void onServerNameReceived(String name)
 			{
+				lastServersStorage.requestServerSave(address, name, new SelectedServersStorage.SaveResultListener()
+				{
+					@Override
+					public void onResult(boolean saved)
+					{
+					}
+				});
+				
 				startMainActivity(name);
 			}
 		});
@@ -100,5 +189,35 @@ public class ServerSelectActivity extends Activity
 		
 		startActivity(intent);
 		ActivityTransitionAnimator.runStartActivityAnimation(this);
+	}
+	
+	private class ServersAdapter extends ArrayAdapter<SelectedServersStorage.ServerEntry>
+	{
+		public ServersAdapter(Context context)
+		{
+			super(context, R.layout.item_selected_servers);
+		}
+		
+		@Override
+		public View getView(int position, View convertView, ViewGroup parent)
+		{
+			ServerEntry server = getItem(position);
+			
+			Context context = getContext();
+			LayoutInflater viewInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			
+			View serverItemView = viewInflater.inflate(R.layout.item_selected_servers, null);
+
+			TextView serverNameView = (TextView)serverItemView.findViewById(R.id.server_name_view);
+			TextView serverAddressView = (TextView)serverItemView.findViewById(R.id.server_address_view);
+			
+			String name = server.getName();
+			serverNameView.setText(name);
+			
+			String address = server.getAddress();
+			serverAddressView.setText(address);
+			
+			return serverItemView;
+		}
 	}
 }

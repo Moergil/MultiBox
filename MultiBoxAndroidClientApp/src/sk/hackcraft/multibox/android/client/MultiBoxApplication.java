@@ -5,28 +5,30 @@ import java.net.Socket;
 
 import sk.hackcraft.multibox.android.client.util.AndroidLog;
 import sk.hackcraft.multibox.android.client.util.HandlerEventLoop;
+import sk.hackcraft.multibox.android.client.util.JsonCacheSelectedServersStorage;
 import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.net.AutoManagingAsynchronousSocketInterface;
-import sk.hackcraft.multibox.net.MockServerInterface;
 import sk.hackcraft.multibox.net.NetworkServerInterface;
 import sk.hackcraft.multibox.net.NetworkStandards;
 import sk.hackcraft.multibox.net.ServerInterface;
+import sk.hackcraft.multibox.util.SelectedServersStorage;
 import sk.hackcraft.netinterface.connection.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.connection.MessageInterface;
 import sk.hackcraft.netinterface.connection.MessageInterfaceFactory;
 import sk.hackcraft.netinterface.connection.SocketMessageInterface;
 import sk.hackcraft.util.Log;
+import sk.hackcraft.util.MessageQueue;
 import android.app.Application;
 import android.content.Intent;
 
 public class MultiBoxApplication extends Application
 {	
-	private HandlerEventLoop eventLoop;
+	private MessageQueue eventLoop;
+	private Log log;
+	
 	private ServerInterface serverInterface;
 	
 	private Server server;
-	
-	private Log log;
 
 	@Override
 	public void onCreate()
@@ -38,9 +40,14 @@ public class MultiBoxApplication extends Application
 		log = new AndroidLog();
 	}
 	
+	public SelectedServersStorage getSelectedServersStorage()
+	{
+		return new JsonCacheSelectedServersStorage(this, eventLoop, log);
+	}
+	
 	public void createServerConnection(final String address)
 	{
-		/*MessageInterfaceFactory factory = new MessageInterfaceFactory()
+		MessageInterfaceFactory factory = new MessageInterfaceFactory()
 		{
 			@Override
 			public MessageInterface create() throws IOException
@@ -60,9 +67,9 @@ public class MultiBoxApplication extends Application
 				serverInterface = null;
 				startConnectActivityAfterDisconnect();
 			}
-		});*/
+		});
 		
-		serverInterface = new MockServerInterface(eventLoop);
+		//serverInterface = new MockServerInterface(eventLoop);
 		
 		server = new Server(serverInterface, eventLoop);
 	}

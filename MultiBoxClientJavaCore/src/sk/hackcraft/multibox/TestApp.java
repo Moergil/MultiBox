@@ -2,7 +2,6 @@ package sk.hackcraft.multibox;
 
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.ServerPlayerShadow;
-import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.MockServerInterface;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.ManualEventLoop;

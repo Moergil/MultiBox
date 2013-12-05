@@ -247,43 +247,6 @@ public class PlayerFragment extends Fragment
 	
 	private class PlayerListener implements Player.PlayerEventListener
 	{
-		/*@Override
-		public void onPlayingStateChanged(boolean playing)
-		{
-			if (playing)
-			{
-				MultimediaItem multimedia = player.getActiveMultimedia();
-				int length = multimedia.getLength();
-				
-				int playbackPosition = player.getPlaybackPosition();
-				
-				startPlaybackPositionUpdater(length, length - playbackPosition);
-			}
-			else
-			{
-				stopPlaybackPositionUpdater();
-			}
-		}
-
-		@Override
-		public void onPlaybackPositionChanged(int newPosition)
-		{
-			synchronizePlaybackPositionInfo(newPosition);
-		}
-
-		@Override
-		public void onMultimediaChanged(MultimediaItem newMultimedia)
-		{
-			if (newMultimedia == null)
-			{
-				showNothing();
-			}
-			else
-			{
-				showMultimedia(newMultimedia);
-			}
-		}*/
-
 		@Override
 		public void set(MultimediaItem multimedia)
 		{
