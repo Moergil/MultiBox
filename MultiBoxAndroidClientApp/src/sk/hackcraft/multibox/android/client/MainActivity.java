@@ -10,6 +10,7 @@ import android.app.ActionBar;
 import android.app.ActionBar.Tab;
 import android.app.Activity;
 import android.app.Fragment;
+import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
@@ -61,7 +62,7 @@ public class MainActivity extends Activity implements BackPressedEvent
 		
 		tab = actionBar.newTab();
 		tab.setText(R.string.playlist);
-		tabsAdapter.addTab(tab,PlayerFragment.class);
+		tabsAdapter.addTab(tab, PlayerFragment.class);
 		
 		tab = actionBar.newTab();
 		tab.setText(R.string.library);
@@ -91,6 +92,17 @@ public class MainActivity extends Activity implements BackPressedEvent
 		if (savedInstanceState != null)
 		{
 			restoreState(savedInstanceState);
+		}
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		super.onDestroy();
+		
+		if (isFinishing())
+		{
+			ActivityTransitionAnimator.runFinishActivityAnimation(this);
 		}
 	}
 	
@@ -147,16 +159,21 @@ public class MainActivity extends Activity implements BackPressedEvent
 	@Override
 	public void onBackPressed()
 	{
-		for (BackPressedListener listener : backPressedListeners)
+		Fragment fragment = getCurrentVisibleViewPagerFragment(Fragment.class);
+		
+		boolean backPressConsumed = false;
+		
+		if (fragment instanceof BackPressedListener)
 		{
-			if (listener.onBackPressed())
-			{
-				return;
-			}
+			BackPressedListener listener = (BackPressedListener)fragment;
+			
+			backPressConsumed = listener.onBackPressed();
 		}
-
-		super.onBackPressed();
-		ActivityTransitionAnimator.runFinishActivityAnimation(this);
+		
+		if (!backPressConsumed)
+		{
+			super.onBackPressed();
+		}
 	}
 	
 	@Override
@@ -169,6 +186,27 @@ public class MainActivity extends Activity implements BackPressedEvent
 	public void unregisterBackPressedListener(BackPressedListener listener)
 	{
 		backPressedListeners.remove(listener);
+	}
+	
+	private <F extends Fragment> F getCurrentVisibleViewPagerFragment(Class<F> fragmentClass)
+	{
+		int position = viewPager.getCurrentItem();
+		return getViewPagerFragment(position, fragmentClass);
+	}
+	
+	private <F extends Fragment> F getViewPagerFragment(int position, Class<F> fragmentClass)
+	{
+		FragmentManager fragmentManager = getFragmentManager();
+		
+		String tag = createViewPagerFragmentTag(position);
+		Fragment fragment = fragmentManager.findFragmentByTag(tag);
+		
+		return fragmentClass.cast(fragment);
+	}
+	
+	private String createViewPagerFragmentTag(int position)
+	{
+		return "android:switcher:" + R.id.pager + ":" + position;
 	}
 	
 	private class TabsAdapter extends FragmentPagerAdapter implements ActionBar.TabListener
@@ -197,6 +235,7 @@ public class MainActivity extends Activity implements BackPressedEvent
 		@Override
 		public Fragment getItem(int position)
 		{
+			// TODO change to that way, that fragments will be instantiated in activity and position will be enum
 			Class<? extends Fragment> fragmentClass = fragmentClasses.get(position);
 			
 			return Fragment.instantiate(MainActivity.this, fragmentClass.getName());

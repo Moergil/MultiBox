@@ -19,6 +19,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -29,7 +30,7 @@ public class ServerSelectActivity extends Activity
 	private MultiBoxApplication application;
 	
 	private EditText serverAddressInputField;
-	private ListView lastServersList;
+	private LinearLayout lastServersList;
 	private View disconnectNotification;
 	
 	private ServersAdapter lastServersAdapter;
@@ -65,21 +66,9 @@ public class ServerSelectActivity extends Activity
 		
 		disconnectNotification = findViewById(R.id.disconnect_notification);
 		
-		lastServersList = (ListView)findViewById(R.id.last_servers_list);
+		lastServersList = (LinearLayout)findViewById(R.id.last_servers_list);
 		
-		lastServersAdapter = new ServersAdapter(this);
-		lastServersList.setAdapter(lastServersAdapter);
-		lastServersList.setOnItemClickListener(new AdapterView.OnItemClickListener()
-		{
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
-			{
-				ServerEntry serverEntry = lastServersAdapter.getItem(position);
-				
-				String address = serverEntry.getAddress();
-				onServerSelected(address);
-			}
-		});
+		lastServersAdapter = new ServersAdapter(this);		
 		
 		lastServersStorage = application.getSelectedServersStorage();
 		
@@ -120,8 +109,7 @@ public class ServerSelectActivity extends Activity
 					return;
 				}
 				
-				lastServersAdapter.clear();
-				lastServersAdapter.addAll(servers);
+				createLastServersList(servers);
 				
 				View lastServersFieldset = findViewById(R.id.last_servers_fieldset);
 				lastServersFieldset.setVisibility(View.VISIBLE);
@@ -142,6 +130,39 @@ public class ServerSelectActivity extends Activity
 		if (disconnectNotification.getVisibility() == View.VISIBLE)
 		{
 			disconnectNotification.setVisibility(View.GONE);
+		}
+	}
+	
+	private void createLastServersList(List<ServerEntry> servers)
+	{
+		lastServersList.removeAllViews();
+		
+		for (final ServerEntry server : servers)
+		{
+			LayoutInflater viewInflater = (LayoutInflater)getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+			
+			View serverItemView = viewInflater.inflate(R.layout.item_selected_servers, null);
+			
+			TextView serverNameView = (TextView)serverItemView.findViewById(R.id.server_name_view);
+			TextView serverAddressView = (TextView)serverItemView.findViewById(R.id.server_address_view);
+			
+			String name = server.getName();
+			serverNameView.setText(name);
+			
+			String address = server.getAddress();
+			serverAddressView.setText(address);
+			
+			serverItemView.setOnClickListener(new View.OnClickListener()
+			{
+				@Override
+				public void onClick(View v)
+				{
+					String address = server.getAddress();
+					onServerSelected(address);
+				}
+			});
+			
+			lastServersList.addView(serverItemView);
 		}
 	}
 	

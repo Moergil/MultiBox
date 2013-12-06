@@ -8,6 +8,7 @@ import sk.hackcraft.multibox.android.client.util.HandlerEventLoop;
 import sk.hackcraft.multibox.android.client.util.JsonCacheSelectedServersStorage;
 import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.net.AutoManagingAsynchronousSocketInterface;
+import sk.hackcraft.multibox.net.MockServerInterface;
 import sk.hackcraft.multibox.net.NetworkServerInterface;
 import sk.hackcraft.multibox.net.NetworkStandards;
 import sk.hackcraft.multibox.net.ServerInterface;
@@ -71,7 +72,7 @@ public class MultiBoxApplication extends Application
 		
 		//serverInterface = new MockServerInterface(eventLoop);
 		
-		server = new Server(serverInterface, eventLoop);
+		server = new Server(serverInterface, eventLoop, log);
 	}
 	
 	public void destroyServerConnection()
@@ -83,6 +84,11 @@ public class MultiBoxApplication extends Application
 	public boolean hasActiveConnection()
 	{
 		return serverInterface != null;
+	}
+	
+	public Log getLog()
+	{
+		return log;
 	}
 	
 	public Server getServer()

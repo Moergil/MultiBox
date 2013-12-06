@@ -23,7 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-public class LibraryFragment extends Fragment
+public class LibraryFragment extends Fragment implements BackPressedListener
 {
 	private static final String SAVED_STATE_KEY_HISTORY = "history";
 	
@@ -194,12 +194,12 @@ public class LibraryFragment extends Fragment
 		outState.putLongArray(SAVED_STATE_KEY_HISTORY, historyEntries);
 	}
 	
-	public boolean canNavigateBack()
+	private boolean canNavigateBack()
 	{
 		return history.size() > 1;
 	}
 	
-	public void navigateBack()
+	private void navigateBack()
 	{
 		history.pop();
 		
@@ -207,6 +207,20 @@ public class LibraryFragment extends Fragment
 		{
 			long id = history.peek();
 			requestDirectory(id);
+		}
+	}
+	
+	@Override
+	public boolean onBackPressed()
+	{
+		if (canNavigateBack())
+		{
+			navigateBack();
+			return true;
+		}
+		else
+		{
+			return false;
 		}
 	}
 	

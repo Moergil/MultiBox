@@ -21,10 +21,6 @@ public interface Player
 	
 	public interface PlayerEventListener
 	{
-		public void set(MultimediaItem multimedia);
-		public void play();
-		public void play(int playbackPosition);
-		public void pause();
-		public void synchronizePlaybackPosition(int playbackPosition);
+		public void update(MultimediaItem multimedia, int playbackPosition, boolean playing);
 	}
 }

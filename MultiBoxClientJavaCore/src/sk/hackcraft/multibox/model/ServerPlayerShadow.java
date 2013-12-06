@@ -7,12 +7,14 @@ import java.util.concurrent.TimeUnit;
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
+import sk.hackcraft.util.Log;
 import sk.hackcraft.util.MessageQueue;
 
 public class ServerPlayerShadow implements Player
 {
 	private final ServerInterface serverInterface;
 	private final MessageQueue messageQueue;
+	private final Log log;
 	
 	private ServerListener serverListener;
 	
@@ -24,10 +26,11 @@ public class ServerPlayerShadow implements Player
 	
 	private List<PlayerEventListener> playerListeners;
 	
-	public ServerPlayerShadow(ServerInterface serverInterface, MessageQueue messageQueue)
+	public ServerPlayerShadow(ServerInterface serverInterface, MessageQueue messageQueue, Log log)
 	{
 		this.serverInterface = serverInterface;
 		this.messageQueue = messageQueue;
+		this.log = log;
 		
 		this.lastUpdateTimestamp = System.currentTimeMillis();
 		
@@ -107,22 +110,13 @@ public class ServerPlayerShadow implements Player
 		@Override
 		public void onPlayerUpdateReceived(final MultimediaItem multimedia, final int playbackPosition, final boolean playing)
 		{
+			if (!isStateValid(multimedia, playbackPosition, playing))
+			{
+				log.printf("Received invalid player state: %s %d %b", multimedia, playbackPosition, playing);
+				return;
+			}
+			
 			ServerPlayerShadow player = ServerPlayerShadow.this;
-
-			final boolean wasPlaying = player.playing;
-			
-			final boolean playingStateChanged = player.playing != playing;
-			final boolean playbackPositionChanged = player.playbackPosition != playbackPosition;
-			final boolean multimediaChanged;
-			
-			if (activeMultimedia == null)
-			{
-				multimediaChanged = multimedia != null;
-			}
-			else
-			{
-				multimediaChanged = !player.activeMultimedia.equals(multimedia);
-			}
 			
 			lastUpdateTimestamp = System.currentTimeMillis();
 			
@@ -137,44 +131,20 @@ public class ServerPlayerShadow implements Player
 				{
 					for (final Player.PlayerEventListener listener : playerListeners)
 					{
-						if (multimediaChanged)
-						{
-							if (wasPlaying)
-							{
-								listener.pause();
-							}
-							
-							listener.set(multimedia);
-							
-							if (playing)
-							{
-								listener.play();
-							}
-						}
-						else
-						{
-							if (playingStateChanged)
-							{
-								if (playing)
-								{
-									listener.play(playbackPosition);
-								}
-								else
-								{
-									listener.pause();
-								}
-							}
-							else
-							{
-								if (playbackPositionChanged)
-								{
-									listener.synchronizePlaybackPosition(playbackPosition);
-								}
-							}
-						}
+						listener.update(multimedia, playbackPosition, playing);
 					}
 				}
 			});
+		}
+		
+		private boolean isStateValid(MultimediaItem multimedia, int playbackPosition, boolean playing)
+		{
+			if (multimedia == null && (playbackPosition != 0 || playing))
+			{
+				return false;
+			}
+			
+			return true;
 		}
 	}
 }

@@ -25,6 +25,8 @@ public class MockServerInterface implements ServerInterface
 	
 	private List<ServerInterface.ServerInterfaceEventListener> serverListeners;
 	
+	private long lastMultimediaStartTimestamp;
+	
 	public MockServerInterface(MessageQueue messageQueue)
 	{
 		this.messageQueue = messageQueue;
@@ -84,7 +86,11 @@ public class MockServerInterface implements ServerInterface
 		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Terra's theme", 9);
+		item = new MultimediaItem(id++, "Terra's theme", 5);
+		rootDirectory.addItem(item);
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "Terra's theme long", 30);
 		rootDirectory.addItem(item);
 		addLibraryItem(item);
 		
@@ -133,6 +139,7 @@ public class MockServerInterface implements ServerInterface
 		
 		playing = true;
 
+		lastMultimediaStartTimestamp = System.currentTimeMillis();
 		int length = playlist.get(0).getLength();
 		
 		messageQueue.postDelayed(new Runnable()
@@ -141,6 +148,8 @@ public class MockServerInterface implements ServerInterface
 			public void run()
 			{
 				playlist.remove(0);
+		
+				lastMultimediaStartTimestamp = System.currentTimeMillis();
 				
 				broadcastPlayerUpdate();
 				broadcastPlaylistUpdate();
@@ -189,7 +198,9 @@ public class MockServerInterface implements ServerInterface
 		else
 		{
 			multimedia = playlist.get(0);
-			playbackPosition = MockServerInterface.this.playbackPosition;
+			
+			int offset = (int)TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - lastMultimediaStartTimestamp); 
+			playbackPosition = MockServerInterface.this.playbackPosition + offset;
 			playing = true;
 		}
 		

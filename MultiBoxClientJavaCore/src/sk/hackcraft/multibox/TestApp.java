@@ -23,7 +23,7 @@ public class TestApp
 			@Override
 			public void run()
 			{
-				Player player = new ServerPlayerShadow(server, eventLoop);
+				Player player = new ServerPlayerShadow(server, eventLoop, log);
 				/*player.registerPlayerEventListener(new Player.PlayerEventListener()
 				{
 					@Override
