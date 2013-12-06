@@ -3,6 +3,7 @@ package sk.hackcraft.multibox.android.client;
 import java.util.List;
 
 import sk.hackcraft.multibox.R;
+import sk.hackcraft.multibox.android.client.util.ActivityTransitionAnimator;
 import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.util.SelectedServersStorage;
 import sk.hackcraft.multibox.util.SelectedServersStorage.ServerEntry;
@@ -32,9 +33,7 @@ public class ServerSelectActivity extends Activity
 	private EditText serverAddressInputField;
 	private LinearLayout lastServersList;
 	private View disconnectNotification;
-	
-	private ServersAdapter lastServersAdapter;
-	
+
 	private SelectedServersStorage lastServersStorage;
 	
 	@Override
@@ -67,15 +66,15 @@ public class ServerSelectActivity extends Activity
 		disconnectNotification = findViewById(R.id.disconnect_notification);
 		
 		lastServersList = (LinearLayout)findViewById(R.id.last_servers_list);
-		
-		lastServersAdapter = new ServersAdapter(this);		
-		
+
 		lastServersStorage = application.getSelectedServersStorage();
 		
 		Intent startIntent = getIntent();
 		if (startIntent.getBooleanExtra(EXTRA_KEY_DISCONNECT, false))
 		{
 			disconnectNotification.setVisibility(View.VISIBLE);
+			startIntent.removeExtra(EXTRA_KEY_DISCONNECT);
+			setIntent(startIntent);
 		}
 		
 		Button connectButton = (Button)findViewById(R.id.button_server_connect);
@@ -210,35 +209,5 @@ public class ServerSelectActivity extends Activity
 		
 		startActivity(intent);
 		ActivityTransitionAnimator.runStartActivityAnimation(this);
-	}
-	
-	private class ServersAdapter extends ArrayAdapter<SelectedServersStorage.ServerEntry>
-	{
-		public ServersAdapter(Context context)
-		{
-			super(context, R.layout.item_selected_servers);
-		}
-		
-		@Override
-		public View getView(int position, View convertView, ViewGroup parent)
-		{
-			ServerEntry server = getItem(position);
-			
-			Context context = getContext();
-			LayoutInflater viewInflater = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			
-			View serverItemView = viewInflater.inflate(R.layout.item_selected_servers, null);
-
-			TextView serverNameView = (TextView)serverItemView.findViewById(R.id.server_name_view);
-			TextView serverAddressView = (TextView)serverItemView.findViewById(R.id.server_address_view);
-			
-			String name = server.getName();
-			serverNameView.setText(name);
-			
-			String address = server.getAddress();
-			serverAddressView.setText(address);
-			
-			return serverItemView;
-		}
 	}
 }

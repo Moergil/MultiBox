@@ -4,4 +4,5 @@
 	<color name="fieldset_activity_background_color">#bbb</color>
 	<color name="warning_background">#902</color>
 	<color name="text_inverse">#fff</color>
+	<color name="list_item_pressed_background">#ccc</color>
 </resources>

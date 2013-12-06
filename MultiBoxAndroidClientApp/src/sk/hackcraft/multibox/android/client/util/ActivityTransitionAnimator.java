@@ -1,4 +1,4 @@
-package sk.hackcraft.multibox.android.client;
+package sk.hackcraft.multibox.android.client.util;
 
 import sk.hackcraft.multibox.R;
 import android.app.Activity;
