@@ -5,6 +5,7 @@ import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class GetPlayerStateDecoder extends JacksonMessageDecoder<GetPlayerStateResultData>
 {
@@ -12,11 +13,14 @@ public class GetPlayerStateDecoder extends JacksonMessageDecoder<GetPlayerStateR
 	public GetPlayerStateResultData decodeJson(ObjectMapper objectMapper, String jsonString) throws Exception
 	{
 		JsonNode rootNode = objectMapper.readTree(jsonString);
+
+		ObjectNode multimediaObjectNode = (ObjectNode)rootNode.path("multimedia");
 		
-		String multimediaJsonString = rootNode.path("multimedia").toString();
-				
-		MultimediaItem.Builder multimediaBuilder = objectMapper.readValue(multimediaJsonString, MultimediaItem.Builder.class);
-		MultimediaItem multimedia = multimediaBuilder.create();
+		long id = multimediaObjectNode.path("id").asLong();
+		String name = multimediaObjectNode.path("name").asText();
+		int length = multimediaObjectNode.path("length").asInt();
+		
+		MultimediaItem multimedia = new MultimediaItem(id, name, length);
 		
 		int playbackPosition = rootNode.path("playbackPosition").asInt();
 		boolean playing = rootNode.path("playing").asBoolean();

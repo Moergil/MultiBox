@@ -287,7 +287,7 @@ public class LibraryFragment extends Fragment implements BackPressedListener
 			}
 			else
 			{
-				Toast.makeText(getActivity(), "TODO item detail", Toast.LENGTH_SHORT).show();
+				// TODO
 			}
 		}
 	}

@@ -3,12 +3,11 @@ package sk.hackcraft.multibox.android.client;
 import java.io.IOException;
 import java.net.Socket;
 
-import sk.hackcraft.multibox.android.client.util.SystemLog;
 import sk.hackcraft.multibox.android.client.util.HandlerEventLoop;
 import sk.hackcraft.multibox.android.client.util.JsonCacheSelectedServersStorage;
+import sk.hackcraft.multibox.android.client.util.SystemLog;
 import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.net.AutoManagingAsynchronousSocketInterface;
-import sk.hackcraft.multibox.net.MockServerInterface;
 import sk.hackcraft.multibox.net.NetworkServerInterface;
 import sk.hackcraft.multibox.net.NetworkStandards;
 import sk.hackcraft.multibox.net.ServerInterface;
@@ -64,7 +63,7 @@ public class MultiBoxApplication extends Application
 			@Override
 			public void onDisconnect()
 			{
-				serverInterface = null;
+				destroyServerConnection();
 				startConnectActivityAfterDisconnect();
 			}
 		});
@@ -78,6 +77,8 @@ public class MultiBoxApplication extends Application
 	{
 		serverInterface.close();
 		serverInterface = null;
+		
+		server = null;
 	}
 	
 	public boolean hasActiveConnection()
@@ -98,7 +99,7 @@ public class MultiBoxApplication extends Application
 	private void startConnectActivityAfterDisconnect()
 	{
 		Intent intent = new Intent(this, ServerSelectActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 		
 		intent.putExtra(ServerSelectActivity.EXTRA_KEY_DISCONNECT, true);
 		

@@ -9,6 +9,7 @@ import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class GetPlaylistDecoder extends JacksonMessageDecoder<GetPlaylistResultData>
 {
@@ -21,11 +22,13 @@ public class GetPlaylistDecoder extends JacksonMessageDecoder<GetPlaylistResultD
 		List<MultimediaItem> playlist = new LinkedList<MultimediaItem>();
 		while (nodesIterator.hasNext())
 		{
-			JsonNode node = nodesIterator.next();
-			String multimediaJson = node.toString();
+			ObjectNode multimediaObjectNode = (ObjectNode)nodesIterator.next();
+
+			long id = multimediaObjectNode.path("id").asLong();
+			String name = multimediaObjectNode.path("name").asText();
+			int length = multimediaObjectNode.path("length").asInt();
 			
-			MultimediaItem.Builder builder = objectMapper.readValue(multimediaJson, MultimediaItem.Builder.class);
-			MultimediaItem multimedia = builder.create();
+			MultimediaItem multimedia = new MultimediaItem(id, name, length);
 			
 			playlist.add(multimedia);
 		}

@@ -11,12 +11,13 @@ import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
 import sk.hackcraft.multibox.net.data.GetPlaylistResultData;
 import sk.hackcraft.multibox.net.data.GetServerInfoResultData;
 import sk.hackcraft.multibox.net.data.LibraryItemIdData;
+import sk.hackcraft.multibox.net.data.MultimediaItemIdData;
 import sk.hackcraft.multibox.net.transformers.AddMultimediaToPlaylistDecoder;
+import sk.hackcraft.multibox.net.transformers.DataStructJacksonEncoder;
 import sk.hackcraft.multibox.net.transformers.GetLibraryItemDecoder;
 import sk.hackcraft.multibox.net.transformers.GetPlayerStateDecoder;
 import sk.hackcraft.multibox.net.transformers.GetPlaylistDecoder;
 import sk.hackcraft.multibox.net.transformers.GetServerInfoDecoder;
-import sk.hackcraft.multibox.net.transformers.LibraryItemIdEncoder;
 import sk.hackcraft.netinterface.connection.AsynchronousMessageInterface;
 import sk.hackcraft.netinterface.connection.AsynchronousMessageInterface.SeriousErrorListener;
 import sk.hackcraft.netinterface.message.DataStringMessage;
@@ -97,7 +98,7 @@ public class NetworkServerInterface implements ServerInterface
 			@Override
 			protected DataTransformer<LibraryItemIdData, String> createEncoder()
 			{
-				return new LibraryItemIdEncoder();
+				return new DataStructJacksonEncoder<LibraryItemIdData>();
 			}
 		};
 		
@@ -107,13 +108,13 @@ public class NetworkServerInterface implements ServerInterface
 	@Override
 	public void addLibraryItemToPlaylist(long itemId)
 	{
-		LibraryItemIdData data = new LibraryItemIdData(itemId);
-		Message message = new DataStringMessage<LibraryItemIdData>(MessageTypes.ADD_LIBRARY_ITEM_TO_PLAYLIST, data)
+		MultimediaItemIdData data = new MultimediaItemIdData(itemId);
+		Message message = new DataStringMessage<MultimediaItemIdData>(MessageTypes.ADD_LIBRARY_ITEM_TO_PLAYLIST, data)
 		{
 			@Override
-			protected DataTransformer<LibraryItemIdData, String> createEncoder()
+			protected DataTransformer<MultimediaItemIdData, String> createEncoder()
 			{
-				return new LibraryItemIdEncoder();
+				return new DataStructJacksonEncoder<MultimediaItemIdData>();
 			}
 		};
 		

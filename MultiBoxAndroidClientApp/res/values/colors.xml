@@ -2,7 +2,7 @@
 <resources>
 	<color name="fieldset_background_color">#fff</color>
 	<color name="fieldset_activity_background_color">#bbb</color>
-	<color name="warning_background">#902</color>
+	<color name="warning_background">#ddff0000</color>
 	<color name="text_inverse">#fff</color>
 	<color name="list_item_pressed_background">#ccc</color>
 </resources>
