@@ -38,7 +38,7 @@ DataMessage SocketMessenger::waitForMessage() throw(MessengerException)
 
     QByteArray byteArray = readByteArray(messageLength);
     DataContent dataContent(byteArray);
-    qDebug() << messageType;
+
     return DataMessage(messageType, dataContent);
 }
 

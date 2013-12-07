@@ -2,12 +2,14 @@
 #include "addlibraryitemtoplaylistresponse.h"
 
 #include <util/messagecontentreader.h>
+#include <QVariant>
 
 AddLibraryItemToPlaylistRequest::AddLibraryItemToPlaylistRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)
 {
     MessageContentReader reader(getDataMessage().getDataContent());
-    multimediaId = reader.readQInt64();
+    QJsonObject json = reader.readQJsonObject();
+    multimediaId = json.value("multimediaId").toVariant().toLongLong();
 }
 
 bool AddLibraryItemToPlaylistRequest::canResponse() const

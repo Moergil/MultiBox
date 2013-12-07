@@ -24,26 +24,26 @@ void Client::run()
 
     try
     {
-        /*pauseTest();
+        //pauseTest();
 
         playerStateTest();
 
-        playlistTest();*/
+        //playlistTest();
 
-        for(int i=0; i<5; i++)
+        /*for(int i=0; i<5; i++)
         {
             getLibraryItemTest(i);
-        }
+        }*/
 
         playlistTest();
         addMultimediaToLibrary(7);
         playlistTest();
 
-        QThread::sleep(4);
+        //Thread::sleep(4);
 
         playerStateTest();
 
-        getPlayerInfoTest();
+        //getPlayerInfoTest();
     }
     catch(MessengerException &exception)
     {
@@ -105,14 +105,15 @@ void Client::getLibraryItemTest(qint64 cislo)
 void Client::addMultimediaToLibrary(qint64 cislo)
 {
     MessageContentWriter writer;
-    writer.write(cislo);
+    QVariantMap map;
+    map["multimediaId"] = cislo;
+    writer.write(QJsonObject::fromVariantMap(map));
 
     messenger->writeMessage(DataMessage(4, writer.toDataContent()));
     DataMessage message = messenger->waitForMessage();
 
     MessageContentReader reader(message.getDataContent());
 
-    qDebug() << reader.readBool();
     qDebug() << reader.readQJsonObject();
 }
 

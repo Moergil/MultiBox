@@ -10,9 +10,12 @@ AddLibraryItemToPlaylistResponse::AddLibraryItemToPlaylistResponse(const bool re
 
 DataContent AddLibraryItemToPlaylistResponse::toDataContent() const
 {
+    QJsonObject object;
+    object.insert("result", result);
+    object.insert("multimedia", multimedia->toQJsonObject());
+
     MessageContentWriter writer;
-    writer.write(result);
-    writer.write(multimedia->toQJsonObject());
+    writer.write(object);
     return writer.toDataContent();
 }
 
