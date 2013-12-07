@@ -24,23 +24,13 @@ void Client::run()
 
     try
     {
-        pauseTest();
+        /*pauseTest();
 
         playerStateTest();
 
-        playlistTest();
+        playlistTest();*/
 
-        QThread::sleep(3);
-
-        playerStateTest();
-
-        QThread::sleep(5);
-
-        playerStateTest();
-
-        QThread::sleep(3);
-
-        for(int i=1; i<10; i++)
+        for(int i=0; i<5; i++)
         {
             getLibraryItemTest(i);
         }
@@ -48,6 +38,10 @@ void Client::run()
         playlistTest();
         addMultimediaToLibrary(7);
         playlistTest();
+
+        QThread::sleep(4);
+
+        playerStateTest();
 
         getPlayerInfoTest();
     }
@@ -81,8 +75,6 @@ void Client::playerStateTest()
     MessageContentReader reader(message.getDataContent());
 
     qDebug() << reader.readQJsonObject();
-    qDebug() << reader.readQInt32();
-    qDebug() << reader.readBool();
 }
 
 void Client::playlistTest()
@@ -98,7 +90,9 @@ void Client::playlistTest()
 void Client::getLibraryItemTest(qint64 cislo)
 {
     MessageContentWriter writer;
-    writer.write(cislo);
+    QVariantMap map;
+    map["itemId"] = cislo;
+    writer.write(QJsonObject::fromVariantMap(map));
 
     messenger->writeMessage(DataMessage(3, writer.toDataContent()));
     DataMessage message = messenger->waitForMessage();
@@ -129,5 +123,5 @@ void Client::getPlayerInfoTest()
 
     MessageContentReader reader(message.getDataContent());
 
-    qDebug() << reader.readQString();
+    qDebug() << reader.readQJsonObject();
 }

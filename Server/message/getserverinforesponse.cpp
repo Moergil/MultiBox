@@ -2,6 +2,7 @@
 #include "messagerecognizer.h"
 
 #include <util/messagecontentwriter.h>
+#include <QVariantMap>
 
 GetServerInfoResponse::GetServerInfoResponse(const QString &playerName)
     : playerName(playerName)
@@ -10,8 +11,11 @@ GetServerInfoResponse::GetServerInfoResponse(const QString &playerName)
 
 DataContent GetServerInfoResponse::toDataContent() const
 {
+    QVariantMap map;
+    map["serverName"] = playerName;
+
     MessageContentWriter writer;
-    writer.write(playerName);
+    writer.write(QJsonObject::fromVariantMap(map));
     return writer.toDataContent();
 }
 

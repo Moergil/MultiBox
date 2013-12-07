@@ -29,6 +29,11 @@ QList<LibraryItem *> *Library::listDirectories()
     return dbManager->readByParentId(0);
 }
 
+LibraryItem *Library::readRootDir()
+{
+    return new WritableDirectory(0, "Libraries", QFileInfo(), *listDirectories());
+}
+
 void Library::removeDirectory(QDir &dir)
 {
     DirectoryFactory *factory = DirectoryFactory::getFactory();
@@ -38,7 +43,14 @@ void Library::removeDirectory(QDir &dir)
 
 LibraryItem *Library::readById(qint64 itemId)
 {
-    return dbManager->readById(itemId);
+    if(itemId == 0)
+    {
+        return readRootDir();
+    }
+    else
+    {
+        return dbManager->readById(itemId);
+    }
 }
 
 QList<LibraryItem *> *Library::readAll()

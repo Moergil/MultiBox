@@ -1,6 +1,6 @@
 #include "getplayerstateresponse.h"
 #include "messagerecognizer.h"
-
+#include <QVariantMap>
 #include <util/messagecontentwriter.h>
 
 GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
@@ -14,11 +14,16 @@ GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
 
 DataContent GetPlayerStateResponse::toDataContent() const
 {
-    MessageContentWriter writer;
-    writer.write(multimedia.toQJsonObject());
-    writer.write(playbackPosition);
-    writer.write(playing);
+    QVariantMap map;
 
+    map["playbackPosition"] = playbackPosition;
+    map["playing"] = playing;
+
+    QJsonObject object = QJsonObject::fromVariantMap(map);
+    object.insert("multimedia", multimedia.toQJsonObject());
+
+    MessageContentWriter writer;
+    writer.write(object);
     return writer.toDataContent();
 }
 

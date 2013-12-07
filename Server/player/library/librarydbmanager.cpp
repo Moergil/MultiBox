@@ -118,7 +118,8 @@ LibraryTableRow *LibraryDbManager::readTableRowFromQuery(QSqlQuery &query)
 
 QList<LibraryTableRow *> LibraryDbManager::readTableRowsByParent(qint64 parentId)
 {
-    QSqlQuery query(QString("SELECT id, name, type, length, path, parent FROM library WHERE parent = %1")
+    QSqlQuery query(QString("SELECT id, name, type, length, path, parent FROM library "
+                            "WHERE parent = %1 OR (0 = %1 AND parent IS NULL)")
                     .arg(parentId)
                     , db);
 

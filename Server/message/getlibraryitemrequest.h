@@ -7,7 +7,7 @@ class GetLibraryItemRequest : public AbstractRequest
         Q_OBJECT
 
     private:
-        qint32 itemId;
+        qint64 itemId;
 
     public:
         GetLibraryItemRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);

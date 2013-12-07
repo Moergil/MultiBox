@@ -12,7 +12,6 @@ DataContent GetPlaylistResponse::toDataContent() const
 {
     MessageContentWriter writer;
     writer.write(playlistState.toQJsonObject());
-
     return writer.toDataContent();
 }
 

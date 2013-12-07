@@ -11,7 +11,9 @@ GetLibraryItemResponse::GetLibraryItemResponse(const LibraryItem *item)
 DataContent GetLibraryItemResponse::toDataContent() const
 {
     MessageContentWriter writer;
-    writer.write(item->toQJsonObject());
+    QJsonObject object;
+    object.insert("libraryItem", item->toQJsonObject());
+    writer.write(object);
     return writer.toDataContent();
 }
 
