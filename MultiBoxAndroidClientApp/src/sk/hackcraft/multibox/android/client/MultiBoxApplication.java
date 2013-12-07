@@ -64,7 +64,7 @@ public class MultiBoxApplication extends Application
 			@Override
 			public void onDisconnect()
 			{
-				serverInterface = null;
+				destroyServerConnection();
 				startConnectActivityAfterDisconnect();
 			}
 		});
@@ -78,6 +78,8 @@ public class MultiBoxApplication extends Application
 	{
 		serverInterface.close();
 		serverInterface = null;
+		
+		server = null;
 	}
 	
 	public boolean hasActiveConnection()
