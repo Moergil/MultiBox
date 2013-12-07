@@ -19,7 +19,7 @@ int main(int argc, char *argv[])
     client->start();
     // END Client test
 
-    Player *player = new QtMultimediaPlayer("asdf");
+    Player *player = new QtMultimediaPlayer("");
 
     Server *server = new Server(player);
 

@@ -24,7 +24,7 @@ void Client::run()
 
     try
     {
-        //pauseTest();
+        pauseTest();
 
         playerStateTest();
 

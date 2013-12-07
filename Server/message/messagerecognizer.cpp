@@ -7,7 +7,6 @@
 #include "pauserequest.h"
 #include "undefinedrequest.h"
 
-
 MessageRecognizer::MessageRecognizer(PlayerHandler *handler, QObject *parent)
     : QObject(parent), handler(handler)
 {
