@@ -3,7 +3,6 @@ package sk.hackcraft.multibox.model;
 public interface Library
 {
 	public static final long ROOT_DIRECTORY = 0;
-	public static final long BACK_NAVIGATION = -1;
 	
 	public void init();
 	public void close();

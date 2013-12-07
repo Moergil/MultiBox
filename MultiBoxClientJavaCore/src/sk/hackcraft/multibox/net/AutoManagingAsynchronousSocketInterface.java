@@ -39,7 +39,7 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 	private boolean connecting;
 	
 	private volatile long lastNetworkActivity;
-	private static final long NETWORK_INACTIVITY_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
+	private static final long NETWORK_INACTIVITY_TIMEOUT = TimeUnit.SECONDS.toMillis(15);
 	private volatile boolean shouldClose;
 	
 	public AutoManagingAsynchronousSocketInterface(MessageInterfaceFactory messageInterfaceFactory, MessageQueue messageQueue, Log log)
@@ -282,7 +282,7 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 					messageInterface.sendMessage(message);
 					sendingResult = true;
 					
-					log.print("Message sended.");
+					log.print("Message " + message.getType() + " sended.");
 				}
 				catch (IOException e)
 				{
@@ -333,7 +333,7 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 					MessageType type = message.getType();
 					byte content[] = message.getContent();
 					
-					log.print("Message received.");
+					log.print("Message " + type + " received.");
 					
 					incomingMessagesRouter.receiveMessage(type, content);
 				}

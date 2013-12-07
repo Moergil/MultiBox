@@ -6,6 +6,7 @@ import java.util.List;
 import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.MessageQueue;
+import sk.hackcraft.util.PeriodicWorkDispatcher;
 
 public class ServerLibraryShadow implements Library
 {	
@@ -15,6 +16,10 @@ public class ServerLibraryShadow implements Library
 	private ServerListener serverListener;
 	
 	private final List<LibraryEventListener> libraryListeners;
+	
+	private final PeriodicWorkDispatcher stateChecker;
+	
+	private long lastRequestedId = Library.ROOT_DIRECTORY;
 
 	public ServerLibraryShadow(ServerInterface serverInterface, MessageQueue messageQueue)
 	{
@@ -24,24 +29,39 @@ public class ServerLibraryShadow implements Library
 		this.serverListener = new ServerListener();
 		
 		libraryListeners = new LinkedList<Library.LibraryEventListener>();
+		
+		stateChecker = new PeriodicWorkDispatcher(messageQueue, 5000)
+		{
+			@Override
+			protected void doWork()
+			{
+				ServerLibraryShadow.this.serverInterface.requestLibraryItem(lastRequestedId);
+			}
+		};
 	}
 	
 	@Override
 	public void init()
 	{
 		serverInterface.registerEventListener(serverListener);
+		
+		stateChecker.start();
 	}
 
 	@Override
 	public void close()
 	{
 		serverInterface.unregisterEventListener(serverListener);
+		
+		stateChecker.stop();
 	}
 
 	@Override
 	public void requestItem(long id)
 	{
 		serverInterface.requestLibraryItem(id);
+		
+		lastRequestedId = id;
 	}
 
 	@Override

@@ -9,6 +9,7 @@ import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.Log;
 import sk.hackcraft.util.MessageQueue;
+import sk.hackcraft.util.PeriodicWorkDispatcher;
 
 public class ServerPlayerShadow implements Player
 {
@@ -24,7 +25,9 @@ public class ServerPlayerShadow implements Player
 	private MultimediaItem activeMultimedia;
 	private int playbackPosition;
 	
-	private List<PlayerEventListener> playerListeners;
+	private final List<PlayerEventListener> playerListeners;
+	
+	private final PeriodicWorkDispatcher stateChecker;
 	
 	public ServerPlayerShadow(ServerInterface serverInterface, MessageQueue messageQueue, Log log)
 	{
@@ -41,6 +44,15 @@ public class ServerPlayerShadow implements Player
 		this.playerListeners = new LinkedList<Player.PlayerEventListener>();
 		
 		this.serverListener = new ServerListener();
+		
+		stateChecker = new PeriodicWorkDispatcher(messageQueue, 5000)
+		{
+			@Override
+			protected void doWork()
+			{
+				ServerPlayerShadow.this.serverInterface.requestPlayerUpdate();
+			}
+		};
 	}
 	
 	@Override
@@ -48,12 +60,16 @@ public class ServerPlayerShadow implements Player
 	{
 		serverInterface.registerEventListener(serverListener);
 		serverInterface.requestPlayerUpdate();
+		
+		stateChecker.start();
 	}
 
 	@Override
 	public void close()
 	{
 		serverInterface.unregisterEventListener(serverListener);
+		
+		stateChecker.stop();
 	}
 
 	@Override

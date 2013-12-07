@@ -2,6 +2,7 @@ package sk.hackcraft.multibox.net.transformers;
 
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
+import sk.hackcraft.multibox.util.JsonConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,17 +15,24 @@ public class GetPlayerStateDecoder extends JacksonMessageDecoder<GetPlayerStateR
 	{
 		JsonNode rootNode = objectMapper.readTree(jsonString);
 
-		ObjectNode multimediaObjectNode = (ObjectNode)rootNode.path("multimedia");
-		
-		long id = multimediaObjectNode.path("id").asLong();
-		String name = multimediaObjectNode.path("name").asText();
-		int length = multimediaObjectNode.path("length").asInt();
-		
-		MultimediaItem multimedia = new MultimediaItem(id, name, length);
-		
-		int playbackPosition = rootNode.path("playbackPosition").asInt();
-		boolean playing = rootNode.path("playing").asBoolean();
-		
-		return new GetPlayerStateResultData(multimedia, playbackPosition, playing);
+		if (rootNode.get("multimedia").asText().equals(JsonConstants.NULL))
+		{
+			return new GetPlayerStateResultData(null, 0, false);
+		}
+		else
+		{
+			ObjectNode multimediaObjectNode = (ObjectNode)rootNode.path("multimedia");
+			
+			long id = multimediaObjectNode.path("id").asLong();
+			String name = multimediaObjectNode.path("name").asText();
+			int length = multimediaObjectNode.path("length").asInt();
+			
+			MultimediaItem multimedia = new MultimediaItem(id, name, length);
+			
+			int playbackPosition = rootNode.path("playbackPosition").asInt();
+			boolean playing = rootNode.path("playing").asBoolean();
+			
+			return new GetPlayerStateResultData(multimedia, playbackPosition, playing);
+		}
 	}
 }
