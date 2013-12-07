@@ -3,7 +3,7 @@ package sk.hackcraft.multibox.android.client;
 import java.io.IOException;
 import java.net.Socket;
 
-import sk.hackcraft.multibox.android.client.util.AndroidLog;
+import sk.hackcraft.multibox.android.client.util.SystemLog;
 import sk.hackcraft.multibox.android.client.util.HandlerEventLoop;
 import sk.hackcraft.multibox.android.client.util.JsonCacheSelectedServersStorage;
 import sk.hackcraft.multibox.model.Server;
@@ -37,8 +37,7 @@ public class MultiBoxApplication extends Application
 		super.onCreate();
 		
 		eventLoop = new HandlerEventLoop();
-		
-		log = new AndroidLog();
+		log = new SystemLog();
 	}
 	
 	public SelectedServersStorage getSelectedServersStorage()

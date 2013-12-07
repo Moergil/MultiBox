@@ -2,7 +2,7 @@ package sk.hackcraft.multibox.android.client.util;
 
 import sk.hackcraft.util.Log;
 
-public class AndroidLog implements Log
+public class SystemLog implements Log
 {
 	private static final String TAG = "MultiBox";
 	

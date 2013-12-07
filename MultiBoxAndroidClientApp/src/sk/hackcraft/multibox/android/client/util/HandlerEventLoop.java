@@ -5,7 +5,7 @@ import android.os.Handler;
 
 public class HandlerEventLoop implements MessageQueue
 {
-	private Handler handler;
+	private final Handler handler;
 	
 	public HandlerEventLoop()
 	{
