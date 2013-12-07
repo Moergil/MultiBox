@@ -1,5 +1,5 @@
 #include <QByteArray>
-#include <QJsonDocument>
+#include <QJsonObject>
 
 #pragma once
 
@@ -12,8 +12,8 @@ public:
     static QByteArray fromQInt64(const qint64 number);
     static QString parseQString(const QByteArray &byteArray);
     static QByteArray fromQString(const QString &string);
-    static QJsonDocument parseQJsonDocument(const QByteArray &byteArray);
-    static QByteArray fromQJsonDocument(QJsonDocument &qJsonDocument);
+    static QJsonObject parseQJsonObject(const QByteArray &byteArray);
+    static QByteArray fromQJsonObject(QJsonObject &qJsonObject);
     static bool parseBool(const QByteArray &byteArray);
     static QByteArray fromBool(const bool value);
 };

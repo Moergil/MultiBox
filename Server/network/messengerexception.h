@@ -3,12 +3,13 @@
 
 #pragma once
 
-class MessangerException : public std::exception
+class MessengerException : public std::exception
 {
 private:
-    QString message;
+    const QString message;
 
 public:
-    MessangerException(QString message);
-    //QString getMessage() const;
+    MessengerException(const QString message);
+    ~MessengerException() throw();
+    QString getMessage() const;
 };

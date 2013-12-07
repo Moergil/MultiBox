@@ -20,7 +20,7 @@ public:
     qint32 readQInt32();
     qint64 readQInt64();
     QString readQString();
-    QJsonDocument readQJsonDocument();
+    QJsonObject readQJsonObject();
     bool readBool();
     void reset();
     bool endOfArray();

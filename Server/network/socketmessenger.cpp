@@ -1,25 +1,21 @@
-#include "socketmessanger.h"
+#include "socketmessenger.h"
 
 #include <util/bytearrayconverter.h>
 
 #include <QThread>
 
-SocketMessanger::SocketMessanger(int socketDescriptor, QObject *parent)
+SocketMessenger::SocketMessenger(int socketDescriptor, QObject *parent) throw(MessengerException)
     : QObject(parent)
 {
     tcpSocket = new QTcpSocket(this);
 
     if (!tcpSocket->setSocketDescriptor(socketDescriptor))
     {
-        emit connectionError(tcpSocket->error());
-        qWarning("Socket connection problem!");
-        return;
+        throw MessengerException("Socket connection problem!");
     }
-
-    setConnections();
 }
 
-SocketMessanger::SocketMessanger(const QString &hostName, quint16 port, QObject *parent)
+SocketMessenger::SocketMessenger(const QString &hostName, quint16 port, QObject *parent) throw(MessengerException)
     : QObject(parent)
 {
     tcpSocket = new QTcpSocket(this);
@@ -28,20 +24,16 @@ SocketMessanger::SocketMessanger(const QString &hostName, quint16 port, QObject 
 
     if (!tcpSocket->waitForConnected())
     {
-        emit connectionError(tcpSocket->error());
-        qWarning("Socket connection problem!");
-        return;
+        throw MessengerException("Socket connection problem!");
     }
-
-    setConnections();
 }
 
-bool SocketMessanger::canWaitForMessage()
+bool SocketMessenger::canWaitForMessage()
 {
     return tcpSocket->isOpen() && tcpSocket->isValid();
 }
 
-DataMessage SocketMessanger::waitForMessage()
+DataMessage SocketMessenger::waitForMessage() throw(MessengerException)
 {
     qint32 messageType = readNumber();
     qint32 messageLength = readNumber();
@@ -52,27 +44,27 @@ DataMessage SocketMessanger::waitForMessage()
     return DataMessage(messageType, dataContent);
 }
 
-void SocketMessanger::writeMessage(DataMessage message)
+void SocketMessenger::writeMessage(DataMessage message) throw(MessengerException)
 {
     writeNumber(message.getMessageType());
     writeNumber(message.getDataContent().getQByteArray().length());
     writeByteArray(message.getDataContent().getQByteArray());
 }
 
-void SocketMessanger::close()
+void SocketMessenger::close()
 {
     tcpSocket->disconnectFromHost();
 
     tcpSocket->close();
 }
 
-qint32 SocketMessanger::readNumber()
+qint32 SocketMessenger::readNumber() throw(MessengerException)
 {
     QByteArray numberBuffer = readByteArray(QINT32_LENGTH);
     return ByteArrayConverter::parseQInt32(numberBuffer);
 }
 
-void SocketMessanger::writeByteArray(QByteArray byteArray)
+void SocketMessenger::writeByteArray(QByteArray byteArray) throw(MessengerException)
 {
     if(byteArray.length() > 0)
     {
@@ -81,42 +73,28 @@ void SocketMessanger::writeByteArray(QByteArray byteArray)
 
         if(nonWrittenDataExists() && !tcpSocket->waitForBytesWritten())
         {
-            emit tooSlowTransferError();
-            qWarning("Too slow connection!");
-            return;
+            throw MessengerException("Too slow connection!");
         }
     }
 }
 
-void SocketMessanger::writeNumber(qint32 number)
+void SocketMessenger::writeNumber(qint32 number) throw(MessengerException)
 {
     QByteArray buffer = ByteArrayConverter::fromQInt32(number);
     writeByteArray(buffer);
 }
 
-bool SocketMessanger::nonReadDataExists()
+bool SocketMessenger::nonReadDataExists()
 {
     return tcpSocket->bytesAvailable() > 0;
 }
 
-bool SocketMessanger::nonWrittenDataExists()
+bool SocketMessenger::nonWrittenDataExists()
 {
     return tcpSocket->bytesToWrite() > 0;
 }
 
-void SocketMessanger::setConnections()
-{
-    connect(this, SIGNAL(notEnoughDataError()), this, SLOT(quitReading()));
-    connect(this, SIGNAL(tooSlowTransferError()), this, SLOT(quitReading()));
-}
-
-void SocketMessanger::quitReading()
-{
-    close();
-    //koniec thread, opravit citanie :-)
-}
-
-QByteArray SocketMessanger::readByteArray(qint32 bytesToRead)
+QByteArray SocketMessenger::readByteArray(qint32 bytesToRead) throw(MessengerException)
 {
     QByteArray buffer;
 
@@ -124,9 +102,7 @@ QByteArray SocketMessanger::readByteArray(qint32 bytesToRead)
     {
         if(!nonReadDataExists() && !tcpSocket->waitForReadyRead())
         {
-            emit notEnoughDataError();
-            qWarning("Not enough data in the stream!");
-            return buffer;
+            throw MessengerException("Not enough data in the stream!");
         }
 
         qint32 bytesAvailable = tcpSocket->bytesAvailable();

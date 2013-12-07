@@ -1,22 +1,20 @@
-#include "getplayerstaterequest.h"
-#include "getplayerstateresponse.h"
-#include <QtDebug>
+#include "getplaylistrequest.h"
+#include "getplaylistresponse.h"
 
-GetPlayerStateRequest::GetPlayerStateRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
+GetPlaylistRequest::GetPlaylistRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)
 {
 }
 
-bool GetPlayerStateRequest::canResponse() const
+bool GetPlaylistRequest::canResponse() const
 {
     return true;
 }
 
-void GetPlayerStateRequest::execute()
+void GetPlaylistRequest::execute()
 {
     PlaylistState playlistState = getPlayerHandler()->getPlaylistState();
-
-    GetPlayerStateResponse * response = new GetPlayerStateResponse(playlistState, 0, false);
+    GetPlaylistResponse * response = new GetPlaylistResponse(playlistState);
 
     setResponse(response);
 }

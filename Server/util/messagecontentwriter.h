@@ -1,5 +1,5 @@
 #include <QByteArray>
-#include <QJsonDocument>
+#include <QJsonObject>
 
 #include <network/datacontent.h>
 
@@ -15,7 +15,7 @@ public:
     void write(qint32 number);
     void write(qint64 number);
     void write(QString qString);
-    void write(QJsonDocument qJsonDocument);
+    void write(QJsonObject qJsonObject);
     void write(bool boolean);
     void reset();
     DataContent toDataContent();

@@ -4,7 +4,7 @@
 #include <QThread>
 #include <QObject>
 
-#include <network/socketmessanger.h>
+#include <network/socketmessenger.h>
 #include <player/player.h>
 
 class ConnectionThread : public QThread
@@ -15,7 +15,7 @@ private:
     int socketDescriptor;
     QTcpSocket *tcpSocket;
     Player *player;
-    SocketMessanger *messanger;
+    SocketMessenger *messanger;
 
 public:
     ConnectionThread(Player *player, int socketDescriptor, QObject *parent);

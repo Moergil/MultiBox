@@ -11,7 +11,7 @@ private:
     const DataContent dataContent;
 
 public:
-    DataMessage(qint32 messageTypeId, DataContent &dataContent);
+    DataMessage(const qint32 messageTypeId, const DataContent &dataContent = DataContent::emptyDataContent());
 
     qint32 getMessageType() const;
     DataContent getDataContent() const;

@@ -8,7 +8,7 @@ class MessageRecognizer : public QObject
         enum MessageCode {
             GetPlayerState              = 1,
             GetPlaylist                 = 2,
-            GetLibraryDirectoryContent  = 3,
+            GetLibraryItem              = 3,
             GetLibraryItemInfo          = 4,
             AddItemToLibrary            = 5,
             AddItemToPlaylist           = 6,

@@ -6,18 +6,15 @@
 
 #pragma once
 
-class GetPlayerStateResponse : public AbstractResponse
+class GetPlaylistResponse : public AbstractResponse
 {
 private:
     const PlaylistState playlistState;
-    const qint32 playbackPosition;
-    const bool playing;
 
 public:
-    GetPlayerStateResponse(PlaylistState playlistState,
-                           qint32 playbackPosition,
-                           bool playing,
+    GetPlaylistResponse(PlaylistState playlistState,
                            QObject *parent = 0);
+
     DataContent toDataContent();
     qint32 getMessageCode();
 };

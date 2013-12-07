@@ -3,13 +3,23 @@
 #include <QTcpSocket>
 #include <QThread>
 
+#include <network/socketmessenger.h>
+
 class Client : public QThread
 {
     Q_OBJECT
-public:
-    Client(QObject *parent = 0);
 
-protected:
-    void run();
-    qint32 parseInt(QByteArray numberBuffer);
+    private:
+        SocketMessenger *messenger;
+
+    public:
+        Client(QObject *parent = 0);
+
+    protected:
+        void run();
+
+    private:
+        void pauseTest();
+        void playerStateTest();
+        void playlistTest();
 };

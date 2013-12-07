@@ -1,11 +1,15 @@
-#include "messangerexception.h"
+#include "messengerexception.h"
 
-MessangerException::MessangerException(QString message)
-    //: message(message)
+MessengerException::MessengerException(const QString message)
+    : message(message)
 {
 }
 
-/*QString MessangerException::getMessage() const
+MessengerException::~MessengerException() throw()
+{
+}
+
+QString MessengerException::getMessage() const
 {
     return message;
-}*/
+}

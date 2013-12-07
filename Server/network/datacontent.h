@@ -4,9 +4,12 @@
 
 class DataContent
 {
-private:
-    const QByteArray byteArray;
-public:
-    DataContent(const QByteArray &byteArray);
-    QByteArray getQByteArray() const;
+    public:
+        static DataContent emptyDataContent();
+
+    private:
+        const QByteArray byteArray;
+    public:
+        DataContent(const QByteArray &byteArray);
+        QByteArray getQByteArray() const;
 };

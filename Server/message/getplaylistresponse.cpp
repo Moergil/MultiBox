@@ -1,28 +1,23 @@
-#include "getplayerstateresponse.h"
+#include "getplaylistresponse.h"
 #include "messagerecognizer.h"
 
 #include <util/messagecontentwriter.h>
 
-GetPlayerStateResponse::GetPlayerStateResponse(PlaylistState playlistState,
-                                                qint32 playbackPosition,
-                                                bool playing,
+GetPlaylistResponse::GetPlaylistResponse(PlaylistState playlistState,
                                                 QObject *parent)
-    : AbstractResponse(parent), playlistState(playlistState),
-      playbackPosition(playbackPosition), playing(playing)
+    : AbstractResponse(parent), playlistState(playlistState)
 {
 }
 
-DataContent GetPlayerStateResponse::toDataContent()
+DataContent GetPlaylistResponse::toDataContent()
 {
     MessageContentWriter writer;
     writer.write(playlistState.toQJsonObject());
-    writer.write(playbackPosition);
-    writer.write(playing);
 
     return writer.toDataContent();
 }
 
-qint32 GetPlayerStateResponse::getMessageCode()
+qint32 GetPlaylistResponse::getMessageCode()
 {
-    return MessageRecognizer::GetPlayerState;
+    return MessageRecognizer::GetPlaylist;
 }

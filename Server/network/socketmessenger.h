@@ -1,11 +1,12 @@
 #include "datamessage.h"
 #include "messangerinterface.h"
+#include "messengerexception.h"
 
 #include <QTcpSocket>
 
 #pragma once
 
-class SocketMessanger : public QObject, public MessangerInterface
+class SocketMessenger : public QObject, public MessengerInterface
 {
     Q_OBJECT
 
@@ -14,29 +15,20 @@ private:
 
     QTcpSocket *tcpSocket;
 
-signals:
-    void notEnoughDataError();
-    void tooSlowTransferError();
-    void connectionError(QTcpSocket::SocketError socketError);
-
 private:
-    QByteArray readByteArray(qint32 byteLength);
-    qint32 readNumber();
-    void writeByteArray(QByteArray byteArray);
-    void writeNumber(qint32 number);
+    QByteArray readByteArray(qint32 byteLength) throw(MessengerException);
+    qint32 readNumber() throw(MessengerException);
+    void writeByteArray(QByteArray byteArray) throw(MessengerException);
+    void writeNumber(qint32 number) throw(MessengerException);
     bool nonReadDataExists();
     bool nonWrittenDataExists();
-    void setConnections();
-
-private slots:
-    void quitReading();
 
 public:
-    SocketMessanger(int socketDescriptor, QObject *parent = 0);
-    SocketMessanger(const QString &hostName, quint16 port, QObject *parent = 0);
+    SocketMessenger(int socketDescriptor, QObject *parent = 0) throw(MessengerException);
+    SocketMessenger(const QString &hostName, quint16 port, QObject *parent = 0) throw(MessengerException);
 
     bool canWaitForMessage();
-    DataMessage waitForMessage();
-    void writeMessage(DataMessage message);
+    DataMessage waitForMessage() throw(MessengerException);
+    void writeMessage(DataMessage message) throw(MessengerException);
     void close();
 };

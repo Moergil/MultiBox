@@ -19,4 +19,10 @@ private:
 
 public:
     PlayerHandler(Player *player, QObject *parent = 0);
+    PlaylistState getPlaylistState();
+    Multimedia getCurrentMultimedia();
+    qint32 getPosition();
+    bool isPlaying();
+    qint32 getDuration();
+    LibraryItem *getLibraryItem(qint64 itemId);
 };

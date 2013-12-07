@@ -14,8 +14,11 @@ bool GetPlayerStateRequest::canResponse() const
 
 void GetPlayerStateRequest::execute()
 {
-    //Multimedia currentMultimedia = getPlayerHandler()->getCurrentMultimedia();
-    /*GetPlayerStateResponse * response = new GetPlayerStateResponse(currentMultimedia, 0, false);
+    Multimedia currentMultimedia = getPlayerHandler()->getCurrentMultimedia();
+    qint32 position = getPlayerHandler()->getPosition();
+    bool playing = getPlayerHandler()->isPlaying();
 
-    setResponse(response);*/
+    GetPlayerStateResponse * response = new GetPlayerStateResponse(currentMultimedia, position, playing);
+
+    setResponse(response);
 }
