@@ -14,14 +14,10 @@ import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 public class ServerSelectActivity extends Activity
@@ -87,6 +83,7 @@ public class ServerSelectActivity extends Activity
 		if (showDisconnectNotification)
 		{
 			disconnectNotification.setVisibility(View.VISIBLE);
+			disconnectNotification.bringToFront();
 		}
 		
 		Button connectButton = (Button)findViewById(R.id.button_server_connect);

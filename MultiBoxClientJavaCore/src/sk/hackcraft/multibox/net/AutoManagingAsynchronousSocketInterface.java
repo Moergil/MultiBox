@@ -269,6 +269,8 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 				}
 				catch (InterruptedException e)
 				{
+					log.print("Sender worker interrupted.");
+					
 					return;
 				}
 				
@@ -284,6 +286,8 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 				}
 				catch (IOException e)
 				{
+					log.print("Sender worker problem: " + e.getMessage());
+					
 					sendingResult = false;
 				}
 
@@ -335,6 +339,8 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 				}
 				catch (IOException e)
 				{
+					log.print("Receive worker problem: " + e.getMessage());
+					
 					if (!Thread.currentThread().isInterrupted())
 					{
 						cleanNetworking();
@@ -374,6 +380,12 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 					try
 					{
 						long sleepMillis = (lastNetworkActivity + NETWORK_INACTIVITY_TIMEOUT) - System.currentTimeMillis();
+						
+						if (sleepMillis < 0)
+						{
+							sleepMillis = 0;
+						}
+						
 						Thread.sleep(sleepMillis);
 					}
 					catch (InterruptedException e)
