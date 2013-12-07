@@ -4,21 +4,21 @@
 #include <QThread>
 #include <QObject>
 
-#include <network/socketmessanger.h>
+#include <network/socketmessenger.h>
 #include <player/player.h>
 
 class ConnectionThread : public QThread
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    int socketDescriptor;
-    QTcpSocket *tcpSocket;
-    Player *player;
-    SocketMessanger *messanger;
+    private:
+        int socketDescriptor;
+        QTcpSocket *tcpSocket;
+        Player *player;
+        SocketMessenger *messanger;
 
-public:
-    ConnectionThread(Player *player, int socketDescriptor, QObject *parent);
+    public:
+        ConnectionThread(Player *player, int socketDescriptor, QObject *parent);
 
-    void run();
+        void run();
 };

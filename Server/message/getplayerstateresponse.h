@@ -1,22 +1,25 @@
 #include "abstractresponse.h"
 
-#include <QJsonDocument>
-
 #include <network/datacontent.h>
+#include <player/entity/multimedia.h>
 
 #pragma once
 
 class GetPlayerStateResponse : public AbstractResponse
 {
-private:
-    const QJsonDocument multimedia;
-    const qint32 playbackPosition;
-    const bool playing;
+        Q_OBJECT
 
-public:
-    GetPlayerStateResponse(QJsonDocument multimedia,
-                           qint32 playbackPosition,
-                           bool playing,
-                           QObject *parent = 0);
-    DataContent toDataContent();
+    private:
+        const Multimedia multimedia;
+        const qint32 playbackPosition;
+        const bool playing;
+
+    public:
+        GetPlayerStateResponse(Multimedia multimedia,
+                               qint32 playbackPosition,
+                               bool playing,
+                               QObject *parent = 0);
+
+        DataContent toDataContent() const;
+        qint32 getMessageCode() const;
 };

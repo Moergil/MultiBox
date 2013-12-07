@@ -1,14 +1,15 @@
 #include "datamessage.h"
+#include "messengerexception.h"
 
 #include <QObject>
 
 #pragma once
 
-class MessangerInterface
+class MessengerInterface
 {
-public:
-    virtual bool canWaitForMessage() = 0;
-    virtual DataMessage waitForMessage() = 0;
-    virtual void writeMessage(DataMessage message) = 0;
-    virtual void close() = 0;
+    public:
+        virtual bool canWaitForMessage() = 0;
+        virtual DataMessage waitForMessage() throw(MessengerException) = 0;
+        virtual void writeMessage(DataMessage message) throw(MessengerException) = 0;
+        virtual void close() = 0;
 };

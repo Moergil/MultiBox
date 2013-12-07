@@ -1,22 +1,24 @@
 #include "getplayerstaterequest.h"
+#include "getplayerstateresponse.h"
 #include <QtDebug>
 
-GetPlayerStateRequest::GetPlayerStateRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
+GetPlayerStateRequest::GetPlayerStateRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)
 {
 }
 
-RequestRunnable *GetPlayerStateRequest::getRunnable()
+bool GetPlayerStateRequest::canResponse() const
 {
-    return new GetPlayerStateRequest::Runnable(this);
+    return true;
 }
 
-GetPlayerStateRequest::Runnable::Runnable(AbstractRequest *request)
-    : RequestRunnable(request)
+void GetPlayerStateRequest::execute()
 {
-}
+    Multimedia currentMultimedia = getPlayerHandler()->getCurrentMultimedia();
+    qint32 position = getPlayerHandler()->getPosition();
+    bool playing = getPlayerHandler()->isPlaying();
 
-void GetPlayerStateRequest::Runnable::run()
-{
-    qDebug() << "getPlaylist :-)";
+    GetPlayerStateResponse * response = new GetPlayerStateResponse(currentMultimedia, position, playing);
+
+    setResponse(response);
 }

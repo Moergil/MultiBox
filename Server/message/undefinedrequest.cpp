@@ -1,24 +1,17 @@
 #include "undefinedrequest.h"
 #include <QtDebug>
 
-UndefinedRequest::UndefinedRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
+UndefinedRequest::UndefinedRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)
 {
 }
 
-RequestRunnable *UndefinedRequest::getRunnable()
+bool UndefinedRequest::canResponse() const
 {
-    return new UndefinedRequest::Runnable(this);
+    return false;
 }
 
-UndefinedRequest::Runnable::Runnable(AbstractRequest *request)
-    : RequestRunnable(request)
+void UndefinedRequest::execute()
 {
-}
-
-void UndefinedRequest::Runnable::run()
-{
-    DataMessage dataMessage = getRequest()->getDataMessage();
-
-    qDebug() << "Undefined message received: " << dataMessage.getMessageType();
+    qDebug() << "Undefined message received: " << getDataMessage().getMessageType();
 }

@@ -1,9 +1,9 @@
 #include "getplayerstateresponse.h"
-#include "util/bytearrayconverter.h"
-
+#include "messagerecognizer.h"
+#include <QVariantMap>
 #include <util/messagecontentwriter.h>
 
-GetPlayerStateResponse::GetPlayerStateResponse( QJsonDocument multimedia,
+GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
                                                 qint32 playbackPosition,
                                                 bool playing,
                                                 QObject *parent)
@@ -12,12 +12,22 @@ GetPlayerStateResponse::GetPlayerStateResponse( QJsonDocument multimedia,
 {
 }
 
-DataContent GetPlayerStateResponse::toDataContent()
+DataContent GetPlayerStateResponse::toDataContent() const
 {
-    MessageContentWriter writer;
-    writer.write(multimedia);
-    writer.write(playbackPosition);
-    writer.write(playing);
+    QVariantMap map;
 
+    map["playbackPosition"] = playbackPosition;
+    map["playing"] = playing;
+
+    QJsonObject object = QJsonObject::fromVariantMap(map);
+    object.insert("multimedia", multimedia.toQJsonObject());
+
+    MessageContentWriter writer;
+    writer.write(object);
     return writer.toDataContent();
+}
+
+qint32 GetPlayerStateResponse::getMessageCode() const
+{
+    return MessageRecognizer::GetPlayerState;
 }

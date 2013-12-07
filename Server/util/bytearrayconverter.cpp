@@ -1,6 +1,8 @@
 #include "bytearrayconverter.h"
 
 #include <QDataStream>
+#include <QJsonDocument>
+#include <QDebug>
 
 qint32 ByteArrayConverter::parseQInt32(const QByteArray &byteArray)
 {
@@ -84,12 +86,15 @@ QByteArray ByteArrayConverter::fromQString(const QString &string)
     return string.toUtf8();
 }
 
-QJsonDocument ByteArrayConverter::parseQJsonDocument(const QByteArray &byteArray)
+QJsonObject ByteArrayConverter::parseQJsonObject(const QByteArray &byteArray)
 {
-    return QJsonDocument::fromJson(byteArray);
+    QJsonDocument document = QJsonDocument::fromJson(byteArray);
+    return document.object();
 }
 
-QByteArray ByteArrayConverter::fromQJsonDocument(QJsonDocument &qJsonDocument)
+QByteArray ByteArrayConverter::fromQJsonObject(QJsonObject &qJsonObject)
 {
-    return qJsonDocument.toJson();
+    QJsonDocument document;
+    document.setObject(qJsonObject);
+    return document.toJson();
 }

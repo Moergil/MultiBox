@@ -1,6 +1,6 @@
 #include "network/datamessage.h"
+#include "abstractresponse.h"
 #include "playerhandler.h"
-#include "requestrunnable.h"
 
 #include <QObject>
 
@@ -8,17 +8,22 @@
 
 class AbstractRequest : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    DataMessage dataMessage;
-    PlayerHandler *handler;
+    private:
+        DataMessage dataMessage;
+        PlayerHandler *handler;
+        AbstractResponse *response;
 
-public:
-    AbstractRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
+    public:
+        AbstractRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
 
-    DataMessage &getDataMessage();
-    PlayerHandler *getPlayerHandler();
+        DataMessage &getDataMessage();
+        PlayerHandler *getPlayerHandler() const;
+        AbstractResponse *getResponse() const;
 
-    virtual RequestRunnable *getRunnable() = 0;
+        void setResponse(AbstractResponse *response);
+
+        virtual bool canResponse() const = 0;
+        virtual void execute() = 0;
 };

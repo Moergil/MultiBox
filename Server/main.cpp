@@ -8,6 +8,8 @@
 
 #include <test/client.h>
 
+#include <player/library/directoryscanner.h>
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
@@ -17,15 +19,8 @@ int main(int argc, char *argv[])
     client->start();
     // END Client test
 
-    Player *player = new QtMultimediaPlayer();
+    Player *player = new QtMultimediaPlayer("asdf");
 
-    player->getPlaylist()->addItem(new PlaylistItem(QUrl::fromLocalFile(QDir::currentPath()+"/playlist/1.mp3")));
-    /*player->getPlaylist()->addItem(new PlaylistItem(QUrl::fromLocalFile(QDir::currentPath()+"/playlist/2.mp3")));
-    player->getPlaylist()->addItem(new PlaylistItem(QUrl::fromLocalFile(QDir::currentPath()+"/playlist/3.mp3")));
-    player->getPlaylist()->addItem(new PlaylistItem(QUrl::fromLocalFile(QDir::currentPath()+"/playlist/4.mp3")));
-    player->getPlaylist()->addItem(new PlaylistItem(QUrl::fromLocalFile(QDir::currentPath()+"/playlist/5.mp3")));
-    player->getPlaylist()->addItem(new PlaylistItem(QUrl::fromLocalFile(QDir::currentPath()+"/playlist/6.mp3")));
-    */
     Server *server = new Server(player);
 
     if(server->listen(QHostAddress::Any, 13110))
@@ -36,6 +31,9 @@ int main(int argc, char *argv[])
     {
         qFatal("Server is already running!");
     }
+
+    DirectoryScanner *directoryScanner = new DirectoryScanner(player);
+    directoryScanner->start();
 
     return a.exec();
 }

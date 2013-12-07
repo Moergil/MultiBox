@@ -6,19 +6,12 @@
 
 class GetPlayerStateRequest : public AbstractRequest
 {
-    Q_OBJECT
+        Q_OBJECT
 
-public:
-    class Runnable : public RequestRunnable
-    {
     public:
-        Runnable(AbstractRequest *request);
-        void run();
-    };
+        GetPlayerStateRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
 
-public:
-    GetPlayerStateRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
-
-    RequestRunnable *getRunnable();
+        bool canResponse() const;
+        void execute();
 };
 

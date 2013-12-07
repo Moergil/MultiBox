@@ -1,38 +1,47 @@
 #pragma once
 
+#include "library.h"
 #include "playlist.h"
 
 #include <QObject>
 
 class Player : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    Playlist *playlist;
+    private:
+        Playlist *playlist;
+        Library *library;
+        const QString playerName;
 
-signals:
-    void songRequested();
+    signals:
+        void songRequested();
 
-private:
-    void setConnections();
+    private:
+        void setConnections();
 
-protected:
-    void emitSongRequestedSignal();
+    private slots:
+        virtual void start() = 0;
 
-public slots:
-    virtual void start() = 0;
-    virtual void setPlaying(bool playing) = 0;
-    virtual void setVolume(int volume) = 0;
-    virtual void playNext() = 0;
-    virtual bool isPlaying() const = 0;
-    virtual int getVolume() const = 0;
+    protected:
+        void emitSongRequestedSignal();
 
-    void skipSong();
+    public slots:
+        virtual void setPlaying(bool playing) = 0;
+        virtual void setVolume(int volume) = 0;
+        virtual void playNext() = 0;
+        virtual bool isPlaying() const = 0;
+        virtual int getVolume() const = 0;
+        virtual int getPosition() const = 0;
+        virtual int getDuration() const = 0;
 
-public:
-    Player();
-    ~Player();
+        void skipSong();
+        QString getPlayerName() const;
 
-    Playlist *getPlaylist() const;
+    public:
+        Player(const QString &playerName);
+        ~Player();
+
+        Playlist *getPlaylist() const;
+        Library *getLibrary() const;
 };

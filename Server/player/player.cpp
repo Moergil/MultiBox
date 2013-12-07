@@ -11,16 +11,17 @@ void Player::emitSongRequestedSignal()
     emit songRequested();
 }
 
-Player::Player()
+Player::Player(const QString &playerName)
+    : playerName(playerName)
 {
-    this->playlist = new Playlist();
+    this->playlist = new Playlist(this);
+    this->library = new Library(this);
 
     this->setConnections();
 }
 
 Player::~Player()
 {
-    delete this->playlist;
 }
 
 void Player::skipSong()
@@ -28,7 +29,17 @@ void Player::skipSong()
     emitSongRequestedSignal();
 }
 
+QString Player::getPlayerName() const
+{
+    return playerName;
+}
+
 Playlist *Player::getPlaylist() const
 {
     return this->playlist;
+}
+
+Library *Player::getLibrary() const
+{
+    return this->library;
 }

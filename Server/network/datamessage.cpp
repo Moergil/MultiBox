@@ -1,7 +1,7 @@
 #include "datamessage.h"
 
-DataMessage::DataMessage(qint32 messageType, DataContent &dataContent)
-    : messageTypeId(messageType), dataContent(dataContent)
+DataMessage::DataMessage(const qint32 messageTypeId, const DataContent &dataContent)
+    : messageTypeId(messageTypeId), dataContent(dataContent)
 {
 }
 
