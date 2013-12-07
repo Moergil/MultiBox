@@ -28,6 +28,8 @@ public class ServerSelectActivity extends Activity
 {
 	public static final String EXTRA_KEY_DISCONNECT = "disconnect";
 	
+	public static final String SAVED_STATE_KEY_DISCONNECT_NOTIFICATION = "disconnectNotification";
+	
 	private MultiBoxApplication application;
 	
 	private EditText serverAddressInputField;
@@ -69,12 +71,22 @@ public class ServerSelectActivity extends Activity
 
 		lastServersStorage = application.getSelectedServersStorage();
 		
+		boolean showDisconnectNotification = false;
+		
 		Intent startIntent = getIntent();
 		if (startIntent.getBooleanExtra(EXTRA_KEY_DISCONNECT, false))
 		{
+			showDisconnectNotification = true;
+		}
+		
+		if (savedInstanceState != null)
+		{
+			showDisconnectNotification = savedInstanceState.getBoolean(SAVED_STATE_KEY_DISCONNECT_NOTIFICATION);
+		}
+		
+		if (showDisconnectNotification)
+		{
 			disconnectNotification.setVisibility(View.VISIBLE);
-			startIntent.removeExtra(EXTRA_KEY_DISCONNECT);
-			setIntent(startIntent);
 		}
 		
 		Button connectButton = (Button)findViewById(R.id.button_server_connect);
@@ -130,6 +142,15 @@ public class ServerSelectActivity extends Activity
 		{
 			disconnectNotification.setVisibility(View.GONE);
 		}
+	}
+	
+	@Override
+	protected void onSaveInstanceState(Bundle outState)
+	{
+		super.onSaveInstanceState(outState);
+
+		boolean showDisconnectNotification = disconnectNotification.getVisibility() == View.VISIBLE; 
+		outState.putBoolean(SAVED_STATE_KEY_DISCONNECT_NOTIFICATION, showDisconnectNotification);
 	}
 	
 	private void createLastServersList(List<ServerEntry> servers)

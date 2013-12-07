@@ -158,12 +158,12 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 					}
 					catch (Exception e)
 					{
+						log.print("Serious error: " + e.getMessage());
+						
 						if (seriousErrorListener != null)
 						{
 							seriousErrorListener.onSeriousError(e.getMessage());
 						}
-						
-						
 					}
 					finally
 					{
