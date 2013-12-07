@@ -1,12 +1,19 @@
 #include "abstractresponse.h"
 
+#include <player/entity/libraryitem.h>
+
 #pragma once
 
 class GetLibraryItemResponse : public AbstractResponse
 {
-    public:
-        GetLibraryItemResponse();
+        Q_OBJECT
 
-        DataContent toDataContent();
-        qint32 getMessageCode();
+    private:
+        const LibraryItem *item;
+
+    public:
+        GetLibraryItemResponse(const LibraryItem *item);
+
+        DataContent toDataContent() const;
+        qint32 getMessageCode() const;
 };

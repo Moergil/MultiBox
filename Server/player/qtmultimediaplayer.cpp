@@ -8,7 +8,8 @@ void QtMultimediaPlayer::onChangeMediaStatus(QMediaPlayer::MediaStatus status)
     }
 }
 
-QtMultimediaPlayer::QtMultimediaPlayer() : Player()
+QtMultimediaPlayer::QtMultimediaPlayer(const QString &playerName)
+    : Player(playerName)
 {
     qMediaPlayer = new QMediaPlayer;
     playing = false;

@@ -9,14 +9,14 @@
 
 class MessageProcessor : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    MessengerInterface *messanger;
-    MessageRecognizer *recognizer;
+    private:
+        MessengerInterface *messanger;
+        MessageRecognizer *recognizer;
 
-public:
-    MessageProcessor(PlayerHandler *handler, int socketDescriptor, QObject *parent = 0);
+    public:
+        MessageProcessor(PlayerHandler *handler, int socketDescriptor, QObject *parent = 0);
 
-    void proccess();
+        void proccess();
 };

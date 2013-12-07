@@ -50,7 +50,7 @@ Playlist::~Playlist()
 
 void Playlist::addItem(Multimedia *playlistItem)
 {
-    //pridanie id v playliste
+    //pridanie id v playliste a dlzky
 
     waitingItems->append(playlistItem);
 
@@ -62,16 +62,14 @@ Multimedia *Playlist::getCurrentItem() const
     return currentItem;
 }
 
-/*void Playlist::addItem(qint64 multimediaId)
-{
-
-}*/
-
 QList<Multimedia *> Playlist::getListOfItems() const
 {
     QList<Multimedia *> list = QList<Multimedia *>(*this->waitingItems);
 
-    list.push_front(currentItem);
+    if(currentItem != NULL)
+    {
+        list.push_front(currentItem);
+    }
 
     return list;
 }

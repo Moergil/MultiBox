@@ -7,11 +7,12 @@
 
 class Player : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
     private:
         Playlist *playlist;
         Library *library;
+        const QString playerName;
 
     signals:
         void songRequested();
@@ -35,9 +36,10 @@ class Player : public QObject
         virtual int getDuration() const = 0;
 
         void skipSong();
+        QString getPlayerName() const;
 
     public:
-        Player();
+        Player(const QString &playerName);
         ~Player();
 
         Playlist *getPlaylist() const;

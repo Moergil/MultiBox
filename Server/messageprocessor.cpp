@@ -19,6 +19,8 @@ MessageProcessor::MessageProcessor(PlayerHandler *handler, int socketDescriptor,
 
 void MessageProcessor::proccess()
 {
+    qDebug() << "New client connected.";
+
     try
     {
         while(messanger->canWaitForMessage())

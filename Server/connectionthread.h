@@ -9,16 +9,16 @@
 
 class ConnectionThread : public QThread
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    int socketDescriptor;
-    QTcpSocket *tcpSocket;
-    Player *player;
-    SocketMessenger *messanger;
+    private:
+        int socketDescriptor;
+        QTcpSocket *tcpSocket;
+        Player *player;
+        SocketMessenger *messanger;
 
-public:
-    ConnectionThread(Player *player, int socketDescriptor, QObject *parent);
+    public:
+        ConnectionThread(Player *player, int socketDescriptor, QObject *parent);
 
-    void run();
+        void run();
 };

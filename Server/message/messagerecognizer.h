@@ -9,9 +9,8 @@ class MessageRecognizer : public QObject
             GetPlayerState              = 1,
             GetPlaylist                 = 2,
             GetLibraryItem              = 3,
-            GetLibraryItemInfo          = 4,
-            AddItemToLibrary            = 5,
-            AddItemToPlaylist           = 6,
+            AddLibraryItemToPlaylist    = 4,
+            GetServerInfo               = 5,
             Pause                       = 7
         };
 

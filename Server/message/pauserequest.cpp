@@ -11,11 +11,6 @@ PauseRequest::PauseRequest(const DataMessage &dataMessage, PlayerHandler *handle
     playing = reader.readBool();
 }
 
-bool PauseRequest::isPlaying()
-{
-    return playing;
-}
-
 bool PauseRequest::canResponse() const
 {
     return false;
@@ -23,5 +18,5 @@ bool PauseRequest::canResponse() const
 
 void PauseRequest::execute()
 {
-    emit getPlayerHandler()->setPlaying(isPlaying());
+    emit getPlayerHandler()->setPlaying(playing);
 }

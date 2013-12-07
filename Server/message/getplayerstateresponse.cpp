@@ -12,7 +12,7 @@ GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
 {
 }
 
-DataContent GetPlayerStateResponse::toDataContent()
+DataContent GetPlayerStateResponse::toDataContent() const
 {
     MessageContentWriter writer;
     writer.write(multimedia.toQJsonObject());
@@ -22,7 +22,7 @@ DataContent GetPlayerStateResponse::toDataContent()
     return writer.toDataContent();
 }
 
-qint32 GetPlayerStateResponse::getMessageCode()
+qint32 GetPlayerStateResponse::getMessageCode() const
 {
     return MessageRecognizer::GetPlayerState;
 }

@@ -7,6 +7,9 @@
 
 class Multimedia : public LibraryItem
 {
+    public:
+        static Multimedia createEmpty();
+
     private:
         const qint32 length;
 

@@ -7,7 +7,7 @@
 
 class Client : public QThread
 {
-    Q_OBJECT
+        Q_OBJECT
 
     private:
         SocketMessenger *messenger;
@@ -22,4 +22,7 @@ class Client : public QThread
         void pauseTest();
         void playerStateTest();
         void playlistTest();
+        void getLibraryItemTest(qint64 cislo);
+        void addMultimediaToLibrary(qint64 cislo);
+        void getPlayerInfoTest();
 };

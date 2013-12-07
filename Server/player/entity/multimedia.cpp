@@ -2,6 +2,11 @@
 
 #include <QVariantMap>
 
+Multimedia Multimedia::createEmpty()
+{
+    return Multimedia(0, "", 0, QFileInfo());
+}
+
 Multimedia::Multimedia(const qint64 id, const QString name, const qint32 length, const QFileInfo file, const qint64 parentId)
     : LibraryItem(id, name, file, LibraryItemType::MULTIMEDIA, parentId), length(length)
 {

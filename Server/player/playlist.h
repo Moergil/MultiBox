@@ -8,42 +8,39 @@
 
 class Playlist : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    QList<Multimedia *> *waitingItems;
-    Multimedia *currentItem;
+    private:
+        QList<Multimedia *> *waitingItems;
+        Multimedia *currentItem;
 
-signals:
-    void waitingListChanged();
-    void currentItemChanged();
+    signals:
+        void waitingListChanged();
+        void currentItemChanged();
 
-private slots:
-    void autoShiftPlaylist();
+    private slots:
+        void autoShiftPlaylist();
 
-private:
-    void emitWaitingListChangedSignal();
-    void emitCurrentItemChanged();
+    private:
+        void emitWaitingListChangedSignal();
+        void emitCurrentItemChanged();
 
-public slots:
-    void shiftPlaylist();
+    public slots:
+        void shiftPlaylist();
 
-    PlaylistState getPlaylistState() const;
-    Multimedia *getCurrentItem() const;
+        PlaylistState getPlaylistState() const;
+        Multimedia *getCurrentItem() const;
+        void addItem(Multimedia *playlistItem);
 
-    //void addItem(qint64 multimediaId);
+    public:
+        Playlist(QObject *parent = 0);
+        ~Playlist();
 
-public:
-    Playlist(QObject *parent = 0);
-    ~Playlist();
+        QList<Multimedia *> getListOfItems() const;
 
-    void addItem(Multimedia *playlistItem);
+        void clear();
 
-    QList<Multimedia *> getListOfItems() const;
-
-    void clear();
-
-    bool isEmpty() const;
-    int count() const;
+        bool isEmpty() const;
+        int count() const;
 };
 

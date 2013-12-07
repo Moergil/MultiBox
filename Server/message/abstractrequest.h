@@ -8,22 +8,22 @@
 
 class AbstractRequest : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    DataMessage dataMessage;
-    PlayerHandler *handler;
-    AbstractResponse *response;
+    private:
+        DataMessage dataMessage;
+        PlayerHandler *handler;
+        AbstractResponse *response;
 
-public:
-    AbstractRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
+    public:
+        AbstractRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
 
-    DataMessage &getDataMessage();
-    PlayerHandler *getPlayerHandler() const;
-    AbstractResponse *getResponse() const;
+        DataMessage &getDataMessage();
+        PlayerHandler *getPlayerHandler() const;
+        AbstractResponse *getResponse() const;
 
-    void setResponse(AbstractResponse *response);
+        void setResponse(AbstractResponse *response);
 
-    virtual bool canResponse() const = 0;
-    virtual void execute() = 0;
+        virtual bool canResponse() const = 0;
+        virtual void execute() = 0;
 };

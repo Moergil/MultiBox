@@ -6,23 +6,25 @@
 
 class PlayerHandler : QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    Player *player;
+    private:
+        Player *player;
 
-signals:
-    void setPlaying(bool playing);
+    signals:
+        void setPlaying(bool playing);
+        void addToPlaylist(Multimedia *multimedia);
 
-private:
-    void setConnections();
+    private:
+        void setConnections();
 
-public:
-    PlayerHandler(Player *player, QObject *parent = 0);
-    PlaylistState getPlaylistState();
-    Multimedia getCurrentMultimedia();
-    qint32 getPosition();
-    bool isPlaying();
-    qint32 getDuration();
-    LibraryItem *getLibraryItem(qint64 itemId);
-};
+    public:
+        PlayerHandler(Player *player, QObject *parent = 0);
+        PlaylistState getPlaylistState();
+        Multimedia getCurrentMultimedia();
+        qint32 getPosition();
+        bool isPlaying();
+        qint32 getDuration();
+        LibraryItem *getLibraryItem(qint64 itemId);
+        QString getPlayerName();
+    };

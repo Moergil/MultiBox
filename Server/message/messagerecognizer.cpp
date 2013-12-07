@@ -1,6 +1,8 @@
+#include "addlibraryitemtoplaylistrequest.h"
 #include "getlibraryitemrequest.h"
 #include "getplayerstaterequest.h"
 #include "getplaylistrequest.h"
+#include "getserverinforequest.h"
 #include "messagerecognizer.h"
 #include "pauserequest.h"
 #include "undefinedrequest.h"
@@ -24,14 +26,11 @@ AbstractRequest *MessageRecognizer::recognizeMessage(const DataMessage &dataMess
         case GetLibraryItem:
             return new GetLibraryItemRequest(dataMessage, handler, this);
 
-        /*case GetLibraryItemInfo:
-            break;
+        case AddLibraryItemToPlaylist:
+            return new AddLibraryItemToPlaylistRequest(dataMessage, handler, this);
 
-        case AddItemToLibrary:
-            break;
-
-        case AddItemToPlaylist:
-            break; */
+        case GetServerInfo:
+            return new GetServerInfoRequest(dataMessage, handler, this);
 
         case Pause:
             return new PauseRequest(dataMessage, handler, this);

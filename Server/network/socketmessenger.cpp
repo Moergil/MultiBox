@@ -2,8 +2,6 @@
 
 #include <util/bytearrayconverter.h>
 
-#include <QThread>
-
 SocketMessenger::SocketMessenger(int socketDescriptor, QObject *parent) throw(MessengerException)
     : QObject(parent)
 {

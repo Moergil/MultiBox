@@ -6,6 +6,7 @@
 
 #include <util/bytearrayconverter.h>
 #include <util/messagecontentreader.h>
+#include <util/messagecontentwriter.h>
 
 Client::Client(QObject *parent) :
     QThread(parent)
@@ -36,6 +37,19 @@ void Client::run()
         QThread::sleep(5);
 
         playerStateTest();
+
+        QThread::sleep(3);
+
+        for(int i=1; i<10; i++)
+        {
+            getLibraryItemTest(i);
+        }
+
+        playlistTest();
+        addMultimediaToLibrary(7);
+        playlistTest();
+
+        getPlayerInfoTest();
     }
     catch(MessengerException &exception)
     {
@@ -79,4 +93,41 @@ void Client::playlistTest()
     MessageContentReader reader(message.getDataContent());
 
     qDebug() << reader.readQJsonObject();
+}
+
+void Client::getLibraryItemTest(qint64 cislo)
+{
+    MessageContentWriter writer;
+    writer.write(cislo);
+
+    messenger->writeMessage(DataMessage(3, writer.toDataContent()));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQJsonObject();
+}
+
+void Client::addMultimediaToLibrary(qint64 cislo)
+{
+    MessageContentWriter writer;
+    writer.write(cislo);
+
+    messenger->writeMessage(DataMessage(4, writer.toDataContent()));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readBool();
+    qDebug() << reader.readQJsonObject();
+}
+
+void Client::getPlayerInfoTest()
+{
+    messenger->writeMessage(DataMessage(5));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQString();
 }

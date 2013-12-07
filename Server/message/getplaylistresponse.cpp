@@ -3,13 +3,12 @@
 
 #include <util/messagecontentwriter.h>
 
-GetPlaylistResponse::GetPlaylistResponse(PlaylistState playlistState,
-                                                QObject *parent)
+GetPlaylistResponse::GetPlaylistResponse(PlaylistState playlistState, QObject *parent)
     : AbstractResponse(parent), playlistState(playlistState)
 {
 }
 
-DataContent GetPlaylistResponse::toDataContent()
+DataContent GetPlaylistResponse::toDataContent() const
 {
     MessageContentWriter writer;
     writer.write(playlistState.toQJsonObject());
@@ -17,7 +16,7 @@ DataContent GetPlaylistResponse::toDataContent()
     return writer.toDataContent();
 }
 
-qint32 GetPlaylistResponse::getMessageCode()
+qint32 GetPlaylistResponse::getMessageCode() const
 {
     return MessageRecognizer::GetPlaylist;
 }

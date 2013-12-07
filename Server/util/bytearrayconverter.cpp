@@ -2,6 +2,7 @@
 
 #include <QDataStream>
 #include <QJsonDocument>
+#include <QDebug>
 
 qint32 ByteArrayConverter::parseQInt32(const QByteArray &byteArray)
 {

@@ -64,7 +64,11 @@ SOURCES += main.cpp \
     player/library/multimediafactory.cpp \
     player/library/librarytablerow.cpp \
     message/getlibraryitemrequest.cpp \
-    message/getlibraryitemresponse.cpp
+    message/getlibraryitemresponse.cpp \
+    message/addlibraryitemtoplaylistrequest.cpp \
+    message/addlibraryitemtoplaylistresponse.cpp \
+    message/getserverinforequest.cpp \
+    message/getserverinforesponse.cpp
 
 HEADERS += \
     server.h \
@@ -110,4 +114,8 @@ HEADERS += \
     player/library/multimediafactory.h \
     player/library/librarytablerow.h \
     message/getlibraryitemrequest.h \
-    message/getlibraryitemresponse.h
+    message/getlibraryitemresponse.h \
+    message/addlibraryitemtoplaylistrequest.h \
+    message/addlibraryitemtoplaylistresponse.h \
+    message/getserverinforequest.h \
+    message/getserverinforesponse.h

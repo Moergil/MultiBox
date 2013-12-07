@@ -3,6 +3,7 @@
 void PlayerHandler::setConnections()
 {
     connect(this, SIGNAL(setPlaying(bool)), player, SLOT(setPlaying(bool)));
+    connect(this, SIGNAL(addToPlaylist(Multimedia*)), player->getPlaylist(), SLOT(addItem(Multimedia*)));
 }
 
 PlayerHandler::PlayerHandler(Player *player, QObject *parent)
@@ -30,7 +31,14 @@ Multimedia PlayerHandler::getCurrentMultimedia()
                               Qt::BlockingQueuedConnection,
                               Q_RETURN_ARG(Multimedia *, multimedia));
 
-    return *multimedia;
+    if(multimedia != NULL)
+    {
+        return *multimedia;
+    }
+    else
+    {
+        return Multimedia::createEmpty();
+    }
 }
 
 qint32 PlayerHandler::getPosition()
@@ -75,5 +83,16 @@ LibraryItem *PlayerHandler::getLibraryItem(qint64 itemId)
                               Q_RETURN_ARG(LibraryItem *,item),
                               Q_ARG(qint64, itemId));
 
-    return *item;
+    return item;
+}
+
+QString PlayerHandler::getPlayerName()
+{
+    QString name;
+
+    QMetaObject::invokeMethod(player, "getPlayerName",
+                              Qt::BlockingQueuedConnection,
+                              Q_RETURN_ARG(QString, name));
+
+    return name;
 }

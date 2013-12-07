@@ -4,13 +4,14 @@
 
 class PauseRequest : public AbstractRequest
 {
-private:
-    bool playing;
+        Q_OBJECT
 
-public:
-    PauseRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
+    private:
+        bool playing;
 
-    bool isPlaying();
-    bool canResponse() const;
-    void execute();
+    public:
+        PauseRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
+
+        bool canResponse() const;
+        void execute();
 };

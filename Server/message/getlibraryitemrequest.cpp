@@ -1,13 +1,12 @@
 #include "getlibraryitemrequest.h"
+#include "getlibraryitemresponse.h"
+#include <util/messagecontentreader.h>
 
 GetLibraryItemRequest::GetLibraryItemRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)
 {
-}
-
-qint32 GetLibraryItemRequest::getItemId() const
-{
-    return itemId;
+    MessageContentReader reader(getDataMessage().getDataContent());
+    itemId = reader.readQInt64();
 }
 
 bool GetLibraryItemRequest::canResponse() const
@@ -17,5 +16,8 @@ bool GetLibraryItemRequest::canResponse() const
 
 void GetLibraryItemRequest::execute()
 {
+    LibraryItem *item = getPlayerHandler()->getLibraryItem(itemId);
+    GetLibraryItemResponse *response = new GetLibraryItemResponse(item);
 
+    setResponse(response);
 }

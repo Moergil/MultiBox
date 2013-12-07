@@ -5,11 +5,11 @@
 
 class MessengerException : public std::exception
 {
-private:
-    const QString message;
+    private:
+        const QString message;
 
-public:
-    MessengerException(const QString message);
-    ~MessengerException() throw();
-    QString getMessage() const;
+    public:
+        MessengerException(const QString message);
+        ~MessengerException() throw();
+        QString getMessage() const;
 };
