@@ -36,7 +36,12 @@ void Client::run()
         }*/
 
         playlistTest();
-        addMultimediaToLibrary(7);
+        addMultimediaToLibrary(759);
+        addMultimediaToLibrary(760);
+        addMultimediaToLibrary(761);
+        addMultimediaToLibrary(762);
+        addMultimediaToLibrary(763);
+        addMultimediaToLibrary(764);
         playlistTest();
 
         //Thread::sleep(4);

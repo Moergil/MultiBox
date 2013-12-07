@@ -22,7 +22,7 @@ MOBILITY    = multimedia
 TEMPLATE    = app
 
 INCLUDEPATH += .
-RESOURCES += resources.qrc
+RESOURCES +=
 
 SOURCES += main.cpp \
     server.cpp \

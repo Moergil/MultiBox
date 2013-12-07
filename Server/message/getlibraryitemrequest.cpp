@@ -10,8 +10,6 @@ GetLibraryItemRequest::GetLibraryItemRequest(const DataMessage &dataMessage, Pla
     MessageContentReader reader(getDataMessage().getDataContent());
     QJsonObject json = reader.readQJsonObject();
     itemId = json.value("itemId").toVariant().toLongLong();
-
-    qDebug() << itemId << "itemId";
 }
 
 bool GetLibraryItemRequest::canResponse() const

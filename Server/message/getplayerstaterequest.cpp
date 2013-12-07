@@ -17,8 +17,9 @@ void GetPlayerStateRequest::execute()
     Multimedia currentMultimedia = getPlayerHandler()->getCurrentMultimedia();
     qint32 position = getPlayerHandler()->getPosition();
     bool playing = getPlayerHandler()->isPlaying();
+    qint32 duration = getPlayerHandler()->getDuration();
 
-    GetPlayerStateResponse * response = new GetPlayerStateResponse(currentMultimedia, position, playing);
+    GetPlayerStateResponse * response = new GetPlayerStateResponse(currentMultimedia, position, playing, duration);
 
     setResponse(response);
 }

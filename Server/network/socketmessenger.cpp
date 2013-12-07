@@ -100,7 +100,7 @@ QByteArray SocketMessenger::readByteArray(qint32 bytesToRead) throw(MessengerExc
     {
         if(!nonReadDataExists() && !tcpSocket->waitForReadyRead())
         {
-            throw MessengerException("Not enough data in the stream!");
+            throw MessengerException("No more data in the stream!");
         }
 
         qint32 bytesAvailable = tcpSocket->bytesAvailable();

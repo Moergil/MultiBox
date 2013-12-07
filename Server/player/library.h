@@ -18,7 +18,7 @@ class Library : public QObject
         Library(QObject *parent = 0);
         ~Library();
 
-public slots:
+    public slots:
         void addDirectory(QDir &dir);
         QList<LibraryItem *> *listDirectories();
         void removeDirectory(QDir &dir);

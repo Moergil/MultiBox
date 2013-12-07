@@ -1,26 +1,26 @@
 #include "getplayerstateresponse.h"
 #include "messagerecognizer.h"
-#include <QVariantMap>
 #include <util/messagecontentwriter.h>
 
 GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
                                                 qint32 playbackPosition,
-                                                bool playing,
+                                                bool playing, qint32 duration,
                                                 QObject *parent)
     : AbstractResponse(parent), multimedia(multimedia),
-      playbackPosition(playbackPosition), playing(playing)
+      playbackPosition(playbackPosition), playing(playing), duration(duration)
 {
 }
 
 DataContent GetPlayerStateResponse::toDataContent() const
 {
-    QVariantMap map;
+    QJsonObject object;
+    object.insert("playbackPosition", playbackPosition);
+    object.insert("playing", playing);
 
-    map["playbackPosition"] = playbackPosition;
-    map["playing"] = playing;
+    QJsonObject multimediaObject = multimedia.toQJsonObject();
+    multimediaObject.insert("length", duration);
 
-    QJsonObject object = QJsonObject::fromVariantMap(map);
-    object.insert("multimedia", multimedia.toQJsonObject());
+    object.insert("multimedia", multimediaObject);
 
     MessageContentWriter writer;
     writer.write(object);
