@@ -1,4 +1,5 @@
 #include "directoryfactory.h"
+#include "libraryitemfactorychooser.h"
 #include "writabledirectory.h"
 
 DirectoryFactory *DirectoryFactory::directoryFactory = new DirectoryFactory();
@@ -18,7 +19,8 @@ LibraryItem *DirectoryFactory::getLibraryItem(LibraryTableRow *row) const
 
     foreach(LibraryTableRow *son, row->getDescendants())
     {
-        descendants.append(getLibraryItem(son));
+        LibraryItemFactory *factory = LibraryItemFactoryChooser::getFactory(son->getType());
+        descendants.append(factory->getLibraryItem(son));
     }
 
     return new WritableDirectory(row->getId(), row->getName(), QFileInfo(row->getPath()), descendants, row->getParent());

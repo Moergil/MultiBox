@@ -11,8 +11,7 @@ void Player::emitSongRequestedSignal()
     emit songRequested();
 }
 
-Player::Player(const QString &playerName)
-    : playerName(playerName)
+Player::Player()
 {
     this->playlist = new Playlist(this);
     this->library = new Library(this);
@@ -42,4 +41,9 @@ Playlist *Player::getPlaylist() const
 Library *Player::getLibrary() const
 {
     return this->library;
+}
+
+void Player::setPlayerName(const QString &name)
+{
+    playerName = name;
 }

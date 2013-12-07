@@ -3,6 +3,7 @@
 
 #include <util/messagecontentreader.h>
 #include <QVariant>
+#include <QDebug>
 
 AddLibraryItemToPlaylistRequest::AddLibraryItemToPlaylistRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)

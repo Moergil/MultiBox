@@ -12,7 +12,7 @@ class Player : public QObject
     private:
         Playlist *playlist;
         Library *library;
-        const QString playerName;
+        QString playerName;
 
     signals:
         void songRequested();
@@ -39,9 +39,11 @@ class Player : public QObject
         QString getPlayerName() const;
 
     public:
-        Player(const QString &playerName);
+        Player();
         ~Player();
 
         Playlist *getPlaylist() const;
         Library *getLibrary() const;
+
+        void setPlayerName(const QString &name);
 };

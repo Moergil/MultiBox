@@ -16,7 +16,7 @@ class QtMultimediaPlayer : public Player
         void onChangeMediaStatus(QMediaPlayer::MediaStatus status);
 
     public:
-        QtMultimediaPlayer(const QString &playerName);
+        QtMultimediaPlayer();
         ~QtMultimediaPlayer();
 
     public slots:

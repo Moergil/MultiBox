@@ -42,7 +42,7 @@ void DirectoryScanner::findNewFiles()
     }
     */
 
-    QDir dir("/home/joso/Home/Music");
+    QDir dir("/home/moergil/Music");
     handleDirectory(dir);
     proccessPath(dir);
 }

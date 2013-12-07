@@ -15,11 +15,19 @@ int main(int argc, char *argv[])
     QCoreApplication a(argc, argv);
 
     // START Client test
-    Client *client = new Client();
-    client->start();
+    //Client *client = new Client();
+    //client->start();
     // END Client test
 
-    Player *player = new QtMultimediaPlayer("asdf");
+
+    /*QStringList libraries;
+
+    libraries.append("/home/joso/Home/Musics");
+    libraries.append("/home/joso/Home/Clips");*/
+
+    Player *player = new QtMultimediaPlayer();
+    player->setPlayerName("MultiBox Beta");
+    //player->getLibrary()->setListOfLibraries(libraries);
 
     Server *server = new Server(player);
 

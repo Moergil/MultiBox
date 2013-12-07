@@ -1,6 +1,7 @@
 #include "playlist.h"
 
 #include <QJsonArray>
+#include <QDebug>
 
 void Playlist::shiftPlaylist()
 {
@@ -52,6 +53,7 @@ void Playlist::addItem(Multimedia *playlistItem)
 {
     //pridanie id v playliste a dlzky
 
+    qDebug() << "Adding new multimedia" << playlistItem->getName();
     waitingItems->append(playlistItem);
 
     emitWaitingListChangedSignal();

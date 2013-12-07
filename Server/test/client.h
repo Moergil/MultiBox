@@ -22,7 +22,7 @@ class Client : public QThread
         void pauseTest();
         void playerStateTest();
         void playlistTest();
-        void getLibraryItemTest(qint64 cislo);
-        void addMultimediaToLibrary(qint64 cislo);
+        void getLibraryItemTest(qint64 number);
+        void addMultimediaToLibrary(qint64 number);
         void getPlayerInfoTest();
 };

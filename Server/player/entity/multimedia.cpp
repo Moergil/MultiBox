@@ -14,7 +14,7 @@ Multimedia::Multimedia(const qint64 id, const QString name, const qint32 length,
 
 qint32 Multimedia::getLength() const
 {
-    return 100; //length;
+    return length;
 }
 
 QUrl Multimedia::getQUrl() const

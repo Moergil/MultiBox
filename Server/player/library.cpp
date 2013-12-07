@@ -31,7 +31,7 @@ QList<LibraryItem *> *Library::listDirectories()
 
 LibraryItem *Library::readRootDir()
 {
-    return new WritableDirectory(0, "Libraries", QFileInfo(), *listDirectories());
+    return new WritableDirectory(0, "Library", QFileInfo(), *listDirectories());
 }
 
 void Library::removeDirectory(QDir &dir)
