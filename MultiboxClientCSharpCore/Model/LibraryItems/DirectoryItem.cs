@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model.LibraryItems
 {
-	class DirectoryItem : GenericLibraryItem
+	public class DirectoryItem : GenericLibraryItem
 	{
 		private IList<ILibraryItem> content;
 

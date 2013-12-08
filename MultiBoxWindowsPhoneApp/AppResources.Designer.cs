@@ -79,20 +79,47 @@ namespace MultiBoxWindowsPhoneApp {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Direct connect.
+        /// </summary>
+        public static string DirectConnectTitle {
+            get {
+                return ResourceManager.GetString("DirectConnectTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Connection to server was lost..
+        /// </summary>
+        public static string DisconnectMessage {
+            get {
+                return ResourceManager.GetString("DisconnectMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Nothing to play....
+        /// </summary>
+        public static string NothingToPlayNotify {
+            get {
+                return ResourceManager.GetString("NothingToPlayNotify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Queying {0}....
+        /// </summary>
+        public static string QueyingItemToPlaylistNotify {
+            get {
+                return ResourceManager.GetString("QueyingItemToPlaylistNotify", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Server select.
         /// </summary>
         public static string ServerSelectTitle {
             get {
                 return ResourceManager.GetString("ServerSelectTitle", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Type server address.
-        /// </summary>
-        public static string TypeServerAddressDescription {
-            get {
-                return ResourceManager.GetString("TypeServerAddressDescription", resourceCulture);
             }
         }
     }

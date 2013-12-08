@@ -40,23 +40,52 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IAsynchronousMessageInterface.cs" />
-    <Compile Include="IServerInterface.cs" />
+    <Compile Include="Model\Server.cs" />
+    <Compile Include="Net\Data\AddLibraryItemToPlaylistData.cs" />
+    <Compile Include="Net\Data\AddLibraryItemToPlaylistResultData.cs" />
+    <Compile Include="Net\Data\GetLibraryItemData.cs" />
+    <Compile Include="Net\Data\GetLibraryItemResultData.cs" />
+    <Compile Include="Net\Data\GetPlayerStateResultData.cs" />
+    <Compile Include="Net\Data\GetPlaylistResultData.cs" />
+    <Compile Include="Net\Data\GetServerInfoResultData.cs" />
+    <Compile Include="Net\IServerInterface.cs" />
     <Compile Include="MockLibrary.cs" />
     <Compile Include="Model\GenericLibraryItem.cs" />
     <Compile Include="Model\ILibrary.cs" />
     <Compile Include="Model\ILibraryItem.cs" />
     <Compile Include="Model\IPlayer.cs" />
     <Compile Include="Model\IPlaylist.cs" />
-    <Compile Include="Model\LibraryItems\BackNavigationLibraryItem.cs" />
     <Compile Include="Model\LibraryItems\DirectoryItem.cs" />
-    <Compile Include="Model\LibraryItems\MultimediaItem.cs" />
     <Compile Include="Model\LibraryItemType.cs" />
-    <Compile Include="Model\Multimedia.cs" />
+    <Compile Include="Model\LibraryItems\MultimediaItem.cs" />
     <Compile Include="Model\ServerLibraryShadow.cs" />
     <Compile Include="Model\ServerPlayerShadow.cs" />
     <Compile Include="Model\ServerPlaylistShadow.cs" />
+    <Compile Include="Net\MessageTypes.cs" />
+    <Compile Include="Net\MockServerInterface.cs" />
+    <Compile Include="Net\NetworkServerInterface.cs" />
+    <Compile Include="Net\NetworkStandards.cs" />
+    <Compile Include="Net\Transformer\AddLibraryItemToPlaylistDecoder.cs" />
+    <Compile Include="Net\Transformer\AddLibraryItemToPlaylistEncoder.cs" />
+    <Compile Include="Net\Transformer\GetLibraryItemDecoder.cs" />
+    <Compile Include="Net\Transformer\GetLibraryItemEncoder.cs" />
+    <Compile Include="Net\Transformer\GetPlayerStateDecoder.cs" />
+    <Compile Include="Net\Transformer\GetPlaylistDecoder.cs" />
+    <Compile Include="Net\Transformer\GetServerInfoDecoder.cs" />
+    <Compile Include="Net\Transformer\Json\MultimediaJsonDecoder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\JsonValues.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.5.0.8\lib\portable-net40+sl4+wp7+win8\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
