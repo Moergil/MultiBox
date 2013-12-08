@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model
 {
-	class GenericLibraryItem : ILibraryItem
+	public class GenericLibraryItem : ILibraryItem
 	{
 		private readonly long id;
 		private readonly LibraryItemType type;

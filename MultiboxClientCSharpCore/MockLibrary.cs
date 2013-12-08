@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
+using MultiboxClientCSharpCore.Model;
+using MultiboxClientCSharpCore.Model.LibraryEventArgs;
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore
 {
 	class MockLibrary : ILibrary
 	{
@@ -25,10 +27,10 @@ namespace MultiBoxCSharpCore
 
 		private void OnItemReceived(ILibraryItem item)
 		{
-			LibraryEventArgs.ItemReceivedEventArgs arguments = new LibraryEventArgs.ItemReceivedEventArgs(item);
-			ItemReceived(this, arguments);
+			LibraryItemReceivedEventArgs arguments = new LibraryItemReceivedEventArgs(item);
+			LibraryItemReceived(this, arguments);
 		}
 
-		public event EventHandler<LibraryEventArgs.ItemReceivedEventArgs> ItemReceived;
+		public event EventHandler<LibraryItemReceivedEventArgs> LibraryItemReceived;
 	}
 }

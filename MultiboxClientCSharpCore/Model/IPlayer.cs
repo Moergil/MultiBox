@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MultiBoxCSharpCore.PlayerEventArgs;
+using MultiboxClientCSharpCore.Model.PlayerEventArgs;
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model
 {
 	public interface IPlayer
 	{
@@ -15,53 +15,38 @@ namespace MultiBoxCSharpCore
 		bool Playing { get; }
 
 		int PlaybackPosition { get; }
-		Multimedia ActiveMultimedia { get; }
+		MultimediaItem ActiveMultimedia { get; }
 
 		void RequestPlayingStateChange(bool playing);
 		void RequestActiveMultimediaSkip();
 
-		event EventHandler<PlayingStateChangedEventArgs> PlayingStateChanged;
-		event EventHandler<PlaybackPositionChangedEventArgs> PlaybackPositionChanged;
-		event EventHandler<MultimediaChangedEventArgs> MultimediaChanged;
+		event EventHandler<PlayerStateChangedEventArgs> PlayerStateChanged;
 	}
 
 	namespace PlayerEventArgs
 	{
-		public class PlayingStateChangedEventArgs : EventArgs
+		public class PlayerStateChangedEventArgs : EventArgs
 		{
-			public PlayingStateChangedEventArgs(bool playing)
+			public PlayerStateChangedEventArgs(MultimediaItem multimedia, int playbackPosition, bool playing)
 			{
+				this.Multimedia = multimedia;
+				this.PlaybackPosition = playbackPosition;
 				this.Playing = playing;
 			}
 
+			public MultimediaItem Multimedia
+			{
+				get;
+				private set;
+			}
+
+			public int PlaybackPosition
+			{
+				get;
+				private set;
+			}
+
 			public bool Playing
-			{
-				get;
-				private set;
-			}
-		}
-
-		public class PlaybackPositionChangedEventArgs : EventArgs
-		{
-			public PlaybackPositionChangedEventArgs(int newPosition)
-			{
-				this.Position = newPosition;
-			}
-
-			public int Position
-			{
-				get;
-				private set;
-			}
-		}
-
-		public class MultimediaChangedEventArgs : EventArgs
-		{
-			public MultimediaChangedEventArgs(Multimedia multimedia)
-			{
-			}
-
-			public Multimedia Multimedia
 			{
 				get;
 				private set;

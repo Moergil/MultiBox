@@ -123,10 +123,19 @@
   <data name="ConnectAction" xml:space="preserve">
     <value>Connect</value>
   </data>
+  <data name="DirectConnectTitle" xml:space="preserve">
+    <value>Direct connect</value>
+  </data>
+  <data name="DisconnectMessage" xml:space="preserve">
+    <value>Connection to server was lost.</value>
+  </data>
+  <data name="NothingToPlayNotify" xml:space="preserve">
+    <value>Nothing to play...</value>
+  </data>
+  <data name="QueyingItemToPlaylistNotify" xml:space="preserve">
+    <value>Queying {0}...</value>
+  </data>
   <data name="ServerSelectTitle" xml:space="preserve">
     <value>Server select</value>
-  </data>
-  <data name="TypeServerAddressDescription" xml:space="preserve">
-    <value>Type server address</value>
   </data>
 </root>

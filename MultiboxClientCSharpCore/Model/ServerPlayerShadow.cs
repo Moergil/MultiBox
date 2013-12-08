@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MultiBoxCSharpCore.PlayerEventArgs;
-using MultiBoxCSharpCore.ServerInterfaceEventArgs;
+using CSharpNetInterface.Util;
+using MultiboxClientCSharpCore.Net;
+using MultiboxClientCSharpCore.Model.PlayerEventArgs;
+using MultiboxClientCSharpCore.Net.ServerInterfaceEventArgs;
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model
 {
 	class ServerPlayerShadow : IPlayer
 	{
@@ -14,12 +16,14 @@ namespace MultiBoxCSharpCore
 		private readonly IMessageQueue messageQueue;
 
 		private bool playing;
-		private Multimedia activeMultimedia;
+		private MultimediaItem activeMultimedia;
 		private int playbackPosition;
 
-		public event EventHandler<PlayerEventArgs.PlayingStateChangedEventArgs> PlayingStateChanged;
-		public event EventHandler<PlayerEventArgs.PlaybackPositionChangedEventArgs> PlaybackPositionChanged;
-		public event EventHandler<PlayerEventArgs.MultimediaChangedEventArgs> MultimediaChanged;
+		private long lastUpdateTimestamp;
+
+		public event EventHandler<PlayerEventArgs.PlayerStateChangedEventArgs> PlayerStateChanged = delegate { };
+
+		private readonly PeriodicWorkDispatcher stateChecker;
 	
 		public ServerPlayerShadow(IServerInterface serverInterface, IMessageQueue messageQueue)
 		{
@@ -29,17 +33,29 @@ namespace MultiBoxCSharpCore
 			this.playing = false;
 			this.activeMultimedia = null;
 			this.playbackPosition = 0;
+
+			this.stateChecker = new PeriodicWorkDispatcher(messageQueue, 5000, UpdatePlayer);
 		}
 
 		public void Init()
 		{
 			serverInterface.PlayerUpdateReceived += OnPlayerUpdateReceived;
-			serverInterface.RequestPlayerUpdate();
+
+			UpdatePlayer();
+
+			stateChecker.Start();
 		}
 
 		public void Close()
 		{
 			serverInterface.PlayerUpdateReceived -= OnPlayerUpdateReceived;
+
+			stateChecker.Stop();
+		}
+
+		private void UpdatePlayer()
+		{
+			serverInterface.RequestPlayerUpdate();
 		}
 
 		public bool Playing
@@ -52,7 +68,7 @@ namespace MultiBoxCSharpCore
 			get { return playbackPosition; }
 		}
 
-		public Multimedia ActiveMultimedia
+		public MultimediaItem ActiveMultimedia
 		{
 			get { return activeMultimedia; }
 		}
@@ -69,59 +85,23 @@ namespace MultiBoxCSharpCore
 
 		private void OnPlayerUpdateReceived(object sender, PlayerUpdateReceivedEventArgs eventArgs)
 		{
-			Multimedia multimedia = eventArgs.Multimedia;
+			MultimediaItem multimedia = eventArgs.Multimedia;
 			int playbackPosition = eventArgs.PlaybackPosition;
 			bool playing = eventArgs.Playing;
 
 			ProcessPlayerUpdate(multimedia, playbackPosition, playing);
 		}
 
-		private void ProcessPlayerUpdate(Multimedia multimedia, int playbackPosition, bool playing)
+		private void ProcessPlayerUpdate(MultimediaItem multimedia, int playbackPosition, bool playing)
 		{
-			if (multimedia == null)
-			{
-				if (activeMultimedia != null)
-				{
-					this.activeMultimedia = null;
-					
-					MultimediaChangedEventArgs eventArgs = new MultimediaChangedEventArgs(multimedia);
-					messageQueue.Post(() => MultimediaChanged(this, eventArgs));
-				}
-			}
-			else
-			{
-				bool newMultimedia;
-				if (activeMultimedia == null || !activeMultimedia.Equals(multimedia))
-				{
-					newMultimedia = true;
-					this.activeMultimedia = multimedia;
-				}
-				else
-				{
-					newMultimedia = false;
-				}
-	
-				this.playbackPosition = playbackPosition;
+			lastUpdateTimestamp = Environment.TickCount;
 
-				if (newMultimedia)
-				{
-					MultimediaChangedEventArgs eventArgs = new MultimediaChangedEventArgs(multimedia);
-					messageQueue.Post(() => MultimediaChanged(this, eventArgs));
-				}
-
-				PlaybackPositionChangedEventArgs playbackEventArgs = new PlaybackPositionChangedEventArgs(playbackPosition);
-				messageQueue.Post(() => PlaybackPositionChanged(this, playbackEventArgs));
-			}
-			
-			bool stateChanged = this.playing != playing;
-			
+			this.activeMultimedia = multimedia;
 			this.playing = playing;
-			
-			if (stateChanged)
-			{
-				PlayingStateChangedEventArgs eventArgs = new PlayingStateChangedEventArgs(playing);
-				messageQueue.Post(() => PlayingStateChanged(this, eventArgs));
-			}
+			this.playbackPosition = playbackPosition;
+
+			PlayerStateChangedEventArgs playerStateEventArgs = new PlayerStateChangedEventArgs(multimedia, playbackPosition, playing);
+			messageQueue.Post(() => PlayerStateChanged(this, playerStateEventArgs));
 		}
 	}
 }

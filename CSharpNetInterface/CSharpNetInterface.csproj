@@ -37,9 +37,24 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Connection\IAsynchronousMessageInterface.cs" />
+    <Compile Include="Connection\IncomingMessagesRouter.cs" />
+    <Compile Include="Message\DataStringMessage.cs" />
+    <Compile Include="Message\DataStringMessageReceiver.cs" />
+    <Compile Include="Message\EmptyMessage.cs" />
+    <Compile Include="Message\IDataTransformer.cs" />
+    <Compile Include="Message\IMessage.cs" />
+    <Compile Include="Connection\IMessageInterface.cs" />
+    <Compile Include="Message\IMessageReceiver.cs" />
+    <Compile Include="Message\IMessageType.cs" />
+    <Compile Include="Message\RawMessage.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\ByteSwapper.cs" />
+    <Compile Include="Util\CountDownTimer.cs" />
+    <Compile Include="Util\NetworkBinaryReader.cs" />
+    <Compile Include="Util\NetworkBinaryWriter.cs" />
     <Compile Include="Util\ILog.cs" />
     <Compile Include="Util\IMessageQueue.cs" />
+    <Compile Include="Util\PeriodicWorkDispatcher.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

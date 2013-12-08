@@ -3,32 +3,32 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MultiBoxCSharpCore.PlaylistEventArgs;
+using MultiboxClientCSharpCore.Model.PlaylistEventArgs;
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model
 {
 	public interface IPlaylist
 	{
 		void Init();
 		void Close();
 
-		IList<Multimedia> Items { get; }
+		IList<MultimediaItem> Items { get; }
 		void AddItem(long itemId);
 
-		event EventHandler<NewPlaylistEventArgs> PlaylistChanged;
+		event EventHandler<PlaylistChangedEventArgs> PlaylistChanged;
 		event EventHandler<ItemAddedEventArgs> ItemAdded;
 	}
 
 	namespace PlaylistEventArgs
 	{
-		public class NewPlaylistEventArgs : EventArgs
+		public class PlaylistChangedEventArgs : EventArgs
 		{
-			public NewPlaylistEventArgs(IList<Multimedia> newPlaylist)
+			public PlaylistChangedEventArgs(IList<MultimediaItem> newPlaylist)
 			{
-				this.NewPlaylist = newPlaylist;
+				this.Playlist = newPlaylist;
 			}
 
-			public IList<Multimedia> NewPlaylist
+			public IList<MultimediaItem> Playlist
 			{
 				get;
 				private set;
@@ -37,7 +37,7 @@ namespace MultiBoxCSharpCore
 
 		public class ItemAddedEventArgs : EventArgs
 		{
-			public ItemAddedEventArgs(bool success, Multimedia multimedia)
+			public ItemAddedEventArgs(bool success, MultimediaItem multimedia)
 			{
 				this.Success = success;
 				this.Multimedia = multimedia;
@@ -49,7 +49,7 @@ namespace MultiBoxCSharpCore
 				private set;
 			}
 
-			public Multimedia Multimedia
+			public MultimediaItem Multimedia
 			{
 				get;
 				private set;

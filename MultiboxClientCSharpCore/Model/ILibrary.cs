@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-using MultiBoxCSharpCore.LibraryEventArgs;
+using MultiboxClientCSharpCore.Model.LibraryEventArgs;
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model
 {
 	public class LibraryConstants
 	{
 		public const long RootDirectory = 0;
-		public const long BackNavigation = 0;
 	}
 
 	public interface ILibrary
@@ -20,19 +19,19 @@ namespace MultiBoxCSharpCore
 
 		void RequestItem(long id);
 
-		event EventHandler<ItemReceivedEventArgs> ItemReceived;
+		event EventHandler<LibraryItemReceivedEventArgs> LibraryItemReceived;
 	}
 
 	namespace LibraryEventArgs
 	{
-		public class ItemReceivedEventArgs : EventArgs
+		public class LibraryItemReceivedEventArgs : EventArgs
 		{
-			public ItemReceivedEventArgs(ILibraryItem item)
+			public LibraryItemReceivedEventArgs(ILibraryItem item)
 			{
-				this.Item = item;
+				this.LibraryItem = item;
 			}
 
-			public ILibraryItem Item
+			public ILibraryItem LibraryItem
 			{
 				get;
 				private set;

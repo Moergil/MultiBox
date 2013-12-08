@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 
 
-namespace MultiBoxCSharpCore
+namespace MultiboxClientCSharpCore.Model
 {
 	public interface ILibraryItem
 	{
