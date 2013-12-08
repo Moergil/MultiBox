@@ -64,14 +64,25 @@ bool LibraryDbManager::open()
 {
     db.setDatabaseName(DB_FILENAME);
 
-    bool open = db.open();
-
-    if(!tableExists())
+    if(db.open())
     {
-        createTable();
+        turnOnForeignKeys();
+
+        if(!tableExists())
+        {
+            createTable();
+        }
+
+        return true;
     }
 
-    return open;
+    return false;
+}
+
+void LibraryDbManager::turnOnForeignKeys()
+{
+    QSqlQuery query("PRAGMA foreign_keys = ON", db);
+    query.exec();
 }
 
 LibraryItem *LibraryDbManager::readById(qint64 id)

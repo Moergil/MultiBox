@@ -17,6 +17,7 @@ class Playlist : public QObject
     signals:
         void waitingListChanged();
         void currentItemChanged();
+        void playlistIsEmpty();
 
     private slots:
         void autoShiftPlaylist();

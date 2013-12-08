@@ -4,6 +4,12 @@ void Player::setConnections()
 {
     connect(this, SIGNAL(songRequested()), this->playlist, SLOT(shiftPlaylist()));
     connect(this->playlist, SIGNAL(currentItemChanged()), this, SLOT(playNext()));
+    connect(this->playlist, SIGNAL(playlistIsEmpty()), this, SLOT(setPlayingToFalse()));
+}
+
+void Player::setPlayingToFalse()
+{
+    setPlaying(false);
 }
 
 void Player::emitSongRequestedSignal()

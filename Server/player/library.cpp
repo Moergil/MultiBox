@@ -17,28 +17,9 @@ Library::~Library()
     dbManager->close();
 }
 
-void Library::addDirectory(QDir &dir)
-{
-    DirectoryFactory *factory = DirectoryFactory::getFactory();
-    WritableDirectory *directory = (WritableDirectory *) factory->getLibraryItem(QFileInfo(dir.absolutePath()));
-    dbManager->write(*directory);
-}
-
-QList<LibraryItem *> *Library::listDirectories()
-{
-    return dbManager->readByParentId(0);
-}
-
 LibraryItem *Library::readRootDir()
 {
-    return new WritableDirectory(0, "Library", QFileInfo(), *listDirectories());
-}
-
-void Library::removeDirectory(QDir &dir)
-{
-    DirectoryFactory *factory = DirectoryFactory::getFactory();
-    LibraryItem *directory = factory->getLibraryItem(QFileInfo(dir.absolutePath()));
-    dbManager->remove(directory);
+    return new WritableDirectory(0, "Library", QFileInfo(), *dbManager->readByParentId(0));
 }
 
 LibraryItem *Library::readById(qint64 itemId)

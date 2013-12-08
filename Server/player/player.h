@@ -22,6 +22,7 @@ class Player : public QObject
 
     private slots:
         virtual void start() = 0;
+        void setPlayingToFalse();
 
     protected:
         void emitSongRequestedSignal();

@@ -5,6 +5,7 @@
 #include "writablemultimedia.h"
 
 #include <QDebug>
+#include <QFileInfo>
 
 void DirectoryScanner::scanDirectory()
 {
@@ -12,6 +13,23 @@ void DirectoryScanner::scanDirectory()
 
     fixExistingFiles();
     findNewFiles();
+
+    qDebug() << "Library is rescanned.";
+}
+
+bool DirectoryScanner::itemExists(LibraryItem *item)
+{
+    return item->getFileInfo().exists();
+}
+
+bool DirectoryScanner::itemIsRootDirectory(LibraryItem *item)
+{
+    return item->getParentId() == 0;
+}
+
+bool DirectoryScanner::itemIsInLibraries(LibraryItem *item)
+{
+    return libraries.contains(item->getFileInfo().absoluteFilePath());
 }
 
 void DirectoryScanner::fixExistingFiles()
@@ -24,7 +42,7 @@ void DirectoryScanner::fixExistingFiles()
 
     foreach(LibraryItem *item, *list)
     {
-        if(!item->getFileInfo().exists())
+        if(!itemExists(item) || (itemIsRootDirectory(item) && !itemIsInLibraries(item)))
         {
             QMetaObject::invokeMethod(player->getLibrary(), "remove",
                                       Qt::BlockingQueuedConnection,
@@ -35,16 +53,12 @@ void DirectoryScanner::fixExistingFiles()
 
 void DirectoryScanner::findNewFiles()
 {
-    /*
-    foreach(LibraryItem *item, manager->getRootDirs())
+    foreach(QString library, libraries)
     {
-        proccessPath(QDir(item->getPath());
+        QDir dir(library);
+        handleDirectory(dir);
+        proccessPath(dir);
     }
-    */
-
-    QDir dir("/home/moergil/Music");
-    handleDirectory(dir);
-    proccessPath(dir);
 }
 
 void DirectoryScanner::proccessPath(QDir dir)
@@ -83,7 +97,7 @@ void DirectoryScanner::proccessFiles(QDir dir)
 
 void DirectoryScanner::handleFile(QFileInfo fileInfo)
 {
-    if(allowedTypes.contains(fileInfo.suffix().toLower()))
+    if(allowedTypes.contains(fileInfo.suffix().toLower()) && fileInfo.exists())
     {
         handleMusicFile(fileInfo);
     }
@@ -102,20 +116,23 @@ void DirectoryScanner::handleMusicFile(QFileInfo fileInfo)
 
 void DirectoryScanner::handleDirectory(QDir dir)
 {
-    QFileInfo info(dir.absolutePath());
+    if(dir.exists())
+    {
+        QFileInfo info(dir.absolutePath());
 
-    DirectoryFactory *factory = DirectoryFactory::getFactory();
-    WritableDirectory *directory = (WritableDirectory *)factory->getLibraryItem(info);
+        DirectoryFactory *factory = DirectoryFactory::getFactory();
+        WritableDirectory *directory = (WritableDirectory *)factory->getLibraryItem(info);
 
-    QMetaObject::invokeMethod(player->getLibrary(), "write",
-                              Qt::BlockingQueuedConnection,
-                              Q_ARG(LibraryWritableInterface &, *directory));
+        QMetaObject::invokeMethod(player->getLibrary(), "write",
+                                  Qt::BlockingQueuedConnection,
+                                  Q_ARG(LibraryWritableInterface &, *directory));
+    }
 }
 
-DirectoryScanner::DirectoryScanner(Player *player)
-    : player(player)
+DirectoryScanner::DirectoryScanner(QSet<QString> libraries, Player *player)
+    : libraries(libraries), player(player)
 {
-    allowedTypes << "mp3" << "wma";
+    allowedTypes << "mp3" << "wma" << "ogg" << "mp4";
 }
 
 void DirectoryScanner::run()

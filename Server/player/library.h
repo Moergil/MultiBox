@@ -18,11 +18,9 @@ class Library : public QObject
         Library(QObject *parent = 0);
         ~Library();
 
-    public slots:
-        void addDirectory(QDir &dir);
-        QList<LibraryItem *> *listDirectories();
-        void removeDirectory(QDir &dir);
+        void setListOfLibraries(QStringList libraries);
 
+    public slots:
         LibraryItem *readById(qint64 itemId);
         QList<LibraryItem *> *readAll();
         bool write(LibraryWritableInterface &item);

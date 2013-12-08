@@ -14,13 +14,21 @@ GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
 DataContent GetPlayerStateResponse::toDataContent() const
 {
     QJsonObject object;
-    object.insert("playbackPosition", playbackPosition);
-    object.insert("playing", playing);
 
-    QJsonObject multimediaObject = multimedia.toQJsonObject();
-    multimediaObject.insert("length", duration);
+    if(playing)
+    {
+        object.insert("playbackPosition", playbackPosition);
+        object.insert("playing", playing);
 
-    object.insert("multimedia", multimediaObject);
+        QJsonObject multimediaObject = multimedia.toQJsonObject();
+        multimediaObject.insert("length", duration);
+
+        object.insert("multimedia", multimediaObject);
+    }
+    else
+    {
+        object.insert("multimedia", QString("null"));
+    }
 
     MessageContentWriter writer;
     writer.write(object);

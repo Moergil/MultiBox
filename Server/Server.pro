@@ -68,7 +68,8 @@ SOURCES += main.cpp \
     message/addlibraryitemtoplaylistrequest.cpp \
     message/addlibraryitemtoplaylistresponse.cpp \
     message/getserverinforequest.cpp \
-    message/getserverinforesponse.cpp
+    message/getserverinforesponse.cpp \
+    configurationmanager.cpp
 
 HEADERS += \
     server.h \
@@ -118,4 +119,5 @@ HEADERS += \
     message/addlibraryitemtoplaylistrequest.h \
     message/addlibraryitemtoplaylistresponse.h \
     message/getserverinforequest.h \
-    message/getserverinforesponse.h
+    message/getserverinforesponse.h \
+    configurationmanager.h

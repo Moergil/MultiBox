@@ -28,5 +28,5 @@ LibraryItem *DirectoryFactory::getLibraryItem(LibraryTableRow *row) const
 
 LibraryItem *DirectoryFactory::getLibraryItem(const QFileInfo path) const
 {
-    return new WritableDirectory(0, path.baseName(), path);
+    return new WritableDirectory(0, path.fileName(), path);
 }

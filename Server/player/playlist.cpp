@@ -14,6 +14,7 @@ void Playlist::shiftPlaylist()
     else
     {
         currentItem = NULL;
+        emit playlistIsEmpty();
     }
 }
 
@@ -51,9 +52,10 @@ Playlist::~Playlist()
 
 void Playlist::addItem(Multimedia *playlistItem)
 {
-    //pridanie id v playliste a dlzky
+    //TODO: playlist item
 
-    qDebug() << "Adding new multimedia" << playlistItem->getName();
+    qDebug() << "Adding new multimedia to playlist" << playlistItem->getName();
+
     waitingItems->append(playlistItem);
 
     emitWaitingListChangedSignal();

@@ -12,6 +12,7 @@ class DirectoryScanner : public QThread
 {
     private:
         QSet<QString> allowedTypes;
+        QSet<QString> libraries;
         Player *player;
 
         void scanDirectory();
@@ -28,8 +29,12 @@ class DirectoryScanner : public QThread
 
         qint64 getParentDirectoryId(QFileInfo fileInfo);
 
+        bool itemExists(LibraryItem *item);
+        bool itemIsRootDirectory(LibraryItem *item);
+        bool itemIsInLibraries(LibraryItem *item);
+
     public:
-        DirectoryScanner(Player *player);
+        DirectoryScanner(QSet<QString> libraries, Player *player);
 
     protected:
         void run();

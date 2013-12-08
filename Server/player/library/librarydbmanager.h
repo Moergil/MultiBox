@@ -25,6 +25,8 @@ class LibraryDbManager : public QObject
         LibraryTableRow *readTableRowFromQuery(QSqlQuery &query);
         QList<LibraryTableRow *> readTableRowsByParent(qint64 parentId);
 
+        void turnOnForeignKeys();
+
     public:
         LibraryDbManager(QObject *parent = 0);
 

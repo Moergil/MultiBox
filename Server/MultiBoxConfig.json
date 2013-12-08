@@ -1,0 +1,8 @@
+{
+	"serverPort": 13110,
+	"serverName": "MultiBox Player",
+	"libraries":
+	[
+		"/home/moergil/Music"
+	]
+}
