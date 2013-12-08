@@ -2,9 +2,13 @@ package sk.hackcraft.multibox;
 
 import java.io.DataInput;
 import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 
 public class TestNetworkServer
 {
@@ -19,15 +23,21 @@ public class TestNetworkServer
 				
 				try
 				{
-					serverSocket = new ServerSocket(13110);
-					serverSocket.setSoTimeout(3000);
+					serverSocket = new ServerSocket(13111);
+					serverSocket.setSoTimeout(300000);
 					
 					socket = serverSocket.accept();
-					DataInput input = new DataInputStream(socket.getInputStream());
+					DataOutput output = new DataOutputStream(socket.getOutputStream());
 					
-					byte value = input.readByte();
+					System.out.println("write");
+					output.writeInt(2);
 					
-					System.out.println("Received " + value);
+					byte[] content = "hw".getBytes(StandardCharsets.UTF_8);
+					//output.writeInt(content.length);
+					//output.write(content);
+					
+					output.writeInt(4);
+					output.writeInt(2048);
 				}
 				catch (IOException e)
 				{

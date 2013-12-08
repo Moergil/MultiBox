@@ -1,9 +1,8 @@
 {
 	"serverPort": 13110,
-	"serverName": "MultiBox Player",
+	"serverName": "ULTRA",
 	"libraries":
 	[
-		"/home/joso/Home/Music",
-		"/home/joso/Home/Clips"
+		"/home/moergil/Music"
 	]
 }

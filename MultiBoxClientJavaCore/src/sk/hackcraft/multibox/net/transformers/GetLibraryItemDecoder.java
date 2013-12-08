@@ -20,31 +20,24 @@ public class GetLibraryItemDecoder extends JacksonMessageDecoder<GetLibraryItemD
 
 		ObjectNode libraryItemObjectNode = (ObjectNode)rootNode.get("libraryItem");
 		
-		try
+		long id = libraryItemObjectNode.get("id").asLong();
+		LibraryItemType type = LibraryItemType.valueOf(libraryItemObjectNode.get("type").asText());
+		String name = libraryItemObjectNode.get("name").asText();
+	
+		LibraryItem libraryItem;
+		switch (type)
 		{
-			long id = libraryItemObjectNode.get("id").asLong();
-			LibraryItemType type = LibraryItemType.valueOf(libraryItemObjectNode.get("type").asText());
-			String name = libraryItemObjectNode.get("name").asText();
+			case DIRECTORY:
+				libraryItem = createDirectory(id, name, libraryItemObjectNode);
+				break;
+			case MULTIMEDIA:
+				libraryItem = createMultimedia(id, name, libraryItemObjectNode);
+				break;
+			default:
+				throw new IllegalArgumentException("Invalid library item type received from server.");
+		}
 		
-			LibraryItem libraryItem;
-			switch (type)
-			{
-				case DIRECTORY:
-					libraryItem = createDirectory(id, name, libraryItemObjectNode);
-					break;
-				case MULTIMEDIA:
-					libraryItem = createMultimedia(id, name, libraryItemObjectNode);
-					break;
-				default:
-					throw new IllegalArgumentException("Invalid library item type received from server.");
-			}
-			
-			return new GetLibraryItemData(libraryItem);
-		}
-		catch (IllegalArgumentException e)
-		{
-			throw new RuntimeException(e);
-		}
+		return new GetLibraryItemData(libraryItem);
 	}
 
 	private LibraryItem createMultimedia(long id, String name, ObjectNode rootNode)

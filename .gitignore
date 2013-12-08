@@ -12,3 +12,7 @@ lint.xml
 # Visual Studio
 obj/
 *.csproj.user
+
+# Binaries
+Binaries/*/*.json
+Binaries/*/*.sqlite

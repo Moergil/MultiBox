@@ -40,6 +40,7 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 	
 	private volatile long lastNetworkActivity;
 	private static final long NETWORK_INACTIVITY_TIMEOUT = TimeUnit.SECONDS.toMillis(15);
+	
 	private volatile boolean shouldClose;
 	
 	public AutoManagingAsynchronousSocketInterface(MessageInterfaceFactory messageInterfaceFactory, MessageQueue messageQueue, Log log)

@@ -3,15 +3,15 @@ package sk.hackcraft.util;
 
 public abstract class PeriodicWorkDispatcher
 {
-	private MessageQueue messageQueue;
-	private long pause;
+	private final MessageQueue messageQueue;
+	private final long pauseDelay;
 	
 	private boolean active;
 	
-	public PeriodicWorkDispatcher(MessageQueue messageQueue, long pause)
+	public PeriodicWorkDispatcher(MessageQueue messageQueue, long pauseDelay)
 	{
 		this.messageQueue = messageQueue;
-		this.pause = pause;
+		this.pauseDelay = pauseDelay;
 		this.active = false;
 	}
 	
@@ -32,7 +32,7 @@ public abstract class PeriodicWorkDispatcher
 				if (active)
 				{
 					doWork();
-					messageQueue.postDelayed(this, pause);
+					messageQueue.postDelayed(this, pauseDelay);
 				}
 			}
 		});

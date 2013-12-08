@@ -116,6 +116,16 @@ public class ServerPlaylistShadow implements Playlist
 		@Override
 		public void onAddingLibraryItemToPlaylistResult(final boolean result, final MultimediaItem multimedia)
 		{
+			if (!result)
+			{
+				return;
+			}
+			
+			if (actualPlaylist.isEmpty())
+			{
+				return;
+			}
+			
 			List<MultimediaItem> updatedPlaylist = new LinkedList<MultimediaItem>(actualPlaylist);
 			updatedPlaylist.add(multimedia);
 			

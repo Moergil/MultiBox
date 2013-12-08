@@ -16,21 +16,28 @@ public class AddMultimediaToPlaylistDecoder extends JacksonMessageDecoder<AddMul
 		
 		boolean result = rootNode.path("result").asBoolean();
 		
-		JsonNode multimediaNode = rootNode.get("multimedia");
-		
-		long id = multimediaNode.get("id").asLong();
-		LibraryItemType type = LibraryItemType.valueOf(multimediaNode.get("type").asText());
-		
-		if (type != LibraryItemType.MULTIMEDIA)
+		if (!result)
 		{
-			throw new IllegalArgumentException("Only MULTIMEDIA type is supported for now.");
+			return new AddMultimediaToPlaylistResultData(result, null);
 		}
-		
-		String name = multimediaNode.get("name").asText();
-		int length = multimediaNode.get("length").asInt();
-		
-		MultimediaItem multimedia = new MultimediaItem(id, name, length);
-		
-		return new AddMultimediaToPlaylistResultData(result, multimedia);
+		else
+		{
+			JsonNode multimediaNode = rootNode.get("multimedia");
+			
+			long id = multimediaNode.get("id").asLong();
+			LibraryItemType type = LibraryItemType.valueOf(multimediaNode.get("type").asText());
+			
+			if (type != LibraryItemType.MULTIMEDIA)
+			{
+				throw new IllegalArgumentException("Only MULTIMEDIA type is supported for now.");
+			}
+			
+			String name = multimediaNode.get("name").asText();
+			int length = multimediaNode.get("length").asInt();
+			
+			MultimediaItem multimedia = new MultimediaItem(id, name, length);
+			
+			return new AddMultimediaToPlaylistResultData(result, multimedia);
+		}
 	}
 }
