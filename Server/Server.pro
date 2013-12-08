@@ -7,10 +7,11 @@
 QT  += core
 QT  += network
 QT  += multimedia
+QT  += sql
 
 QT  -= gui
 
-TARGET  = Server
+TARGET  = MultiBoxServer
 
 CONFIG  += console
 CONFIG  -= app_bundle
@@ -21,7 +22,7 @@ MOBILITY    = multimedia
 TEMPLATE    = app
 
 INCLUDEPATH += .
-RESOURCES += resources.qrc
+RESOURCES +=
 
 SOURCES += main.cpp \
     server.cpp \
@@ -33,24 +34,42 @@ SOURCES += main.cpp \
     message/getplayerstaterequest.cpp \
     message/undefinedrequest.cpp \
     message/getplayerstateresponse.cpp \
-    network/socketmessanger.cpp \
     network/datamessage.cpp \
     util/bytearrayconverter.cpp \
     util/messagecontentreader.cpp \
     util/messagecontentwriter.cpp \
     network/datacontent.cpp \
-    player/youtubeitem.cpp \
-    player/user.cpp \
-    player/songfile.cpp \
     player/qtmultimediaplayer.cpp \
-    player/playlistitem.cpp \
     player/playlist.cpp \
     player/player.cpp \
     player/library.cpp \
     message/pauserequest.cpp \
-    message/requestrunnable.cpp \
     test/client.cpp \
-    network/messangerexception.cpp
+    player/entity/libraryitem.cpp \
+    player/entity/multimedia.cpp \
+    player/entity/directory.cpp \
+    player/entity/playliststate.cpp \
+    message/getplaylistresponse.cpp \
+    message/getplaylistrequest.cpp \
+    network/messengerexception.cpp \
+    message/messagerecognizer.cpp \
+    network/socketmessenger.cpp \
+    player/library/librarydbmanager.cpp \
+    player/entity/libraryitemtype.cpp \
+    player/library/libraryitemfactorychooser.cpp \
+    player/library/directoryscanner.cpp \
+    player/library/writabledirectory.cpp \
+    player/library/writablemultimedia.cpp \
+    player/library/directoryfactory.cpp \
+    player/library/multimediafactory.cpp \
+    player/library/librarytablerow.cpp \
+    message/getlibraryitemrequest.cpp \
+    message/getlibraryitemresponse.cpp \
+    message/addlibraryitemtoplaylistrequest.cpp \
+    message/addlibraryitemtoplaylistresponse.cpp \
+    message/getserverinforequest.cpp \
+    message/getserverinforesponse.cpp \
+    configurationmanager.cpp
 
 HEADERS += \
     server.h \
@@ -62,22 +81,43 @@ HEADERS += \
     message/getplayerstaterequest.h \
     message/undefinedrequest.h \
     message/getplayerstateresponse.h \
-    network/socketmessanger.h \
     network/datamessage.h \
     network/messangerinterface.h \
     util/bytearrayconverter.h \
     util/messagecontentreader.h \
     util/messagecontentwriter.h \
     network/datacontent.h \
-    player/youtubeitem.h \
-    player/user.h \
-    player/songfile.h \
     player/qtmultimediaplayer.h \
-    player/playlistitem.h \
     player/playlist.h \
     player/player.h \
     player/library.h \
     message/pauserequest.h \
-    message/requestrunnable.h \
     test/client.h \
-    network/messangerexception.h
+    message/messagerecognizer.h \
+    player/entity/libraryitem.h \
+    player/entity/multimedia.h \
+    player/entity/directory.h \
+    player/entity/qjsonexportableinterface.h \
+    player/entity/playliststate.h \
+    message/getplaylistresponse.h \
+    message/getplaylistrequest.h \
+    network/socketmessenger.h \
+    network/messengerexception.h \
+    player/library/librarydbmanager.h \
+    player/entity/libraryitemtype.h \
+    player/library/libraryitemfactorychooser.h \
+    player/library/directoryscanner.h \
+    player/library/libraryitemfactory.h \
+    player/library/librarywritableinterface.h \
+    player/library/writabledirectory.h \
+    player/library/writablemultimedia.h \
+    player/library/directoryfactory.h \
+    player/library/multimediafactory.h \
+    player/library/librarytablerow.h \
+    message/getlibraryitemrequest.h \
+    message/getlibraryitemresponse.h \
+    message/addlibraryitemtoplaylistrequest.h \
+    message/addlibraryitemtoplaylistresponse.h \
+    message/getserverinforequest.h \
+    message/getserverinforesponse.h \
+    configurationmanager.h

@@ -1,6 +1,5 @@
 package sk.hackcraft.multibox;
 
-import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.ServerPlayerShadow;
 import sk.hackcraft.multibox.net.MockServerInterface;
@@ -24,8 +23,8 @@ public class TestApp
 			@Override
 			public void run()
 			{
-				Player player = new ServerPlayerShadow(server, eventLoop);
-				player.registerPlayerEventListener(new Player.PlayerEventListener()
+				Player player = new ServerPlayerShadow(server, eventLoop, log);
+				/*player.registerPlayerEventListener(new Player.PlayerEventListener()
 				{
 					@Override
 					public void onPlayingStateChanged(boolean playing)
@@ -40,11 +39,11 @@ public class TestApp
 					}
 
 					@Override
-					public void onMultimediaChanged(Multimedia newMultimedia)
+					public void onMultimediaChanged(MultimediaItem newMultimedia)
 					{
 						log.print("P: multimedia changed: " + newMultimedia);
 					}
-				});
+				});*/
 
 				player.init();
 			}

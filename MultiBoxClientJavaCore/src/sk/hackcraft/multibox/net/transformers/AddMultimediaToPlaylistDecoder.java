@@ -1,6 +1,7 @@
 package sk.hackcraft.multibox.net.transformers;
 
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.LibraryItemType;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.data.AddMultimediaToPlaylistResultData;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,9 +16,20 @@ public class AddMultimediaToPlaylistDecoder extends JacksonMessageDecoder<AddMul
 		
 		boolean result = rootNode.path("result").asBoolean();
 		
-		String multimediaJson = rootNode.path("multimedia").toString();
-		Multimedia.Builder multimediaBuilder = objectMapper.readValue(multimediaJson, Multimedia.Builder.class);
-		Multimedia multimedia = multimediaBuilder.create();
+		JsonNode multimediaNode = rootNode.get("multimedia");
+		
+		long id = multimediaNode.get("id").asLong();
+		LibraryItemType type = LibraryItemType.valueOf(multimediaNode.get("type").asText());
+		
+		if (type != LibraryItemType.MULTIMEDIA)
+		{
+			throw new IllegalArgumentException("Only MULTIMEDIA type is supported for now.");
+		}
+		
+		String name = multimediaNode.get("name").asText();
+		int length = multimediaNode.get("length").asInt();
+		
+		MultimediaItem multimedia = new MultimediaItem(id, name, length);
 		
 		return new AddMultimediaToPlaylistResultData(result, multimedia);
 	}

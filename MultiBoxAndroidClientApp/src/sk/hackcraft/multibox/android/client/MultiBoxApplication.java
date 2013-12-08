@@ -1,58 +1,108 @@
 package sk.hackcraft.multibox.android.client;
 
-import sk.hackcraft.multibox.R;
+import java.io.IOException;
+import java.net.Socket;
+
 import sk.hackcraft.multibox.android.client.util.HandlerEventLoop;
-import sk.hackcraft.multibox.model.Library;
-import sk.hackcraft.multibox.model.Player;
-import sk.hackcraft.multibox.model.Playlist;
-import sk.hackcraft.multibox.model.ServerLibraryShadow;
-import sk.hackcraft.multibox.model.ServerPlayerShadow;
-import sk.hackcraft.multibox.model.ServerPlaylistShadow;
-import sk.hackcraft.multibox.net.MockServerInterface;
+import sk.hackcraft.multibox.android.client.util.JsonCacheSelectedServersStorage;
+import sk.hackcraft.multibox.android.client.util.SystemLog;
+import sk.hackcraft.multibox.model.Server;
+import sk.hackcraft.multibox.net.AutoManagingAsynchronousSocketInterface;
+import sk.hackcraft.multibox.net.NetworkServerInterface;
+import sk.hackcraft.multibox.net.NetworkStandards;
 import sk.hackcraft.multibox.net.ServerInterface;
+import sk.hackcraft.multibox.util.SelectedServersStorage;
+import sk.hackcraft.netinterface.connection.AsynchronousMessageInterface;
+import sk.hackcraft.netinterface.connection.MessageInterface;
+import sk.hackcraft.netinterface.connection.MessageInterfaceFactory;
+import sk.hackcraft.netinterface.connection.SocketMessageInterface;
+import sk.hackcraft.util.Log;
+import sk.hackcraft.util.MessageQueue;
 import android.app.Application;
-import android.widget.Toast;
+import android.content.Intent;
 
 public class MultiBoxApplication extends Application
-{
-	private HandlerEventLoop eventLoop;
-	private MockServerInterface serverInterface;
+{	
+	private MessageQueue eventLoop;
+	private Log log;
 	
+	private ServerInterface serverInterface;
+	
+	private Server server;
+
 	@Override
 	public void onCreate()
 	{
 		super.onCreate();
 		
 		eventLoop = new HandlerEventLoop();
-		serverInterface = new MockServerInterface(eventLoop);
+		log = new SystemLog();
+	}
+	
+	public SelectedServersStorage getSelectedServersStorage()
+	{
+		return new JsonCacheSelectedServersStorage(this, eventLoop, log);
+	}
+	
+	public void createServerConnection(final String address)
+	{
+		MessageInterfaceFactory factory = new MessageInterfaceFactory()
+		{
+			@Override
+			public MessageInterface create() throws IOException
+			{
+				Socket socket = new Socket(address, NetworkStandards.SOCKET_PORT);
+				return new SocketMessageInterface(socket);
+			}
+		};
+		
+		AsynchronousMessageInterface messageInterface = new AutoManagingAsynchronousSocketInterface(factory, eventLoop, log);
+		serverInterface = new NetworkServerInterface(messageInterface, eventLoop);
 		serverInterface.registerEventListener(new ServerInterface.ServerInterfaceEventAdapter()
 		{
 			@Override
 			public void onDisconnect()
 			{
-				Toast.makeText(MultiBoxApplication.this, R.string.message_connection_problem, Toast.LENGTH_LONG).show();
+				destroyServerConnection();
+				startConnectActivityAfterDisconnect();
 			}
 		});
 		
-		final MockServerInterface.Controller controller = serverInterface.getController();
-
-		controller.addRandomSongToPlaylist();
-		controller.addRandomSongToPlaylist();
-		controller.addRandomSongToPlaylist();
+		//serverInterface = new MockServerInterface(eventLoop);
+		
+		server = new Server(serverInterface, eventLoop, log);
 	}
 	
-	public Player getPlayer()
+	public void destroyServerConnection()
 	{
-		return new ServerPlayerShadow(serverInterface, eventLoop);
+		serverInterface.close();
+		serverInterface = null;
+		
+		server = null;
 	}
 	
-	public Playlist getPlaylist()
+	public boolean hasActiveConnection()
 	{
-		return new ServerPlaylistShadow(serverInterface, eventLoop);
+		return serverInterface != null;
 	}
 	
-	public Library getLibrary()
+	public Log getLog()
 	{
-		return new ServerLibraryShadow(serverInterface, eventLoop);
+		return log;
+	}
+	
+	public Server getServer()
+	{
+		return server;
+	}
+	
+	private void startConnectActivityAfterDisconnect()
+	{
+		Intent intent = new Intent(this, ServerSelectActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+		
+		intent.putExtra(ServerSelectActivity.EXTRA_KEY_DISCONNECT, true);
+		
+		startActivity(intent);
 	}
 }

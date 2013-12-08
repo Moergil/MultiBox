@@ -4,20 +4,24 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.MessageQueue;
+import sk.hackcraft.util.PeriodicWorkDispatcher;
 
 public class ServerPlaylistShadow implements Playlist
 {
 	private final ServerInterface serverInterface;
 	private final MessageQueue messageQueue;
 	
-	private List<Multimedia> actualPlaylist;
+	private List<MultimediaItem> actualPlaylist;
 	
-	private List<Playlist.PlaylistEventListener> playlistListeners;
+	private final List<Playlist.PlaylistEventListener> playlistListeners;
 	
-	private ServerListener serverListener;
+	private final ServerListener serverListener;
+	
+	private final PeriodicWorkDispatcher stateChecker;
 	
 	public ServerPlaylistShadow(ServerInterface serverInterface, MessageQueue messageQueue)
 	{
@@ -28,7 +32,16 @@ public class ServerPlaylistShadow implements Playlist
 		
 		serverListener = new ServerListener();
 		
-		actualPlaylist = new LinkedList<Multimedia>();
+		actualPlaylist = new LinkedList<MultimediaItem>();
+		
+		stateChecker = new PeriodicWorkDispatcher(messageQueue, 5000)
+		{
+			@Override
+			protected void doWork()
+			{
+				ServerPlaylistShadow.this.serverInterface.requestPlaylistUpdate();
+			}
+		};
 	}
 	
 	@Override
@@ -36,12 +49,16 @@ public class ServerPlaylistShadow implements Playlist
 	{
 		serverInterface.registerEventListener(serverListener);
 		serverInterface.requestPlaylistUpdate();
+		
+		stateChecker.start();
 	}
 
 	@Override
 	public void close()
 	{
 		serverInterface.unregisterEventListener(serverListener);
+		
+		stateChecker.stop();
 	}
 	
 	@Override
@@ -57,7 +74,7 @@ public class ServerPlaylistShadow implements Playlist
 	}
 
 	@Override
-	public List<Multimedia> getItems()
+	public List<MultimediaItem> getItems()
 	{
 		return Collections.unmodifiableList(actualPlaylist);
 	}
@@ -68,12 +85,12 @@ public class ServerPlaylistShadow implements Playlist
 		serverInterface.addLibraryItemToPlaylist(itemId);
 	}
 	
-	private void updatePlaylist(List<Multimedia> playlist)
+	private void updatePlaylist(List<MultimediaItem> playlist)
 	{
 		actualPlaylist.clear();
 		actualPlaylist.addAll(playlist);
 		
-		final List<Multimedia> playlistCopy = new LinkedList<Multimedia>(actualPlaylist);
+		final List<MultimediaItem> playlistCopy = new LinkedList<MultimediaItem>(actualPlaylist);
 		
 		for (final Playlist.PlaylistEventListener listener : playlistListeners)
 		{
@@ -91,14 +108,19 @@ public class ServerPlaylistShadow implements Playlist
 	private class ServerListener extends ServerInterfaceEventAdapter
 	{
 		@Override
-		public void onPlaylistReceived(List<Multimedia> playlist)
+		public void onPlaylistReceived(List<MultimediaItem> playlist)
 		{
 			updatePlaylist(playlist);
 		}
 		
 		@Override
-		public void onAddingLibraryItemToPlaylistResult(final boolean result, final Multimedia multimedia)
+		public void onAddingLibraryItemToPlaylistResult(final boolean result, final MultimediaItem multimedia)
 		{
+			List<MultimediaItem> updatedPlaylist = new LinkedList<MultimediaItem>(actualPlaylist);
+			updatedPlaylist.add(multimedia);
+			
+			updatePlaylist(updatedPlaylist);
+			
 			for (final Playlist.PlaylistEventListener listener : playlistListeners)
 			{
 				messageQueue.post(new Runnable()

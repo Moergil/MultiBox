@@ -33,14 +33,14 @@ QString MessageContentReader::readQString()
     return ByteArrayConverter::parseQString(array);
 }
 
-QJsonDocument MessageContentReader::readQJsonDocument()
+QJsonObject MessageContentReader::readQJsonObject()
 {
     qint32 size = readQInt32();
 
     QByteArray array = byteArray.mid(pointer, size);
     pointer += size;
 
-    return ByteArrayConverter::parseQJsonDocument(array);
+    return ByteArrayConverter::parseQJsonObject(array);
 }
 
 bool MessageContentReader::readBool()

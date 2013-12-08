@@ -5,9 +5,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import sk.hackcraft.multibox.model.LibraryItem;
-import sk.hackcraft.multibox.model.Multimedia;
 import sk.hackcraft.multibox.model.libraryitems.DirectoryItem;
 import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.util.MessageQueue;
@@ -18,24 +18,36 @@ public class MockServerInterface implements ServerInterface
 	
 	private boolean playing;
 	
-	private List<Multimedia> playlist;
+	private List<MultimediaItem> playlist;
 	private int playbackPosition;
 	
 	private Map<Long, LibraryItem> library;
 	
 	private List<ServerInterface.ServerInterfaceEventListener> serverListeners;
 	
+	private long lastMultimediaStartTimestamp;
+	
 	public MockServerInterface(MessageQueue messageQueue)
 	{
 		this.messageQueue = messageQueue;
 		
 		this.playing = false;
-		this.playlist = new LinkedList<Multimedia>();
+		this.playlist = new LinkedList<MultimediaItem>();
 		this.playbackPosition = 0;
 		
 		initLibrary();
 		
 		this.serverListeners = new LinkedList<ServerInterface.ServerInterfaceEventListener>();
+	}
+	
+	private long generateDelay()
+	{
+		return 50;
+	}
+	
+	@Override
+	public void close()
+	{		
 	}
 	
 	private void initLibrary()
@@ -54,27 +66,31 @@ public class MockServerInterface implements ServerInterface
 		
 		LibraryItem item;
 		
-		item = new MultimediaItem(id++, "Bleed it out");
+		item = new MultimediaItem(id++, "Bleed it out", 5);
 		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Faint");
+		item = new MultimediaItem(id++, "Faint", 6);
 		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Blackout");
+		item = new MultimediaItem(id++, "Blackout", 7);
 		linkinParkDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Homeworld");
+		item = new MultimediaItem(id++, "Homeworld", 3);
 		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "New languages");
+		item = new MultimediaItem(id++, "New languages", 8);
 		yesDirectory.addItem(item);
 		addLibraryItem(item);
 		
-		item = new MultimediaItem(id++, "Terra's theme");
+		item = new MultimediaItem(id++, "Terra's theme", 5);
+		rootDirectory.addItem(item);
+		addLibraryItem(item);
+		
+		item = new MultimediaItem(id++, "Terra's theme long", 30);
 		rootDirectory.addItem(item);
 		addLibraryItem(item);
 		
@@ -109,9 +125,67 @@ public class MockServerInterface implements ServerInterface
 		return new Controller();
 	}
 	
+	private boolean isPlaying()
+	{
+		return playing;
+	}
+	
+	private void startPlaying()
+	{
+		if (playlist.isEmpty())
+		{
+			return;
+		}
+		
+		playing = true;
+
+		lastMultimediaStartTimestamp = System.currentTimeMillis();
+		int length = playlist.get(0).getLength();
+		
+		messageQueue.postDelayed(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				playlist.remove(0);
+		
+				lastMultimediaStartTimestamp = System.currentTimeMillis();
+				
+				broadcastPlayerUpdate();
+				broadcastPlaylistUpdate();
+				
+				if (!playlist.isEmpty())
+				{
+					MultimediaItem nextOne = playlist.get(0);
+					messageQueue.postDelayed(this, TimeUnit.SECONDS.toMillis(nextOne.getLength()));
+				}
+				else
+				{
+					playing = false;
+					broadcastPlayerUpdate();
+				}
+			}
+		}, TimeUnit.SECONDS.toMillis(length));
+	}
+	
+	private void broadcastServerInfo()
+	{
+		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
+		{
+			messageQueue.postDelayed(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					listener.onServerInfoReceived("M0ck3d");
+				}
+			}, generateDelay());
+		}
+	}	
+	
 	private void broadcastPlayerUpdate()
 	{
-		final Multimedia multimedia;
+		final MultimediaItem multimedia;
 		final int playbackPosition;
 		final boolean playing;
 		
@@ -124,7 +198,9 @@ public class MockServerInterface implements ServerInterface
 		else
 		{
 			multimedia = playlist.get(0);
-			playbackPosition = MockServerInterface.this.playbackPosition;
+			
+			int offset = (int)TimeUnit.MILLISECONDS.toSeconds(System.currentTimeMillis() - lastMultimediaStartTimestamp); 
+			playbackPosition = MockServerInterface.this.playbackPosition + offset;
 			playing = true;
 		}
 		
@@ -137,13 +213,13 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onPlayerUpdateReceived(multimedia, playbackPosition, playing);
 				}
-			}, 1000);
+			}, generateDelay());
 		}
 	}	
 	
 	private void broadcastPlaylistUpdate()
 	{
-		final List<Multimedia> playlist = new LinkedList<Multimedia>(this.playlist);
+		final List<MultimediaItem> playlist = new LinkedList<MultimediaItem>(this.playlist);
 		
 		for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
 		{
@@ -154,7 +230,7 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onPlaylistReceived(playlist);
 				}
-			}, 1000);
+			}, generateDelay());
 		}
 	}
 	
@@ -171,8 +247,14 @@ public class MockServerInterface implements ServerInterface
 				{
 					listener.onLibraryItemReceived(directory);
 				}
-			}, 1000);
+			}, generateDelay());
 		}
+	}
+	
+	@Override
+	public void requestServerInfo()
+	{
+		broadcastServerInfo();
 	}
 
 	@Override
@@ -209,7 +291,7 @@ public class MockServerInterface implements ServerInterface
 			String name = "Random" + random.nextInt(100);
 			int length = random.nextInt(60);
 			
-			Multimedia multimedia = new Multimedia(id, name, length);
+			MultimediaItem multimedia = new MultimediaItem(id, name, length);
 			
 			playlist.add(multimedia);
 		}
@@ -217,7 +299,7 @@ public class MockServerInterface implements ServerInterface
 		public void addSongToPlaylist(final String name, final int length)
 		{
 			long id = generateId();
-			Multimedia multimedia = new Multimedia(id, name, length);
+			MultimediaItem multimedia = new MultimediaItem(id, name, length);
 			playlist.add(multimedia);
 		}
 		
@@ -264,6 +346,15 @@ public class MockServerInterface implements ServerInterface
 	@Override
 	public void addLibraryItemToPlaylist(long itemId)
 	{
-		// TODO Auto-generated method stub
+		MultimediaItem item = (MultimediaItem)library.get(itemId);
+		playlist.add(item);
+		
+		broadcastPlaylistUpdate();
+		broadcastPlayerUpdate();
+		
+		if (!isPlaying())
+		{
+			startPlaying();
+		}
 	}
 }

@@ -1,21 +1,21 @@
 package sk.hackcraft.multibox.net.data;
 
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 
 public class GetPlayerStateResultData
 {
-	private final Multimedia multimedia;
+	private final MultimediaItem multimedia;
 	private final int playbackPosition;
 	private final boolean playing;
 	
-	public GetPlayerStateResultData(Multimedia multimedia, int playbackPosition, boolean playing)
+	public GetPlayerStateResultData(MultimediaItem multimedia, int playbackPosition, boolean playing)
 	{
 		this.multimedia = multimedia;
 		this.playbackPosition = playbackPosition;
 		this.playing = playing;
 	}
 	
-	public Multimedia getMultimedia()
+	public MultimediaItem getMultimedia()
 	{
 		return multimedia;
 	}

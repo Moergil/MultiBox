@@ -8,17 +8,17 @@ void QtMultimediaPlayer::onChangeMediaStatus(QMediaPlayer::MediaStatus status)
     }
 }
 
-QtMultimediaPlayer::QtMultimediaPlayer() : Player()
+QtMultimediaPlayer::QtMultimediaPlayer()
 {
-    this->qMediaPlayer = new QMediaPlayer;
-    this->playing = false;
+    qMediaPlayer = new QMediaPlayer;
+    playing = false;
 
-    connect(this->qMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(onChangeMediaStatus(QMediaPlayer::MediaStatus)));
+    connect(qMediaPlayer, SIGNAL(mediaStatusChanged(QMediaPlayer::MediaStatus)), this, SLOT(onChangeMediaStatus(QMediaPlayer::MediaStatus)));
 }
 
 QtMultimediaPlayer::~QtMultimediaPlayer()
 {
-    delete this->qMediaPlayer;
+    delete qMediaPlayer;
 }
 
 void QtMultimediaPlayer::start()
@@ -30,11 +30,11 @@ void QtMultimediaPlayer::setPlaying(bool playing)
 {
     if(playing)
     {
-        this->qMediaPlayer->play();
+        qMediaPlayer->play();
     }
     else
     {
-        this->qMediaPlayer->pause();
+        qMediaPlayer->pause();
     }
 
     this->playing = playing;
@@ -47,10 +47,10 @@ void QtMultimediaPlayer::setVolume(int volume)
 
 void QtMultimediaPlayer::playNext()
 {
-    PlaylistItem item = getPlaylist()->getCurrentItem();
-    this->qMediaPlayer->setMedia(item.getItemUrl());
+    Multimedia *item = getPlaylist()->getCurrentItem();
+    qMediaPlayer->setMedia(item->getQUrl());
 
-    this->qMediaPlayer->play();
+    setPlaying(true);
 }
 
 bool QtMultimediaPlayer::isPlaying() const
@@ -60,5 +60,15 @@ bool QtMultimediaPlayer::isPlaying() const
 
 int QtMultimediaPlayer::getVolume() const
 {
-    return this->qMediaPlayer->volume();
+    return qMediaPlayer->volume();
+}
+
+int QtMultimediaPlayer::getPosition() const
+{
+    return qMediaPlayer->position() / 1000;
+}
+
+int QtMultimediaPlayer::getDuration() const
+{
+    return qMediaPlayer->duration() / 1000;
 }

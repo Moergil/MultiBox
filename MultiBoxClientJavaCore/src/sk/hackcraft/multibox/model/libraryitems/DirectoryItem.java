@@ -9,22 +9,22 @@ import sk.hackcraft.multibox.model.LibraryItemType;
 
 public class DirectoryItem extends GenericLibraryItem
 {
-	private List<LibraryItem> contentIds;
+	private List<LibraryItem> content;
 	
 	public DirectoryItem(long id, String name)
 	{
 		super(id, LibraryItemType.DIRECTORY, name);
 		
-		this.contentIds = new LinkedList<LibraryItem>();
+		this.content = new LinkedList<LibraryItem>();
 	}
 	
 	public void addItem(LibraryItem item)
 	{
-		contentIds.add(item);
+		content.add(item);
 	}
 	
 	public List<LibraryItem> getItems()
 	{
-		return new LinkedList<LibraryItem>(contentIds);
+		return new LinkedList<LibraryItem>(content);
 	}
 }

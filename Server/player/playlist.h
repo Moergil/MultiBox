@@ -3,42 +3,45 @@
 #include <QList>
 #include <QObject>
 
-#include "playlistitem.h"
+#include <player/entity/playliststate.h>
+#include <player/entity/multimedia.h>
 
 class Playlist : public QObject
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    QList<PlaylistItem *> *playlistItems;
-    PlaylistItem *currentItem;
+    private:
+        QList<Multimedia *> *waitingItems;
+        Multimedia *currentItem;
 
-signals:
-    void playlistChanged();
-    void currentItemChanged();
+    signals:
+        void waitingListChanged();
+        void currentItemChanged();
+        void playlistIsEmpty();
 
-private slots:
-    void autoShiftPlaylist();
+    private slots:
+        void autoShiftPlaylist();
 
-private:
-    void emitPlaylistChangedSignal();
-    void emitCurrentItemChanged();
+    private:
+        void emitWaitingListChangedSignal();
+        void emitCurrentItemChanged();
 
-public slots:
-    void shiftPlaylist();
+    public slots:
+        void shiftPlaylist();
 
-public:
-    Playlist();
-    ~Playlist();
+        PlaylistState getPlaylistState() const;
+        Multimedia *getCurrentItem() const;
+        void addItem(Multimedia *playlistItem);
 
-    void addItem(PlaylistItem *playlistItem);
+    public:
+        Playlist(QObject *parent = 0);
+        ~Playlist();
 
-    PlaylistItem getCurrentItem() const;
-    QList<PlaylistItem *> getListOfItems() const;
+        QList<Multimedia *> getListOfItems() const;
 
-    void clear();
+        void clear();
 
-    bool isEmpty() const;
-    int count() const;
+        bool isEmpty() const;
+        int count() const;
 };
 

@@ -4,32 +4,19 @@
 
 #include <util/messagecontentreader.h>
 
-PauseRequest::PauseRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
+PauseRequest::PauseRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent)
     : AbstractRequest(dataMessage, handler, parent)
 {
     MessageContentReader reader(getDataMessage().getDataContent());
     playing = reader.readBool();
 }
 
-RequestRunnable *PauseRequest::getRunnable()
+bool PauseRequest::canResponse() const
 {
-    return new PauseRequest::Runnable(this);
+    return false;
 }
 
-bool PauseRequest::isPlaying()
+void PauseRequest::execute()
 {
-    return playing;
-}
-
-
-PauseRequest::Runnable::Runnable(AbstractRequest *request)
-    : RequestRunnable(request)
-{
-}
-
-void PauseRequest::Runnable::run()
-{
-    bool playing = ((PauseRequest *)getRequest())->isPlaying();
-
     emit getPlayerHandler()->setPlaying(playing);
 }

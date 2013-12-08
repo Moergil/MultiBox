@@ -1,7 +1,5 @@
 package sk.hackcraft.multibox.model;
 
-
-
 public interface Library
 {
 	public static final long ROOT_DIRECTORY = 0;

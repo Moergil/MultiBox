@@ -4,22 +4,14 @@
 
 class PauseRequest : public AbstractRequest
 {
-public:
-    class Runnable : public RequestRunnable
-    {
+        Q_OBJECT
+
+    private:
+        bool playing;
+
     public:
-        Runnable(AbstractRequest *request);
+        PauseRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
 
-        void run();
-    };
-
-private:
-    bool playing;
-
-public:
-    PauseRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
-
-    RequestRunnable *getRunnable();
-
-    bool isPlaying();
+        bool canResponse() const;
+        void execute();
 };

@@ -36,9 +36,11 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 	private final Object networkingStateChangeLock;
 	
 	private boolean active;
+	private boolean connecting;
 	
 	private volatile long lastNetworkActivity;
-	private static final long NETWORK_INACTIVITY_TIMEOUT = TimeUnit.SECONDS.toMillis(5);
+	private static final long NETWORK_INACTIVITY_TIMEOUT = TimeUnit.SECONDS.toMillis(15);
+	private volatile boolean shouldClose;
 	
 	public AutoManagingAsynchronousSocketInterface(MessageInterfaceFactory messageInterfaceFactory, MessageQueue messageQueue, Log log)
 	{
@@ -51,8 +53,21 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 		this.incomingMessagesRouter = new IncomingMessagesRouter();
 		
 		this.active = false;
+		this.connecting = false;
 		
 		networkingStateChangeLock = new Object();
+		
+		this.shouldClose = false;
+	}
+	
+	@Override
+	public synchronized void close()
+	{
+		if (active)
+		{
+			shouldClose = true;
+			usageGuarderThread.interrupt();
+		}
 	}
 	
 	@Override
@@ -103,14 +118,14 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 	
 	private synchronized void checkAndSpawnNetworking()
 	{
-		if (active)
+		if (active || connecting)
 		{
 			return;
 		}
 		
 		log.print("Starting networking...");
 		
-		active = true;
+		connecting = true;
 		
 		Runnable networkingInitCode = new Runnable()
 		{
@@ -135,12 +150,26 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 						receiveWorkerThread.start();
 						
 						log.print("Networking was started.");
+						
+						synchronized (AutoManagingAsynchronousSocketInterface.this)
+						{
+							active = true;
+						}
 					}
 					catch (Exception e)
 					{
+						log.print("Serious error: " + e.getMessage());
+						
 						if (seriousErrorListener != null)
 						{
 							seriousErrorListener.onSeriousError(e.getMessage());
+						}
+					}
+					finally
+					{
+						synchronized (AutoManagingAsynchronousSocketInterface.this)
+						{
+							connecting = false;
 						}
 					}
 				}
@@ -240,6 +269,8 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 				}
 				catch (InterruptedException e)
 				{
+					log.print("Sender worker interrupted.");
+					
 					return;
 				}
 				
@@ -251,10 +282,12 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 					messageInterface.sendMessage(message);
 					sendingResult = true;
 					
-					log.print("Message sended.");
+					log.print("Message " + message.getType() + " sended.");
 				}
 				catch (IOException e)
 				{
+					log.print("Sender worker problem: " + e.getMessage());
+					
 					sendingResult = false;
 				}
 
@@ -300,12 +333,14 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 					MessageType type = message.getType();
 					byte content[] = message.getContent();
 					
-					log.print("Message received.");
+					log.print("Message " + type + " received.");
 					
 					incomingMessagesRouter.receiveMessage(type, content);
 				}
 				catch (IOException e)
 				{
+					log.print("Receive worker problem: " + e.getMessage());
+					
 					if (!Thread.currentThread().isInterrupted())
 					{
 						cleanNetworking();
@@ -322,9 +357,18 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 		@Override
 		public void run()
 		{
-			while (true)
+			boolean run = true;
+			
+			while (run)
 			{
-				if (lastNetworkActivity + NETWORK_INACTIVITY_TIMEOUT < System.currentTimeMillis())
+				if (shouldClose)
+				{
+					log.print("Close request.");
+					
+					cleanNetworking();
+					return;
+				}
+				else if (lastNetworkActivity + NETWORK_INACTIVITY_TIMEOUT < System.currentTimeMillis())
 				{
 					log.print("Network is inactive for long time.");
 					
@@ -335,11 +379,17 @@ public class AutoManagingAsynchronousSocketInterface implements AsynchronousMess
 				{
 					try
 					{
-						Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+						long sleepMillis = (lastNetworkActivity + NETWORK_INACTIVITY_TIMEOUT) - System.currentTimeMillis();
+						
+						if (sleepMillis < 0)
+						{
+							sleepMillis = 0;
+						}
+						
+						Thread.sleep(sleepMillis);
 					}
 					catch (InterruptedException e)
 					{
-						return;
 					}
 				}
 			}

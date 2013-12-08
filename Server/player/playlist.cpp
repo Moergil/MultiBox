@@ -1,30 +1,34 @@
 #include "playlist.h"
 
+#include <QJsonArray>
+#include <QDebug>
+
 void Playlist::shiftPlaylist()
 {
-    if(!playlistItems->isEmpty())
+    if(!waitingItems->isEmpty())
     {
-        currentItem = playlistItems->takeFirst();
+        currentItem = waitingItems->takeFirst();
         emitCurrentItemChanged();
-        emitPlaylistChangedSignal();
+        emitWaitingListChangedSignal();
     }
     else
     {
         currentItem = NULL;
+        emit playlistIsEmpty();
     }
 }
 
 void Playlist::autoShiftPlaylist()
 {
-    if(!playlistItems->isEmpty() && currentItem == NULL)
+    if(!waitingItems->isEmpty() && currentItem == NULL)
     {
         shiftPlaylist();
     }
 }
 
-void Playlist::emitPlaylistChangedSignal()
+void Playlist::emitWaitingListChangedSignal()
 {
-    emit playlistChanged();
+    emit waitingListChanged();
 }
 
 void Playlist::emitCurrentItemChanged()
@@ -32,50 +36,66 @@ void Playlist::emitCurrentItemChanged()
     emit currentItemChanged();
 }
 
-Playlist::Playlist()
+Playlist::Playlist(QObject *parent)
+    : QObject(parent)
 {
-    this->playlistItems = new QList<PlaylistItem *>();
-    this->currentItem = NULL;
+    waitingItems = new QList<Multimedia *>();
+    currentItem = NULL;
 
-    connect(this, SIGNAL(playlistChanged()), this, SLOT(autoShiftPlaylist()));
+    connect(this, SIGNAL(waitingListChanged()), this, SLOT(autoShiftPlaylist()));
 }
 
 Playlist::~Playlist()
 {
-    delete this->playlistItems;
-    delete this->currentItem;
+    delete waitingItems;
 }
 
-void Playlist::addItem(PlaylistItem *playlistItem)
+void Playlist::addItem(Multimedia *playlistItem)
 {
-    this->playlistItems->append(playlistItem);
+    //TODO: playlist item
 
-    emitPlaylistChangedSignal();
+    qDebug() << "Adding new multimedia to playlist" << playlistItem->getName();
+
+    waitingItems->append(playlistItem);
+
+    emitWaitingListChangedSignal();
 }
 
-PlaylistItem Playlist::getCurrentItem() const
+Multimedia *Playlist::getCurrentItem() const
 {
-    return *this->currentItem;
+    return currentItem;
 }
 
-QList<PlaylistItem *> Playlist::getListOfItems() const
+QList<Multimedia *> Playlist::getListOfItems() const
 {
-    return QList<PlaylistItem *>(*this->playlistItems);
+    QList<Multimedia *> list = QList<Multimedia *>(*this->waitingItems);
+
+    if(currentItem != NULL)
+    {
+        list.push_front(currentItem);
+    }
+
+    return list;
+}
+
+PlaylistState Playlist::getPlaylistState() const
+{
+    return PlaylistState(getListOfItems());
 }
 
 void Playlist::clear()
 {
-    playlistItems->clear();
+    waitingItems->clear();
 
-    emitPlaylistChangedSignal();
+    emitWaitingListChangedSignal();
 }
 
 bool Playlist::isEmpty() const
 {
-    return playlistItems->isEmpty();
+    return count() == 0;
 }
 
 int Playlist::count() const
 {
-    return playlistItems->count();
+    return currentItem == NULL ? 0 : waitingItems->count() + 1;
 }

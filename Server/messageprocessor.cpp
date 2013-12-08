@@ -1,63 +1,45 @@
 #include "messageprocessor.h"
-#include "network/socketmessanger.h"
+#include "network/socketmessenger.h"
 
 #include <QThread>
 
 #include <message/getplayerstaterequest.h>
+#include <message/messagerecognizer.h>
 #include <message/pauserequest.h>
 #include <message/undefinedrequest.h>
 
-#include <util/bytearrayconverter.h>
+#include <network/messengerexception.h>
 
 MessageProcessor::MessageProcessor(PlayerHandler *handler, int socketDescriptor, QObject *parent)
-    : QObject(parent), handler(handler)
+    : QObject(parent)
 {
-    messanger = new SocketMessanger(socketDescriptor, this);
-}
-
-AbstractRequest *MessageProcessor::recognizeRequest(DataMessage &dataMessage)
-{
-    switch(dataMessage.getMessageType())
-    {
-    case GetPlayerState:
-        return new GetPlayerStateRequest(dataMessage, getPlayerHandler());
-
-    /* case GetPlaylist :
-        break;
-
-    case GetLibraryDirectoryContent:
-        break;
-
-    case GetLibraryItemInfo:
-        break;
-
-    case AddItemToLibrary:
-        break;
-
-    case AddItemToPlaylist:
-        break; */
-
-    case Pause:
-        return new PauseRequest(dataMessage, getPlayerHandler());
-
-    default:
-        return new UndefinedRequest(dataMessage, getPlayerHandler());
-    }
-}
-
-PlayerHandler *MessageProcessor::getPlayerHandler()
-{
-    return handler;
+    messanger = new SocketMessenger(socketDescriptor, this);
+    recognizer = new MessageRecognizer(handler, this);
 }
 
 void MessageProcessor::proccess()
 {
-    while(messanger->canWaitForMessage())
-    {
-        DataMessage dataMessage = messanger->waitForMessage();
+    qDebug() << "New client connected.";
 
-        AbstractRequest *request = recognizeRequest(dataMessage);
-        request->getRunnable()->run();
+    try
+    {
+        while(messanger->canWaitForMessage())
+        {
+            DataMessage dataMessage = messanger->waitForMessage();
+
+            AbstractRequest *request = recognizer->recognizeMessage(dataMessage);
+            request->execute();
+
+            if(request->canResponse())
+            {
+                AbstractResponse *response = request->getResponse();
+                messanger->writeMessage(response->toDataMessage());
+            }
+        }
+    }
+    catch(MessengerException &exception)
+    {
+        qDebug() << exception.getMessage() << "Closing connection...";
     }
 
     messanger->close();

@@ -4,14 +4,18 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 
 import sk.hackcraft.netinterface.message.transformer.DataTransformer;
 import sk.hackcraft.util.MessageQueue;
 
 public abstract class DataStringMessageReceiver<R> implements MessageReceiver
 {
-	private static final Charset ENCODING = StandardCharsets.UTF_8;
+	private static final Charset ENCODING;
+	
+	static
+	{
+		ENCODING = Charset.forName("UTF-8");
+	}
 
 	private final MessageQueue messageQueue;
 	

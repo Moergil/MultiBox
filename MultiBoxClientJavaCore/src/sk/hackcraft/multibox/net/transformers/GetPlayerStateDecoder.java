@@ -1,26 +1,38 @@
 package sk.hackcraft.multibox.net.transformers;
 
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.data.GetPlayerStateResultData;
+import sk.hackcraft.multibox.util.JsonConstants;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class GetPlayerStateDecoder extends JacksonMessageDecoder<GetPlayerStateResultData>
 {
 	@Override
-	public GetPlayerStateResultData decodeJson(ObjectMapper objectMapper, String dataString) throws Exception
+	public GetPlayerStateResultData decodeJson(ObjectMapper objectMapper, String jsonString) throws Exception
 	{
-		JsonNode rootNode = objectMapper.readTree(dataString);
-		
-		String multimediaJsonString = rootNode.path("multimedia").toString();
-				
-		Multimedia.Builder multimediaBuilder = objectMapper.readValue(multimediaJsonString, Multimedia.Builder.class);
-		Multimedia multimedia = multimediaBuilder.create();
-		
-		int playbackPosition = rootNode.path("playbackPosition").asInt();
-		boolean playing = rootNode.path("playing").asBoolean();
-		
-		return new GetPlayerStateResultData(multimedia, playbackPosition, playing);
+		JsonNode rootNode = objectMapper.readTree(jsonString);
+
+		if (rootNode.get("multimedia").asText().equals(JsonConstants.NULL))
+		{
+			return new GetPlayerStateResultData(null, 0, false);
+		}
+		else
+		{
+			ObjectNode multimediaObjectNode = (ObjectNode)rootNode.path("multimedia");
+			
+			long id = multimediaObjectNode.path("id").asLong();
+			String name = multimediaObjectNode.path("name").asText();
+			int length = multimediaObjectNode.path("length").asInt();
+			
+			MultimediaItem multimedia = new MultimediaItem(id, name, length);
+			
+			int playbackPosition = rootNode.path("playbackPosition").asInt();
+			boolean playing = rootNode.path("playing").asBoolean();
+			
+			return new GetPlayerStateResultData(multimedia, playbackPosition, playing);
+		}
 	}
 }

@@ -2,6 +2,8 @@ package sk.hackcraft.multibox.model;
 
 import java.util.List;
 
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
+
 public interface Playlist
 {
 	public void init();
@@ -10,12 +12,12 @@ public interface Playlist
 	public void registerListener(PlaylistEventListener listener);
 	public void unregisterListener(PlaylistEventListener listener);
 	
-	public List<Multimedia> getItems();
+	public List<MultimediaItem> getItems();
 	public void addItem(long itemId);
 	
 	public interface PlaylistEventListener
 	{
-		public void onPlaylistChanged(List<Multimedia> newPlaylist);
-		public void onItemAdded(boolean success, Multimedia multimedia);
+		public void onPlaylistChanged(List<MultimediaItem> newPlaylist);
+		public void onItemAdded(boolean success, MultimediaItem multimedia);
 	}
 }

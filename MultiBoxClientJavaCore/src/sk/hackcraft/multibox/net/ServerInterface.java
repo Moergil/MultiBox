@@ -3,12 +3,16 @@ package sk.hackcraft.multibox.net;
 import java.util.List;
 
 import sk.hackcraft.multibox.model.LibraryItem;
-import sk.hackcraft.multibox.model.Multimedia;
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 
 public interface ServerInterface
 {
+	public void close();
+	
 	public void registerEventListener(ServerInterfaceEventListener listener);
 	public void unregisterEventListener(ServerInterfaceEventListener listener);
+	
+	public void requestServerInfo();
 	
 	public void requestPlayerUpdate();
 	public void requestPlaylistUpdate();
@@ -20,14 +24,14 @@ public interface ServerInterface
 	{
 		public void onDisconnect();
 		
-		public void onAuthentificationResponse(boolean succesfull);
+		public void onServerInfoReceived(String serverName);
 		
-		public void onPlayerUpdateReceived(Multimedia multimedia, int playbackPosition, boolean playing);
-		public void onPlaylistReceived(List<Multimedia> playlist);
+		public void onPlayerUpdateReceived(MultimediaItem multimedia, int playbackPosition, boolean playing);
+		public void onPlaylistReceived(List<MultimediaItem> playlist);
 		
 		public void onLibraryItemReceived(LibraryItem item);
 		
-		public void onAddingLibraryItemToPlaylistResult(boolean result, Multimedia multimedia);
+		public void onAddingLibraryItemToPlaylistResult(boolean result, MultimediaItem multimedia);
 	}
 	
 	public class ServerInterfaceEventAdapter implements ServerInterfaceEventListener
@@ -36,19 +40,19 @@ public interface ServerInterface
 		public void onDisconnect()
 		{
 		}
-
+		
 		@Override
-		public void onAuthentificationResponse(boolean succesfull)
+		public void onServerInfoReceived(String serverName)
 		{
 		}
 
 		@Override
-		public void onPlayerUpdateReceived(Multimedia multimedia, int playbackPosition, boolean playing)
+		public void onPlayerUpdateReceived(MultimediaItem multimedia, int playbackPosition, boolean playing)
 		{
 		}
 
 		@Override
-		public void onPlaylistReceived(List<Multimedia> playlist)
+		public void onPlaylistReceived(List<MultimediaItem> playlist)
 		{
 		}
 
@@ -58,7 +62,7 @@ public interface ServerInterface
 		}
 
 		@Override
-		public void onAddingLibraryItemToPlaylistResult(boolean result, Multimedia multimedia)
+		public void onAddingLibraryItemToPlaylistResult(boolean result, MultimediaItem multimedia)
 		{
 		}
 	}

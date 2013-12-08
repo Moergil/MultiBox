@@ -10,7 +10,8 @@ public enum MessageTypes implements MessageType
 	GET_PLAYER_STATE(1),
 	GET_PLAYLIST(2),
 	GET_LIBRARY_ITEM(3),
-	ADD_LIBRARY_ITEM_TO_PLAYLIST(4);
+	ADD_LIBRARY_ITEM_TO_PLAYLIST(4),
+	GET_SERVER_INFO(5);
 
 	private static Map<Integer, MessageTypes> convertMap;
 	
@@ -35,6 +36,12 @@ public enum MessageTypes implements MessageType
 	public int toTypeId()
 	{
 		return id;
+	}
+	
+	@Override
+	public String toString()
+	{
+		return name();
 	}
 	
 	public class MessageParser implements Parser<MessageTypes>

@@ -7,15 +7,8 @@ class UndefinedRequest : public AbstractRequest
     Q_OBJECT
 
 public:
-    class Runnable : public RequestRunnable
-    {
-    public:
-        Runnable(AbstractRequest *request);
-        void run();
-    };
+    UndefinedRequest(const DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
 
-public:
-    UndefinedRequest(DataMessage &dataMessage, PlayerHandler *handler, QObject *parent = 0);
-
-    RequestRunnable *getRunnable();
+    bool canResponse() const;
+    void execute();
 };

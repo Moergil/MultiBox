@@ -1,20 +1,19 @@
 #pragma once
 
 #include <QTcpServer>
-#include <QStringList>
 
 #include <player/player.h>
 
 class Server : public QTcpServer
 {
-    Q_OBJECT
+        Q_OBJECT
 
-private:
-    Player *player;
+    private:
+        Player *player;
 
-public:
-    Server(Player *player, QObject *parent = 0);
+    public:
+        Server(Player *player, QObject *parent = 0);
 
-protected:
-    void incomingConnection(qintptr socketDescriptor);
+    protected:
+        void incomingConnection(qintptr socketDescriptor);
 };

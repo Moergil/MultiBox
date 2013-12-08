@@ -1,10 +1,30 @@
-#ifndef LIBRARY_H
-#define LIBRARY_H
+#include <player/entity/libraryitem.h>
 
-class Library
+#include <player/library/librarydbmanager.h>
+
+#include <QDir>
+#include <QList>
+
+#pragma once
+
+class Library : public QObject
 {
-public:
-    Library();
-};
+        Q_OBJECT
 
-#endif // LIBRARY_H
+    private:
+        LibraryDbManager *dbManager;
+
+    public:
+        Library(QObject *parent = 0);
+        ~Library();
+
+        void setListOfLibraries(QStringList libraries);
+
+    public slots:
+        LibraryItem *readById(qint64 itemId);
+        QList<LibraryItem *> *readAll();
+        bool write(LibraryWritableInterface &item);
+        bool exists(LibraryWritableInterface &item);
+        void remove(LibraryItem *item);
+        LibraryItem *readRootDir();
+};

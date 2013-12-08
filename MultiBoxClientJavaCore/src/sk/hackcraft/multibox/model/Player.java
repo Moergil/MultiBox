@@ -1,5 +1,7 @@
 package sk.hackcraft.multibox.model;
 
+import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
+
 public interface Player
 {
 	public void init();
@@ -9,18 +11,16 @@ public interface Player
 	public boolean hasActiveMultimedia();
 	
 	public int getPlaybackPosition();
-	public Multimedia getActiveMultimedia();
+	public MultimediaItem getActiveMultimedia();
 
 	public void requestPlayingStateChange(boolean playing);
 	public void requestActiveMultimediaSkip();
 	
 	public void registerPlayerEventListener(PlayerEventListener listener);
-	public void unregisterPlayerEventListener(PlayerEventListener listener);
+	public void unregisterListener(PlayerEventListener listener);
 	
 	public interface PlayerEventListener
 	{
-		public void onPlayingStateChanged(boolean playing);
-		public void onPlaybackPositionChanged(int newPosition);
-		public void onMultimediaChanged(Multimedia newMultimedia);
+		public void update(MultimediaItem multimedia, int playbackPosition, boolean playing);
 	}
 }

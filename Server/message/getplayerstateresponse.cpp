@@ -1,23 +1,41 @@
 #include "getplayerstateresponse.h"
-#include "util/bytearrayconverter.h"
-
+#include "messagerecognizer.h"
 #include <util/messagecontentwriter.h>
 
-GetPlayerStateResponse::GetPlayerStateResponse( QJsonDocument multimedia,
+GetPlayerStateResponse::GetPlayerStateResponse(Multimedia multimedia,
                                                 qint32 playbackPosition,
-                                                bool playing,
+                                                bool playing, qint32 duration,
                                                 QObject *parent)
     : AbstractResponse(parent), multimedia(multimedia),
-      playbackPosition(playbackPosition), playing(playing)
+      playbackPosition(playbackPosition), playing(playing), duration(duration)
 {
 }
 
-DataContent GetPlayerStateResponse::toDataContent()
+DataContent GetPlayerStateResponse::toDataContent() const
 {
-    MessageContentWriter writer;
-    writer.write(multimedia);
-    writer.write(playbackPosition);
-    writer.write(playing);
+    QJsonObject object;
 
+    if(playing)
+    {
+        object.insert("playbackPosition", playbackPosition);
+        object.insert("playing", playing);
+
+        QJsonObject multimediaObject = multimedia.toQJsonObject();
+        multimediaObject.insert("length", duration);
+
+        object.insert("multimedia", multimediaObject);
+    }
+    else
+    {
+        object.insert("multimedia", QString("null"));
+    }
+
+    MessageContentWriter writer;
+    writer.write(object);
     return writer.toDataContent();
+}
+
+qint32 GetPlayerStateResponse::getMessageCode() const
+{
+    return MessageRecognizer::GetPlayerState;
 }

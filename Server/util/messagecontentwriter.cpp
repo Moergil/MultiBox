@@ -23,9 +23,9 @@ void MessageContentWriter::write(QString qString)
     byteArray.append(rawArray);
 }
 
-void MessageContentWriter::write(QJsonDocument qJsonDocument)
+void MessageContentWriter::write(QJsonObject qJsonObject)
 {
-    QByteArray rawArray = ByteArrayConverter::fromQJsonDocument(qJsonDocument);
+    QByteArray rawArray = ByteArrayConverter::fromQJsonObject(qJsonObject);
     byteArray.append(ByteArrayConverter::fromQInt32(rawArray.length()));
     byteArray.append(rawArray);
 }

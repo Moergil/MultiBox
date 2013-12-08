@@ -2,9 +2,11 @@
 
 #include <QDataStream>
 
-#include <network/socketmessanger.h>
+#include <network/socketmessenger.h>
 
 #include <util/bytearrayconverter.h>
+#include <util/messagecontentreader.h>
+#include <util/messagecontentwriter.h>
 
 Client::Client(QObject *parent) :
     QThread(parent)
@@ -14,49 +16,118 @@ Client::Client(QObject *parent) :
 
 void Client::run()
 {
-    /*forever
-    {
-        QTcpSocket socket;
-
-        socket.connectToHost("localhost", 13110);
-
-
-        if(socket.waitForConnected())
-        {
-            qDebug() << "sending";
-
-            while (socket.waitForReadyRead())
-            {
-                QByteArray array = socket.readAll();
-                socket.write(array.constData(), array.length());
-
-                qDebug() << socket.bytesToWrite();
-                socket.flush();
-
-                socket.waitForBytesWritten();
-            }
-        }
-
-        qDebug() << "closing";
-        socket.close();
-
-        QThread::sleep(2);
-    }*/
-
     QObject object;
+
     QThread::sleep(2);
 
-    SocketMessanger *messanger = new SocketMessanger("localhost", 13110, &object);
+    messenger = new SocketMessenger("localhost", 13110, &object);
 
+    try
+    {
+        //pauseTest();
+
+        //playerStateTest();
+
+        //playlistTest();
+
+        /*for(int i=0; i<5; i++)
+        {
+            getLibraryItemTest(i);
+        }*/
+
+        /*playlistTest();
+        addMultimediaToLibrary(759);
+        addMultimediaToLibrary(760);
+        addMultimediaToLibrary(761);
+        addMultimediaToLibrary(762);
+        addMultimediaToLibrary(763);
+        addMultimediaToLibrary(764);
+        playlistTest();*/
+
+        //Thread::sleep(4);
+
+        //playerStateTest();
+
+        //getPlayerInfoTest();
+    }
+    catch(MessengerException &exception)
+    {
+        qDebug() << exception.getMessage() << "Closing connection to server...";
+    }
+
+
+    messenger->close();
+}
+
+void Client::pauseTest()
+{
     DataContent pauseContent(ByteArrayConverter::fromBool(false));
     DataMessage pauseMessage(7, pauseContent);
-    messanger->writeMessage(pauseMessage);
+    messenger->writeMessage(pauseMessage);
 
     QThread::sleep(2);
 
     DataContent pauseContent2(ByteArrayConverter::fromBool(true));
     DataMessage pauseMessage2(7, pauseContent2);
-    messanger->writeMessage(pauseMessage2);
+    messenger->writeMessage(pauseMessage2);
+}
 
-    messanger->close();
+void Client::playerStateTest()
+{
+    messenger->writeMessage(DataMessage(1));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQJsonObject();
+}
+
+void Client::playlistTest()
+{
+    messenger->writeMessage(DataMessage(2));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQJsonObject();
+}
+
+void Client::getLibraryItemTest(qint64 number)
+{
+    MessageContentWriter writer;
+    QVariantMap map;
+    map["itemId"] = number;
+    writer.write(QJsonObject::fromVariantMap(map));
+
+    messenger->writeMessage(DataMessage(3, writer.toDataContent()));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQJsonObject();
+}
+
+void Client::addMultimediaToLibrary(qint64 number)
+{
+    MessageContentWriter writer;
+    QVariantMap map;
+    map["multimediaId"] = number;
+    writer.write(QJsonObject::fromVariantMap(map));
+
+    messenger->writeMessage(DataMessage(4, writer.toDataContent()));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQJsonObject();
+}
+
+void Client::getPlayerInfoTest()
+{
+    messenger->writeMessage(DataMessage(5));
+    DataMessage message = messenger->waitForMessage();
+
+    MessageContentReader reader(message.getDataContent());
+
+    qDebug() << reader.readQJsonObject();
 }
