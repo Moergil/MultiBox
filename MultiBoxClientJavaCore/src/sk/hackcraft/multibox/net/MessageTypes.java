@@ -38,6 +38,12 @@ public enum MessageTypes implements MessageType
 		return id;
 	}
 	
+	@Override
+	public String toString()
+	{
+		return name();
+	}
+	
 	public class MessageParser implements Parser<MessageTypes>
 	{
 		@Override

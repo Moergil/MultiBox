@@ -41,7 +41,7 @@ public class NetworkServerInterface implements ServerInterface
 		
 		messageInterface.setSeriousErrorListener(new NetworkSeriousErrorListener());
 		
-		this.serverListeners = new LinkedList<ServerInterface.ServerInterfaceEventListener>();
+		this.serverListeners = new LinkedList<ServerInterfaceEventListener>();
 
 		messageInterface.setMessageReceiver(MessageTypes.GET_PLAYER_STATE, new GetPlayerStateReceiver(messageQueue));
 		messageInterface.setMessageReceiver(MessageTypes.GET_PLAYLIST, new GetPlaylistReceiver(messageQueue));
@@ -261,7 +261,8 @@ public class NetworkServerInterface implements ServerInterface
 		{
 			final String serverName = result.getServerName();
 			
-			for (ServerInterfaceEventListener listener : serverListeners)
+			List<ServerInterfaceEventListener> listenersCopy = new LinkedList<ServerInterfaceEventListener>(serverListeners);
+			for (ServerInterfaceEventListener listener : listenersCopy)
 			{
 				listener.onServerInfoReceived(serverName);
 			}

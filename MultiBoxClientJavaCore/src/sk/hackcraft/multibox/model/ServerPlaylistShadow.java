@@ -8,6 +8,7 @@ import sk.hackcraft.multibox.model.libraryitems.MultimediaItem;
 import sk.hackcraft.multibox.net.ServerInterface;
 import sk.hackcraft.multibox.net.ServerInterface.ServerInterfaceEventAdapter;
 import sk.hackcraft.util.MessageQueue;
+import sk.hackcraft.util.PeriodicWorkDispatcher;
 
 public class ServerPlaylistShadow implements Playlist
 {
@@ -16,9 +17,11 @@ public class ServerPlaylistShadow implements Playlist
 	
 	private List<MultimediaItem> actualPlaylist;
 	
-	private List<Playlist.PlaylistEventListener> playlistListeners;
+	private final List<Playlist.PlaylistEventListener> playlistListeners;
 	
-	private ServerListener serverListener;
+	private final ServerListener serverListener;
+	
+	private final PeriodicWorkDispatcher stateChecker;
 	
 	public ServerPlaylistShadow(ServerInterface serverInterface, MessageQueue messageQueue)
 	{
@@ -30,6 +33,15 @@ public class ServerPlaylistShadow implements Playlist
 		serverListener = new ServerListener();
 		
 		actualPlaylist = new LinkedList<MultimediaItem>();
+		
+		stateChecker = new PeriodicWorkDispatcher(messageQueue, 5000)
+		{
+			@Override
+			protected void doWork()
+			{
+				ServerPlaylistShadow.this.serverInterface.requestPlaylistUpdate();
+			}
+		};
 	}
 	
 	@Override
@@ -37,12 +49,16 @@ public class ServerPlaylistShadow implements Playlist
 	{
 		serverInterface.registerEventListener(serverListener);
 		serverInterface.requestPlaylistUpdate();
+		
+		stateChecker.start();
 	}
 
 	@Override
 	public void close()
 	{
 		serverInterface.unregisterEventListener(serverListener);
+		
+		stateChecker.stop();
 	}
 	
 	@Override

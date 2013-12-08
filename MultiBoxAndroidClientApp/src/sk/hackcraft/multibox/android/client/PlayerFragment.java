@@ -25,7 +25,6 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 public class PlayerFragment extends Fragment
 {
@@ -97,7 +96,7 @@ public class PlayerFragment extends Fragment
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id)
 			{
-				Toast.makeText(getActivity(), "clicked " + position, Toast.LENGTH_SHORT).show();
+				// TODO
 			}
 		});
 		
@@ -223,7 +222,7 @@ public class PlayerFragment extends Fragment
 		int estimatedTime = length - (int)TimeUnit.MILLISECONDS.toSeconds(playbackPositionMillis);
 		int seconds = (int)(estimatedTime % 60);
 		int minutes = (int)(estimatedTime / 60);
-		timeView.setText(String.format("%d:%d", minutes, seconds));
+		timeView.setText(String.format("%02d:%02d", minutes, seconds));
 
 		progressView.setProgress((int)playbackPositionMillis);
 	}
