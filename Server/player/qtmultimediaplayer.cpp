@@ -50,6 +50,8 @@ void QtMultimediaPlayer::playNext()
     Multimedia *item = getPlaylist()->getCurrentItem();
     qMediaPlayer->setMedia(item->getQUrl());
 
+    qDebug() << "Playing" << item->getName();
+
     setPlaying(true);
 }
 
