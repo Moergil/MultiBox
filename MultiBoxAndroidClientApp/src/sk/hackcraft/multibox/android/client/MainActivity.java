@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.android.client.util.ActivityTransitionAnimator;
 import sk.hackcraft.multibox.model.Server;
 import android.app.ActionBar;

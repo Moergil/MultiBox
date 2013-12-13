@@ -75,6 +75,11 @@ public class MultiBoxApplication extends Application
 	
 	public void destroyServerConnection()
 	{
+		if (serverInterface == null)
+		{
+			return;
+		}
+		
 		serverInterface.close();
 		serverInterface = null;
 		

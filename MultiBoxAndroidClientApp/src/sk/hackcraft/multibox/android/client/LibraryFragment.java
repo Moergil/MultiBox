@@ -3,7 +3,6 @@ package sk.hackcraft.multibox.android.client;
 import java.util.List;
 import java.util.Stack;
 
-import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.model.Library;
 import sk.hackcraft.multibox.model.LibraryItem;
 import sk.hackcraft.multibox.model.LibraryItemType;
@@ -92,7 +91,7 @@ public class LibraryFragment extends Fragment implements BackPressedListener
 			for (Long id : historyEntries)
 			{
 				history.push(id);
-			}			
+			}
 		}
 		else
 		{
@@ -227,10 +226,18 @@ public class LibraryFragment extends Fragment implements BackPressedListener
 	public void requestDirectory(long id)
 	{
 		library.requestItem(id);
+		
+		contentAdapter.clear();
+		contentAdapter.notifyDataSetChanged();
 	}
 
 	private void setDirectory(DirectoryItem directory)
 	{
+		if (directory.getId() != history.peek())
+		{
+			return;
+		}
+		
 		contentAdapter.clear();
 		
 		List<LibraryItem> items = directory.getItems();
@@ -262,7 +269,7 @@ public class LibraryFragment extends Fragment implements BackPressedListener
 			String name;
 			if (libraryItem.getType() == LibraryItemType.DIRECTORY)
 			{
-				name = "[Dir] " + libraryItem.getName();
+				name = "[DIR] " + libraryItem.getName();
 			}
 			else
 			{

@@ -17,6 +17,12 @@ public class Event<D>
 		}
 	}
 	
+	public static interface Data2
+	{
+		public int getX();
+		public String getName();
+	}
+	
 	public static void main(String[] args)
 	{
 		Event<Data> event = new Event<Data>();
@@ -40,6 +46,31 @@ public class Event<D>
 		});
 		
 		event.fire(new Data(5, "hups"));
+		
+		Event<Data2> event2 = new Event<Data2>();
+		event2.addListener(new Listener<Event.Data2>()
+		{
+			@Override
+			public void onEvent(Data2 data)
+			{
+				System.out.println(data.getX());
+			}
+		});
+		
+		event2.fire(new Data2()
+		{
+			@Override
+			public int getX()
+			{
+				return 3;
+			}
+			
+			@Override
+			public String getName()
+			{
+				return "huhu";
+			}
+		});
 	}
 	
 	private List<Listener<D>> listeners;

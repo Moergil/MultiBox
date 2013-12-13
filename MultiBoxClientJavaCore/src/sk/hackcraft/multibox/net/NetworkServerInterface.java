@@ -126,7 +126,8 @@ public class NetworkServerInterface implements ServerInterface
 		@Override
 		public void onSeriousError(String errorDescription)
 		{
-			for (final ServerInterface.ServerInterfaceEventListener listener : serverListeners)
+			List<ServerInterfaceEventListener> listenersCopy = new LinkedList<ServerInterfaceEventListener>(serverListeners);
+			for (final ServerInterface.ServerInterfaceEventListener listener : listenersCopy)
 			{
 				messageQueue.post(new Runnable()
 				{

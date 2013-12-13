@@ -2,7 +2,6 @@ package sk.hackcraft.multibox.android.client;
 
 import java.util.List;
 
-import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.android.client.util.ActivityTransitionAnimator;
 import sk.hackcraft.multibox.model.Server;
 import sk.hackcraft.multibox.util.SelectedServersStorage;
@@ -131,6 +130,14 @@ public class ServerSelectActivity extends Activity
 	}
 	
 	@Override
+	protected void onRestart()
+	{
+		super.onRestart();
+		
+		serverAddressInputField.setText("");
+	}
+	
+	@Override
 	public void onUserInteraction()
 	{
 		super.onUserInteraction();
@@ -187,8 +194,6 @@ public class ServerSelectActivity extends Activity
 	{
 		String address = serverAddressInputField.getText().toString();
 		connectToServer(address);
-		
-		serverAddressInputField.setText("");
 	}
 	
 	private void onServerSelected(String address)

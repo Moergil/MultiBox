@@ -60,7 +60,7 @@
 		
 					<EditText
 						android:id="@+id/server_address_input_field"
-						android:inputType="text"
+						android:inputType="textUri"
 						android:imeOptions="actionGo"
 						android:hint="@string/hint_server_address"
 						android:layout_width="wrap_content"

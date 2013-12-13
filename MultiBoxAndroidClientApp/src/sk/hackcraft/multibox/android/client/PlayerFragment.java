@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import sk.hackcraft.multibox.R;
 import sk.hackcraft.multibox.model.Player;
 import sk.hackcraft.multibox.model.Playlist;
 import sk.hackcraft.multibox.model.Server;
