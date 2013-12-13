@@ -24,31 +24,31 @@ void Client::run()
 
     try
     {
-        //pauseTest();
+        pauseTest();
 
-        //playerStateTest();
+        playerStateTest();
 
-        //playlistTest();
+        playlistTest();
 
-        /*for(int i=0; i<5; i++)
+        for(int i=0; i<5; i++)
         {
             getLibraryItemTest(i);
-        }*/
+        }
 
-        /*playlistTest();
+        playlistTest();
         addMultimediaToLibrary(759);
         addMultimediaToLibrary(760);
         addMultimediaToLibrary(761);
         addMultimediaToLibrary(762);
         addMultimediaToLibrary(763);
         addMultimediaToLibrary(764);
-        playlistTest();*/
+        playlistTest();
 
-        //Thread::sleep(4);
+        Thread::sleep(4);
 
-        //playerStateTest();
+        playerStateTest();
 
-        //getPlayerInfoTest();
+        getPlayerInfoTest();
     }
     catch(MessengerException &exception)
     {
